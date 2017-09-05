@@ -1,3 +1,3 @@
-module Schemeson
+# frozen_string_literal: true
 
-end
+class Schemeson; end
