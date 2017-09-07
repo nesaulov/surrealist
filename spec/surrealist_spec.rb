@@ -28,7 +28,7 @@ class Baz
   def right; true; end
 end
 
-class Foo
+class WrongTypes
   include Surrealist
 
   schema do
@@ -38,7 +38,7 @@ class Foo
   def foo; 'string'; end
 end
 
-class Wrong
+class WithoutSchema
   include Surrealist
   def foo; 4; end
 
@@ -84,6 +84,16 @@ class WithAttrReaders
   end
 end
 
+class WithNil
+  include Surrealist
+
+  schema do
+    { foo: NilClass }
+  end
+
+  def foo; end
+end
+
 RSpec.describe 'Surrealist' do
   context 'with defined schema' do
     context 'with correct types' do
@@ -98,8 +108,9 @@ RSpec.describe 'Surrealist' do
 
     context 'with wrong types' do
       it 'raises TypeError' do
-        expect { Foo.new.surrealize }
-          .to raise_error(TypeError, 'Wrong type for key `foo`. Expected Integer, got String.')
+        expect { WrongTypes.new.surrealize }
+          .to raise_error(Surrealist::InvalidTypeError,
+                          'Wrong type for key `foo`. Expected Integer, got String.')
       end
     end
 
@@ -114,11 +125,17 @@ RSpec.describe 'Surrealist' do
         expect(JSON.parse(WithAttrReaders.new.surrealize)).to eq('foo' => 'foo', 'bar' => [1, 2])
       end
     end
+
+    context 'with NilClass' do
+      it 'works' do
+        expect(JSON.parse(WithNil.new.surrealize)).to eq('foo' => nil)
+      end
+    end
   end
 
   context 'with undefined schema' do
     it 'raises error on #surrealize' do
-      expect { Wrong.new.surrealize }
+      expect { WithoutSchema.new.surrealize }
         .to raise_error(Surrealist::UnknownSchemaError, "Can't serialize Wrong - no schema was provided.")
     end
   end

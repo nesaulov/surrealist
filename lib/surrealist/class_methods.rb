@@ -2,7 +2,6 @@
 
 require_relative 'builder'
 require_relative 'schema_definer'
-require 'pry'
 
 module Surrealist
   # Class methods that are extended by the object.
