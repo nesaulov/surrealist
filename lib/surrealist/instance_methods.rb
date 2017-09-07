@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module Schemeson
+module Surrealist
   module InstanceMethods
-    def serialize
-      Schemeson.serialize(self)
+    def surrealize
+      Surrealist.surrealize(self)
     end
   end
 end
