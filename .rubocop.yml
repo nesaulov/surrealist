@@ -9,3 +9,5 @@ Style/StringLiterals:
   ConsistentQuotesInMultiline: true
 Metrics/LineLength:
   Max: 106
+Style/SingleLineMethods:
+  Enabled: false
