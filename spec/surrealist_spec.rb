@@ -136,7 +136,8 @@ RSpec.describe 'Surrealist' do
   context 'with undefined schema' do
     it 'raises error on #surrealize' do
       expect { WithoutSchema.new.surrealize }
-        .to raise_error(Surrealist::UnknownSchemaError, "Can't serialize Wrong - no schema was provided.")
+        .to raise_error(Surrealist::UnknownSchemaError,
+                        "Can't serialize WithoutSchema - no schema was provided.")
     end
   end
 end
