@@ -47,6 +47,43 @@ class Wrong
   def baz; 1; end
 end
 
+class Parent
+  private def foo
+    'foo'
+  end
+end
+
+class Child < Parent
+  include Surrealist
+
+  schema do
+    {
+      foo: String,
+      bar: Array,
+    }
+  end
+
+  def bar; [1, 2]; end
+end
+
+class WithAttrReaders
+  include Surrealist
+
+  attr_reader :foo, :bar
+
+  schema do
+    {
+      foo: String,
+      bar: Array,
+    }
+  end
+
+  def initialize
+    @foo = 'foo'
+    @bar = [1, 2]
+  end
+end
+
 RSpec.describe 'Surrealist' do
   context 'with defined schema' do
     context 'with correct types' do
@@ -63,6 +100,18 @@ RSpec.describe 'Surrealist' do
       it 'raises TypeError' do
         expect { Foo.new.surrealize }
           .to raise_error(TypeError, 'Wrong type for key `foo`. Expected Integer, got String.')
+      end
+    end
+
+    context 'with inheritance' do
+      it 'works' do
+        expect(JSON.parse(Child.new.surrealize)).to eq('foo' => 'foo', 'bar' => [1, 2])
+      end
+    end
+
+    context 'with attr_readers' do
+      it 'works' do
+        expect(JSON.parse(WithAttrReaders.new.surrealize)).to eq('foo' => 'foo', 'bar' => [1, 2])
       end
     end
   end
