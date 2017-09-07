@@ -3,7 +3,6 @@
 require_relative 'surrealist/class_methods'
 require_relative 'surrealist/instance_methods'
 require_relative 'surrealist/extensions/boolean'
-
 require 'multi_json'
 
 module Surrealist
@@ -12,6 +11,9 @@ module Surrealist
 
   # Error class for classes with #schema defined not as a hash
   class InvalidSchemaError < RuntimeError; end
+
+  # Error class for NoMethodError
+  class UndefinedMethodError < RuntimeError; end
 
   class << self
     def included(base)

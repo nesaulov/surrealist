@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'pry'
 require_relative '../lib/surrealist'
 
 class Person; include Surrealist; end

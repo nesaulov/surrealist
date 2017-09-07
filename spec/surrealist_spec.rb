@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'pry'
 require 'json'
 require_relative '../lib/surrealist'
 
@@ -63,7 +62,7 @@ RSpec.describe 'Surrealist' do
     context 'with wrong types' do
       it 'raises TypeError' do
         expect { Foo.new.surrealize }
-          .to raise_error(TypeError, 'Wrong type for key `foo`. Expected Integer, got String')
+          .to raise_error(TypeError, 'Wrong type for key `foo`. Expected Integer, got String.')
       end
     end
   end
