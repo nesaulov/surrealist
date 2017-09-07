@@ -82,6 +82,40 @@ Person.find_by(email: 'example@email.com').surrealize
 # => "{\"foo\":\"Some string\",\"name\":\"John Doe\",\"nested\":{\"at\":{\"any\":42,\"level\":true}}}"
 ```
 
+### Type Errors
+`Surrealist::InvalidTypeError` is thrown if types mismatch.
+
+``` ruby
+class CreditCard
+  include Surrealist
+
+  schema do
+    { number: Integer }
+  end
+
+  def number; 'string'; end
+end
+
+CreditCard.new.surrealize
+# => Surrealist::InvalidTypeError: Wrong type for key `number`. Expected Integer, got String.
+```
+
+### Undefined methods in schema
+`Surrealist::UndefinedMethodError` is thrown if a key defined in the schema does not have
+a corresponding method defined in the object.
+``` ruby
+class Car
+  include Surrealist
+
+  schema do
+    { weight: Integer }
+  end
+end
+
+Car.new.surrealize
+# => Surrealist::UndefinedMethodError: undefined method `weight' for #<Car:0x007f9bc1dc7fa8>. You have probably defined a key in the schema that doesn't have a corresponding method.
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/nesaulov/surrealist.
