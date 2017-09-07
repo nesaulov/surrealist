@@ -9,7 +9,7 @@ module Surrealist
   module ClassMethods
     # A DSL method to define schema in a declarative style. Schema should be defined with a block
     # that contains a hash.
-    # Every key the schema should be either a name of a method of the
+    # Every key of the schema should be either a name of a method of the
     # surrealizable object (or it's parents/mixins), or - in case value is a hash - a symbol:
     # to build nested JSON structures. Every value of the hash should be a constant that represents
     # a Ruby class, that will be used for type-checks.

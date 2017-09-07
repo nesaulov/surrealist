@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'bundler/setup'
-require 'schemeson'
+require 'surrealist'
 require 'pry'
 
 Pry.start

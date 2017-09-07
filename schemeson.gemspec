@@ -10,9 +10,12 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Nikita Esaulov']
   spec.email         = ['billikota@gmail.com']
 
-  spec.summary       = ''
-  spec.description   = ''
-  spec.homepage      = ''
+  spec.summary       = 'A gem that provides DSL for serialization of plain old Ruby objects to JSON ' \
+                       'in a declarative style.'
+  spec.description   = 'A gem that provides DSL for serialization of plain old Ruby objects to JSON ' \
+                       'in a declarative style by defining a `schema`. ' \
+                       'It also provides a trivial type checking in the runtime before serialization.'
+  spec.homepage      = 'https://github.com/nesaulov/surrealist'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
@@ -26,5 +29,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.6.0'
   spec.add_development_dependency 'rubocop-config-umbrellio'
 
-  spec.add_runtime_dependency 'multi_json', '~> 1.12'
+  spec.add_runtime_dependency 'multi_json', '~> 1.0'
 end
