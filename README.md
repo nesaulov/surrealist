@@ -1,5 +1,5 @@
 # Surrealist
-[![Build Status](https://travis-ci.com/nesaulov/surrealist.svg?token=UM7SJoXQ7Y56NHBpib7v&branch=master)](https://travis-ci.com/nesaulov/surrealist)
+[![Build Status](https://travis-ci.org/nesaulov/surrealist.svg?branch=master)](https://travis-ci.org/nesaulov/surrealist)
 [![Coverage Status](https://coveralls.io/repos/github/nesaulov/surrealist/badge.svg?branch=master)](https://coveralls.io/github/nesaulov/surrealist?branch=master)
 
 A gem that provides DSL for serialization of plain old Ruby objects to JSON in a declarative style
