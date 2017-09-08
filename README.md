@@ -1,14 +1,17 @@
 # Surrealist
 [![Build Status](https://travis-ci.org/nesaulov/surrealist.svg?branch=master)](https://travis-ci.org/nesaulov/surrealist)
 [![Coverage Status](https://coveralls.io/repos/github/nesaulov/surrealist/badge.svg?branch=master)](https://coveralls.io/github/nesaulov/surrealist?branch=master)
+[![Inline docs](http://inch-ci.org/github/nesaulov/surrealist.svg?branch=master)](http://inch-ci.org/github/nesaulov/surrealist)
 
 A gem that provides DSL for serialization of plain old Ruby objects to JSON in a declarative style
 by defining a `schema`. It also provides a trivial type checking in the runtime before serialization.
 [Yard documentation](http://www.rubydoc.info/github/nesaulov/surrealist/master)
 
 ## Motivation
-A typical use case for this gem could be, for example, serializing a decorated object outside of the view context.
- 
+A typical use case for this gem could be, for example, serializing a (decorated) object outside
+of the view context. The schema is described through a hash, so you can build the structure
+of serialized object independently of its methods and attributes.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -39,18 +42,18 @@ that will be used for type-checks.
 ``` ruby
 class Person
   include Surrealist
-  
+ 
   schema do
     {
       foo: String,
       bar: Integer,
-    } 
+    }
   end
-  
+ 
   def foo
     'This is a string'
   end
-  
+ 
   def bar
     42
   end
@@ -66,7 +69,7 @@ Person.new.surrealize
 ``` ruby
 class Person
   include Surrealist
-
+ 
   schema do
     {
       foo: String,
@@ -81,7 +84,7 @@ class Person
   end
   # ... method definitions
 end
-
+ 
 Person.find_by(email: 'example@email.com').surrealize
 # => "{\"foo\":\"Some string\",\"name\":\"John Doe\",\"nested\":{\"at\":{\"any\":42,\"level\":true}}}"
 ```
@@ -92,11 +95,11 @@ Person.find_by(email: 'example@email.com').surrealize
 ``` ruby
 class CreditCard
   include Surrealist
-
+ 
   schema do
     { number: Integer }
   end
-
+ 
   def number; 'string'; end
 end
 
@@ -110,7 +113,7 @@ a corresponding method defined in the object.
 ``` ruby
 class Car
   include Surrealist
-
+ 
   schema do
     { weight: Integer }
   end
