@@ -8,6 +8,9 @@ A gem that provides DSL for serialization of plain old Ruby objects to JSON in a
 by defining a `schema`. It also provides a trivial type checking in the runtime before serialization.
 [Yard documentation](http://www.rubydoc.info/github/nesaulov/surrealist/master)
 
+## Current status
+In development, not yet ready for real projects.
+
 ## Motivation
 A typical use case for this gem could be, for example, serializing a (decorated) object outside
 of the view context. The schema is described through a hash, so you can build the structure
