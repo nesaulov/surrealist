@@ -1,9 +1,5 @@
-inherit_gem:
-  rubocop-config-umbrellio: lib/rubocop.yml
-
 AllCops:
   TargetRubyVersion: 2.4
-
 Style/StringLiterals:
   EnforcedStyle: single_quotes
   ConsistentQuotesInMultiline: true

@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.org/nesaulov/surrealist.svg?branch=master)](https://travis-ci.org/nesaulov/surrealist)
 [![Coverage Status](https://coveralls.io/repos/github/nesaulov/surrealist/badge.svg?branch=master)](https://coveralls.io/github/nesaulov/surrealist?branch=master)
 [![Inline docs](http://inch-ci.org/github/nesaulov/surrealist.svg?branch=master)](http://inch-ci.org/github/nesaulov/surrealist)
+[![Gem Version](https://badge.fury.io/rb/surrealist.svg)](https://rubygems.org/gems/surrealist)
 
 A gem that provides DSL for serialization of plain old Ruby objects to JSON in a declarative style
 by defining a `schema`. It also provides a trivial type checking in the runtime before serialization.
@@ -39,6 +40,7 @@ that will be used for type-checks.
 ### Simple example
 * Include Surrealist in your class.
 * Define a schema with methods that need to be serialized.
+
 ``` ruby
 class Person
   include Surrealist
@@ -59,13 +61,16 @@ class Person
   end
 end
 ```
+
 * Surrealize it.
+
 ``` ruby
 Person.new.surrealize
 # => "{\"foo\":\"This is a string\",\"bar\":42}"
 ```
 
 ### Nested structures
+
 ``` ruby
 class Person
   include Surrealist
@@ -90,6 +95,7 @@ Person.find_by(email: 'example@email.com').surrealize
 ```
 
 ### Type Errors
+
 `Surrealist::InvalidTypeError` is thrown if types mismatch.
 
 ``` ruby
@@ -108,8 +114,10 @@ CreditCard.new.surrealize
 ```
 
 ### Undefined methods in schema
+
 `Surrealist::UndefinedMethodError` is thrown if a key defined in the schema does not have
 a corresponding method defined in the object.
+
 ``` ruby
 class Car
   include Surrealist

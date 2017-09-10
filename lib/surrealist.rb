@@ -2,7 +2,7 @@
 
 require_relative 'surrealist/class_methods'
 require_relative 'surrealist/instance_methods'
-require_relative 'surrealist/extensions/boolean'
+require_relative 'surrealist/boolean'
 require 'multi_json'
 
 # Main module that provides the +schema+ class method and +surrealize+ instance method.
@@ -30,7 +30,6 @@ module Surrealist
   #
   # @param [Object] instance of a class that has +Surrealist+ included.
   #
-  #
   # @return [String] a json-formatted string corresponding to the schema
   #   provided in the object's class. Values will be taken from the return values
   #   of appropriate methods from the object.
@@ -48,25 +47,72 @@ module Surrealist
   #
   #     schema do
   #       {
-  #         foo: String,
-  #         bar: Integer,
+  #         name: String,
+  #         age: Integer,
   #       }
   #     end
   #
-  #     def foo; 'A string'; end
-  #     def bar; 42; end
+  #     def name
+  #       'Nikita'
+  #     end
+  #
+  #     def age
+  #       23
+  #     end
   #   end
   #
   #   User.new.surrealize
-  #   # => "{\"foo\":\"A string\",\"bar\":42}"
+  #   # => "{\"name\":\"Nikita\",\"age\":23}"
   #   # For more examples see README
   def self.surrealize(instance)
+    ::MultiJson.dump(build_schema(instance))
+  end
+
+  # Builds hash from schema provided in the object's class and type-checks the values.
+  #
+  # @param [Object] instance of a class that has +Surrealist+ included.
+  #
+  # @return [Hash] a hash corresponding to the schema
+  #   provided in the object's class. Values will be taken from the return values
+  #   of appropriate methods from the object.
+  #
+  # @raise +Surrealist::UnknownSchemaError+ if no schema was provided in the object's class.
+  #
+  # @raise +Surrealist::InvalidTypeError+ if type-check failed at some point.
+  #
+  # @raise +Surrealist::UndefinedMethodError+ if a key defined in the schema
+  #   does not have a corresponding method on the object.
+  #
+  # @example Define a schema and surrealize the object
+  #   class User
+  #     include Surrealist
+  #
+  #     schema do
+  #       {
+  #         name: String,
+  #         age: Integer,
+  #       }
+  #     end
+  #
+  #     def name
+  #       'Nikita'
+  #     end
+  #
+  #     def age
+  #       23
+  #     end
+  #   end
+  #
+  #   User.new.build_schema
+  #   # => { name: 'Nikita', age: 23 }
+  #   # For more examples see README
+  def self.build_schema(instance)
     schema = instance.__surrealist_schema rescue nil
 
     if schema.nil?
       raise Surrealist::UnknownSchemaError, "Can't serialize #{instance.class} - no schema was provided."
     end
 
-    ::MultiJson.dump(Builder.call(schema, instance))
+    Builder.call(schema: schema, instance: instance)
   end
 end
