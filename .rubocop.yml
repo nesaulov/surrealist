@@ -1,9 +1,0 @@
-AllCops:
-  TargetRubyVersion: 2.4
-Style/StringLiterals:
-  EnforcedStyle: single_quotes
-  ConsistentQuotesInMultiline: true
-Metrics/LineLength:
-  Max: 106
-Style/SingleLineMethods:
-  Enabled: false

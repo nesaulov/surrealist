@@ -16,10 +16,18 @@ class Table
   def baz
     { key: :value }
   end
+
+  def struct
+    Struct.new(:foo, :bar).new(42, [1])
+  end
+
+  def multi_struct
+    Struct.new(:foo, :bar).new(42, Struct.new(:baz).new([1]))
+  end
 end
 
 RSpec.describe Surrealist::Builder do
-  subject(:result) { described_class.call(schema, instance) }
+  subject(:result) { described_class.call(schema: schema, instance: instance) }
 
   let(:instance) { Table.new }
 
@@ -43,6 +51,22 @@ RSpec.describe Surrealist::Builder do
 
       it 'returns hash with correct values' do
         is_expected.to eq(foo: 'A string', nested: { bar: [1, 2, 4], again: { baz: { key: :value } } })
+      end
+    end
+
+    context 'with nested objects' do
+      let(:schema) { Hash[foo: String, struct: { foo: Integer, bar: Array }] }
+
+      it 'invokes nested methods on the object' do
+        is_expected.to eq(foo: 'A string', struct: { foo: 42, bar: [1] })
+      end
+    end
+
+    context 'with multi-nested objects' do
+      let(:schema) { Hash[foo: String, multi_struct: { foo: Integer, bar: { baz: Array } }] }
+
+      it 'invokes nested methods on the objects' do
+        is_expected.to eq(foo: 'A string', multi_struct: { foo: 42, bar: { baz: [1] } })
       end
     end
   end
