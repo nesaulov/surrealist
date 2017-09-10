@@ -7,5 +7,10 @@ module Surrealist
     def surrealize
       Surrealist.surrealize(self)
     end
+
+    # Invokes +Surrealist+'s class method +build_schema+
+    def build_schema
+      Surrealist.build_schema(self)
+    end
   end
 end
