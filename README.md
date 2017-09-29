@@ -5,7 +5,7 @@
 [![Gem Version](https://badge.fury.io/rb/surrealist.svg)](https://rubygems.org/gems/surrealist)
 
 A gem that provides DSL for serialization of plain old Ruby objects to JSON in a declarative style
-by defining a `schema`. It also provides a trivial type checking in the runtime before serialization.
+by defining a `json_schema`. It also provides a trivial type checking in the runtime before serialization.
 [Yard documentation](http://www.rubydoc.info/github/nesaulov/surrealist/master)
 
 ## Current status
@@ -48,7 +48,7 @@ that will be used for type-checks.
 class Person
   include Surrealist
  
-  schema do
+  json_schema do
     {
       foo: String,
       bar: Integer,
@@ -78,7 +78,7 @@ Person.new.surrealize
 class Person
   include Surrealist
  
-  schema do
+  json_schema do
     {
       foo: String,
       name: String,
@@ -105,7 +105,7 @@ Person.find_by(email: 'example@email.com').surrealize
 class CreditCard
   include Surrealist
  
-  schema do
+  json_schema do
     { number: Integer }
   end
  
@@ -125,7 +125,7 @@ a corresponding method defined in the object.
 class Car
   include Surrealist
  
-  schema do
+  json_schema do
     { weight: Integer }
   end
 end

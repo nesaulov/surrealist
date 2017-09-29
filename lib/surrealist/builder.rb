@@ -3,6 +3,7 @@
 module Surrealist
   # A class that builds a hash from the schema and type-checks the values.
   class Builder
+    # TODO: refactor methods so they don't take so much arguments
     class << self
       # A method that goes recursively through the schema hash, defines the values and type-checks them.
       #

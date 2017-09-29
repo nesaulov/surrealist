@@ -19,7 +19,7 @@ module Surrealist
     #   class User
     #     include Surrealist
     #
-    #     schema do
+    #     json_schema do
     #       {
     #         foo: String,
     #         bar: Integer,
@@ -38,7 +38,7 @@ module Surrealist
     #   class Person
     #     include Surrealist
     #
-    #     schema do
+    #     json_schema do
     #       {
     #         foo: String,
     #         nested: {
