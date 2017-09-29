@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
-require 'json'
 require_relative '../lib/surrealist'
 
 class Baz
   include Surrealist
 
-  schema do
+  json_schema do
     {
       foo:    Integer,
       bar:    Array,
@@ -47,7 +46,7 @@ end
 class WrongTypes
   include Surrealist
 
-  schema do
+  json_schema do
     { foo: Integer }
   end
 
@@ -87,7 +86,7 @@ end
 class Child < Parent
   include Surrealist
 
-  schema do
+  json_schema do
     {
       foo: String,
       bar: Array,
@@ -106,7 +105,7 @@ class WithAttrReaders
 
   attr_reader :foo, :bar
 
-  schema do
+  json_schema do
     {
       foo: String,
       bar: Array,
@@ -124,7 +123,7 @@ end
 class WithNil
   include Surrealist
 
-  schema do
+  json_schema do
     { foo: NilClass }
   end
 
@@ -136,7 +135,7 @@ end
 class WithNull
   include Surrealist
 
-  schema do
+  json_schema do
     { foo: String }
   end
 
@@ -148,7 +147,7 @@ end
 class WithNestedObjects
   include Surrealist
 
-  schema do
+  json_schema do
     { foo: { bar: Integer } }
   end
 
@@ -162,7 +161,7 @@ end
 class MultiMethodStruct
   include Surrealist
 
-  schema do
+  json_schema do
     {
       foo: {
         bar: Integer,
@@ -179,7 +178,7 @@ class MultiMethodStruct
 end
 
 RSpec.describe 'Surrealist' do
-  describe '#surrealize' do
+  describe '#surrealize & #build_schema' do
     context 'with defined schema' do
       context 'with correct types' do
         it 'works' do
@@ -188,51 +187,75 @@ RSpec.describe 'Surrealist' do
               'left'  => 'left',
               'right' => true,
             })
+
+          expect(Baz.new.build_schema)
+            .to eq(foo: 4, bar: [1, 3, 5], nested: { left: 'left', right: true })
         end
       end
 
       context 'with wrong types' do
         it 'raises TypeError' do
+          error_text = 'Wrong type for key `foo`. Expected Integer, got String.'
+
           expect { WrongTypes.new.surrealize }
-            .to raise_error(Surrealist::InvalidTypeError,
-                            'Wrong type for key `foo`. Expected Integer, got String.')
+            .to raise_error(Surrealist::InvalidTypeError, error_text)
+          expect { WrongTypes.new.build_schema }
+            .to raise_error(Surrealist::InvalidTypeError, error_text)
         end
       end
 
       context 'with inheritance' do
         it 'works' do
-          expect(JSON.parse(Child.new.surrealize)).to eq('foo' => 'foo', 'bar' => [1, 2])
+          instance = Child.new
+
+          expect(JSON.parse(instance.surrealize)).to eq('foo' => 'foo', 'bar' => [1, 2])
+          expect(instance.build_schema).to eq(foo: 'foo', bar: [1, 2])
         end
       end
 
       context 'with attr_readers' do
         it 'works' do
-          expect(JSON.parse(WithAttrReaders.new.surrealize)).to eq('foo' => 'foo', 'bar' => [1, 2])
+          instance = WithAttrReaders.new
+
+          expect(JSON.parse(instance.surrealize)).to eq('foo' => 'foo', 'bar' => [1, 2])
+          expect(instance.build_schema).to eq(foo: 'foo', bar: [1, 2])
         end
       end
 
       context 'with NilClass' do
         it 'works' do
           expect(JSON.parse(WithNil.new.surrealize)).to eq('foo' => nil)
+          expect(WithNil.new.build_schema).to eq(foo: nil)
         end
       end
 
       context 'with nil values' do
         it 'returns null' do
-          expect(JSON.parse(WithNull.new.surrealize)).to eq('foo' => nil)
+          instance = WithNull.new
+
+          expect(JSON.parse(instance.surrealize)).to eq('foo' => nil)
+          expect(instance.build_schema).to eq(foo: nil)
         end
       end
 
       context 'with nested objects' do
         it 'tries to invoke the method on the object' do
-          expect(JSON.parse(WithNestedObjects.new.surrealize)).to eq('foo' => { 'bar' => 123 })
+          instance = WithNestedObjects.new
+
+          expect(JSON.parse(instance.surrealize)).to eq('foo' => { 'bar' => 123 })
+          expect(instance.build_schema).to eq(foo: { bar: 123 })
         end
       end
 
       context 'with multi-method struct' do
         it 'works' do
-          expect(JSON.parse(MultiMethodStruct.new.surrealize))
+          instance = MultiMethodStruct.new
+
+          expect(JSON.parse(instance.surrealize))
             .to eq('foo' => { 'bar' => 123, 'baz' => 'string' })
+
+          expect(instance.build_schema)
+            .to eq(foo: { bar: 123, baz: 'string' })
         end
       end
     end

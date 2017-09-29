@@ -5,7 +5,7 @@ require_relative '../lib/surrealist'
 class Note
   include Surrealist
 
-  schema do
+  json_schema do
     {
       foo:    Integer,
       bar:    Array,
@@ -46,7 +46,7 @@ end
 class IncorrectTypes
   include Surrealist
 
-  schema do
+  json_schema do
     { foo: Integer }
   end
 
@@ -68,7 +68,7 @@ end
 class Infant < Ancestor
   include Surrealist
 
-  schema do
+  json_schema do
     {
       foo: String,
       bar: Array,

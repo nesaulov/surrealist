@@ -8,7 +8,7 @@ class Human
 
   attr_reader :name, :lastname
 
-  schema do
+  json_schema do
     {
       name: String,
       lastname: String,

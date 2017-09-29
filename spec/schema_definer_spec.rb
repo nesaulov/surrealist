@@ -12,8 +12,8 @@ RSpec.describe Surrealist::SchemaDefiner do
 
     before { described_class.call(instance, schema) }
 
-    it 'defines a method on class instance' do
-      expect(instance.new.__surrealist_schema).to eq(schema)
+    it 'defines a method on class' do
+      expect(instance.new.class.instance_variable_get('@__surrealist_schema')).to eq(schema)
     end
   end
 
