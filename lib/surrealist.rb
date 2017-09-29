@@ -3,14 +3,14 @@
 require_relative 'surrealist/class_methods'
 require_relative 'surrealist/instance_methods'
 require_relative 'surrealist/boolean'
-require 'multi_json'
+require 'json'
 
-# Main module that provides the +schema+ class method and +surrealize+ instance method.
+# Main module that provides the +json_schema+ class method and +surrealize+ instance method.
 module Surrealist
   # Error class for classes without defined +schema+.
   class UnknownSchemaError < RuntimeError; end
 
-  # Error class for classes with +schema+ defined not as a hash.
+  # Error class for classes with +json_schema+ defined not as a hash.
   class InvalidSchemaError < RuntimeError; end
 
   # Error class for +NoMethodError+.
@@ -45,7 +45,7 @@ module Surrealist
   #   class User
   #     include Surrealist
   #
-  #     schema do
+  #     json_schema do
   #       {
   #         name: String,
   #         age: Integer,
@@ -65,7 +65,7 @@ module Surrealist
   #   # => "{\"name\":\"Nikita\",\"age\":23}"
   #   # For more examples see README
   def self.surrealize(instance)
-    ::MultiJson.dump(build_schema(instance))
+    ::JSON.dump(build_schema(instance))
   end
 
   # Builds hash from schema provided in the object's class and type-checks the values.
@@ -87,7 +87,7 @@ module Surrealist
   #   class User
   #     include Surrealist
   #
-  #     schema do
+  #     json_schema do
   #       {
   #         name: String,
   #         age: Integer,
@@ -107,12 +107,22 @@ module Surrealist
   #   # => { name: 'Nikita', age: 23 }
   #   # For more examples see README
   def self.build_schema(instance)
-    schema = instance.__surrealist_schema rescue nil
+    schema = instance.class.instance_variable_get('@__surrealist_schema')
 
     if schema.nil?
       raise Surrealist::UnknownSchemaError, "Can't serialize #{instance.class} - no schema was provided."
     end
 
-    Builder.call(schema: schema, instance: instance)
+
+    Builder.call(schema: deep_copy(schema), instance: instance)
+  end
+
+  # Deep copies the schema hash.
+  #
+  # @param [Object] obj object to be coopied
+  #
+  # @return [Object] a copied object
+  def self.deep_copy(obj)
+    Marshal.load(Marshal.dump(obj))
   end
 end
