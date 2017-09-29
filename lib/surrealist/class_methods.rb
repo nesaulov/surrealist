@@ -54,7 +54,7 @@ module Surrealist
     #   Person.new.surrealize
     #   # => "{\"foo\":\"A string\",\"nested\":{\"bar\":42}}"
     #   # For more examples see README
-    def schema(&_block)
+    def json_schema(&_block)
       SchemaDefiner.call(self, yield)
     end
   end
