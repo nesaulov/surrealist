@@ -30,7 +30,7 @@ module Surrealist
       #
       # @param [String | Symbol] key a key to be camelized
       #
-      # @param [Boolean] first_upper boolean value that stands for some shit
+      # @param [Boolean] first_upper should the first letter be capitalized
       #
       # @return [String | Symbol] camelized key of a hash
       def camelize_key(key, first_upper = true)
@@ -47,7 +47,7 @@ module Surrealist
       #
       # @param [String] snake_word a word to be camelized
       #
-      # @param [Boolean] first_upper booooo
+      # @param [Boolean] first_upper should the first letter be capitalized
       #
       # @return [String] camelized string
       def camelize(snake_word, first_upper = true)
