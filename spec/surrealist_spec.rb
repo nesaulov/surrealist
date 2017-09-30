@@ -10,8 +10,8 @@ class Baz
       foo:    Integer,
       bar:    Array,
       nested: {
-        left:  String,
-        right: Boolean,
+        left_side:  String,
+        right_side: Boolean,
       },
     }
   end
@@ -26,19 +26,19 @@ class Baz
 
   private
 
-  def left
+  def left_side
     'left'
   end
 
-  def right
+  def right_side
     true
   end
 
   # expecting:
   # {
   #   foo: 4, bar: [1, 3, 5], nested: {
-  #     left: 'left',
-  #     right: true
+  #     left_side: 'left',
+  #     right_side: true
   #   }
   # }
 end
@@ -148,14 +148,14 @@ class WithNestedObjects
   include Surrealist
 
   json_schema do
-    { foo: { bar: Integer } }
+    { foo: { bar_bar: Integer } }
   end
 
   def foo
-    Struct.new(:bar).new(123)
+    Struct.new(:bar_bar).new(123)
   end
 
-  # expecting: { foo: { bar: 123 } }
+  # expecting: { foo: { bar_bar: 123 } }
 end
 
 class MultiMethodStruct
@@ -164,32 +164,47 @@ class MultiMethodStruct
   json_schema do
     {
       foo: {
-        bar: Integer,
-        baz: String,
+        bar_bar: Integer,
+        baz_baz: String,
       },
     }
   end
 
   def foo
-    Struct.new(:bar, :baz).new(123, 'string')
+    Struct.new(:bar_bar, :baz_baz).new(123, 'string')
   end
 
-  # expecting: { foo: { bar: 123, baz: 'string' } }
+  # expecting: { foo: { bar_bar: 123, baz_baz: 'string' } }
 end
 
-RSpec.describe 'Surrealist' do
+RSpec.describe Surrealist do
   describe '#surrealize & #build_schema' do
     context 'with defined schema' do
       context 'with correct types' do
-        it 'works' do
-          expect(JSON.parse(Baz.new.surrealize))
+        let(:instance) { Baz.new }
+
+        it 'surrealizes' do
+          expect(JSON.parse(instance.surrealize))
             .to eq('foo' => 4, 'bar' => [1, 3, 5], 'nested' => {
-              'left'  => 'left',
-              'right' => true,
+              'left_side'  => 'left',
+              'right_side' => true,
+            })
+        end
+
+        it 'builds schema' do
+          expect(instance.build_schema)
+            .to eq(foo: 4, bar: [1, 3, 5], nested: { left_side: 'left', right_side: true })
+        end
+
+        it 'camelizes' do
+          expect(JSON.parse(instance.surrealize(camelize: true)))
+            .to eq('foo' => 4, 'bar' => [1, 3, 5], 'nested' => {
+              'leftSide'  => 'left',
+              'rightSide' => true,
             })
 
-          expect(Baz.new.build_schema)
-            .to eq(foo: 4, bar: [1, 3, 5], nested: { left: 'left', right: true })
+          expect(instance.build_schema(camelize: true))
+            .to eq(foo: 4, bar: [1, 3, 5], nested: { leftSide: 'left', rightSide: true })
         end
       end
 
@@ -205,19 +220,25 @@ RSpec.describe 'Surrealist' do
       end
 
       context 'with inheritance' do
-        it 'works' do
-          instance = Child.new
+        let(:instance) { Child.new }
 
+        it 'surrealizes' do
           expect(JSON.parse(instance.surrealize)).to eq('foo' => 'foo', 'bar' => [1, 2])
+        end
+
+        it 'builds schema' do
           expect(instance.build_schema).to eq(foo: 'foo', bar: [1, 2])
         end
       end
 
       context 'with attr_readers' do
-        it 'works' do
-          instance = WithAttrReaders.new
+        let(:instance) { WithAttrReaders.new }
 
+        it 'surrealizes' do
           expect(JSON.parse(instance.surrealize)).to eq('foo' => 'foo', 'bar' => [1, 2])
+        end
+
+        it 'builds schema' do
           expect(instance.build_schema).to eq(foo: 'foo', bar: [1, 2])
         end
       end
@@ -239,32 +260,56 @@ RSpec.describe 'Surrealist' do
       end
 
       context 'with nested objects' do
-        it 'tries to invoke the method on the object' do
-          instance = WithNestedObjects.new
+        let(:instance) { WithNestedObjects.new }
 
-          expect(JSON.parse(instance.surrealize)).to eq('foo' => { 'bar' => 123 })
-          expect(instance.build_schema).to eq(foo: { bar: 123 })
+        it 'surrealizes & tries to invoke the method on the object' do
+          expect(JSON.parse(instance.surrealize)).to eq('foo' => { 'bar_bar' => 123 })
+        end
+
+        it 'builds schema & tries to invoke the method on the object' do
+          expect(instance.build_schema).to eq(foo: { bar_bar: 123 })
+        end
+
+        it 'camelizes' do
+          expect(JSON.parse(instance.surrealize(camelize: true)))
+            .to eq('foo' => { 'barBar' => 123 })
+
+          expect(instance.build_schema(camelize: true)).to eq(foo: { barBar: 123 })
         end
       end
 
       context 'with multi-method struct' do
-        it 'works' do
-          instance = MultiMethodStruct.new
+        let(:instance) { MultiMethodStruct.new }
 
+        it 'surrealizes' do
           expect(JSON.parse(instance.surrealize))
-            .to eq('foo' => { 'bar' => 123, 'baz' => 'string' })
+            .to eq('foo' => { 'bar_bar' => 123, 'baz_baz' => 'string' })
+        end
 
+        it 'builds schema' do
           expect(instance.build_schema)
-            .to eq(foo: { bar: 123, baz: 'string' })
+            .to eq(foo: { bar_bar: 123, baz_baz: 'string' })
+        end
+
+        it 'camelizes' do
+          expect(JSON.parse(instance.surrealize(camelize: true)))
+            .to eq('foo' => { 'barBar' => 123, 'bazBaz' => 'string' })
+
+          expect(instance.build_schema(camelize: true))
+            .to eq(foo: { barBar: 123, bazBaz: 'string' })
         end
       end
     end
 
     context 'with undefined schema' do
+      let(:error) { "Can't serialize WithoutSchema - no schema was provided." }
+
       it 'raises error on #surrealize' do
         expect { WithoutSchema.new.surrealize }
-          .to raise_error(Surrealist::UnknownSchemaError,
-                          "Can't serialize WithoutSchema - no schema was provided.")
+          .to raise_error(Surrealist::UnknownSchemaError, error)
+
+        expect { WithoutSchema.new.surrealize(camelize: true) }
+          .to raise_error(Surrealist::UnknownSchemaError, error)
       end
     end
   end
