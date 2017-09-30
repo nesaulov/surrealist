@@ -6,19 +6,19 @@ require_relative '../lib/surrealist'
 class Human
   include Surrealist
 
-  attr_reader :name, :lastname
+  attr_reader :name, :last_name
 
   json_schema do
     {
       name: String,
-      lastname: String,
+      last_name: String,
       properties: {
         gender: String,
         age: Integer,
       },
       credit_card: {
-        number: Integer,
-        holder: String,
+        card_number: Integer,
+        card_holder: String,
       },
       children: {
         male: {
@@ -31,9 +31,9 @@ class Human
     }
   end
 
-  def initialize(name, lastname)
+  def initialize(name, last_name)
     @name = name
-    @lastname = lastname
+    @last_name = last_name
   end
 
   def properties
@@ -41,7 +41,7 @@ class Human
   end
 
   def full_name
-    "#{name} #{lastname}"
+    "#{name} #{last_name}"
   end
 
   def credit_card
@@ -56,11 +56,11 @@ end
 Properties = Struct.new(:gender, :age)
 
 class CreditCard
-  attr_reader :number, :holder
+  attr_reader :card_number, :card_holder
 
   def initialize(number:, holder:)
-    @number = number
-    @holder = holder
+    @card_number = number
+    @card_holder = holder
   end
 end
 
@@ -86,16 +86,41 @@ end
 
 RSpec.describe Surrealist do
   context 'ultimate spec' do
-    it 'works' do
-      expect(JSON.parse(Human.new('John', 'Doe').surrealize))
-        .to eq('name' => 'John', 'lastname' => 'Doe', 'properties' => {
-          'gender' => 'male', 'age' => 42
+    let(:human) { Human.new('John', 'Doe') }
+    it 'surrealizes' do
+      expect(JSON.parse(human.surrealize))
+        .to eq('name' => 'John', 'last_name' => 'Doe', 'properties' => {
+          'gender' => 'male', 'age' => 42,
         }, 'credit_card' => {
-          'number' => 1234, 'holder' => 'John Doe'
+          'card_number' => 1234, 'card_holder' => 'John Doe',
         }, 'children' => {
           'male' => { 'count' => 2 },
           'female' => { 'count' => 1 },
         })
+    end
+
+    it 'builds schema' do
+      expect(human.build_schema)
+        .to eq(name: 'John', last_name: 'Doe', properties: { gender: 'male', age: 42 },
+               credit_card: { card_number: 1234, card_holder: 'John Doe' },
+               children: { male: { count: 2 }, female: { count: 1 } })
+    end
+
+    it 'camelizes' do
+      expect(JSON.parse(human.surrealize(camelize: true)))
+        .to eq('name' => 'John', 'lastName' => 'Doe', 'properties' => {
+          'gender' => 'male', 'age' => 42,
+        }, 'creditCard' => {
+          'cardNumber' => 1234, 'cardHolder' => 'John Doe',
+        }, 'children' => {
+          'male' => { 'count' => 2 },
+          'female' => { 'count' => 1 },
+        })
+
+      expect(human.build_schema(camelize: true))
+        .to eq(name: 'John', lastName: 'Doe', properties: { gender: 'male', age: 42 },
+               creditCard: { cardNumber: 1234, cardHolder: 'John Doe' },
+               children: { male: { count: 2 }, female: { count: 1 } })
     end
   end
 end

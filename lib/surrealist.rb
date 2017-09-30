@@ -3,6 +3,7 @@
 require_relative 'surrealist/class_methods'
 require_relative 'surrealist/instance_methods'
 require_relative 'surrealist/boolean'
+require_relative 'surrealist/utils'
 require 'json'
 
 # Main module that provides the +json_schema+ class method and +surrealize+ instance method.
@@ -64,8 +65,8 @@ module Surrealist
   #   User.new.surrealize
   #   # => "{\"name\":\"Nikita\",\"age\":23}"
   #   # For more examples see README
-  def self.surrealize(instance)
-    ::JSON.dump(build_schema(instance))
+  def self.surrealize(instance, camelize:)
+    ::JSON.dump(build_schema(instance, camelize: camelize))
   end
 
   # Builds hash from schema provided in the object's class and type-checks the values.
@@ -106,23 +107,15 @@ module Surrealist
   #   User.new.build_schema
   #   # => { name: 'Nikita', age: 23 }
   #   # For more examples see README
-  def self.build_schema(instance)
+  def self.build_schema(instance, camelize:)
     schema = instance.class.instance_variable_get('@__surrealist_schema')
 
     if schema.nil?
       raise Surrealist::UnknownSchemaError, "Can't serialize #{instance.class} - no schema was provided."
     end
 
+    hash = Builder.call(schema: Surrealist::Utils.deep_copy(schema), instance: instance)
 
-    Builder.call(schema: deep_copy(schema), instance: instance)
-  end
-
-  # Deep copies the schema hash.
-  #
-  # @param [Object] obj object to be coopied
-  #
-  # @return [Object] a copied object
-  def self.deep_copy(obj)
-    Marshal.load(Marshal.dump(obj))
+    camelize ? Surrealist::Utils.camelize_hash(hash) : hash
   end
 end
