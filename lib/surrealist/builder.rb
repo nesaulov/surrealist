@@ -117,6 +117,8 @@ module Surrealist
       #
       # @return [boolean]
       def type_check_passed?(value:, type:)
+        return true if type == Any
+
         if type == Boolean
           [true, false].include?(value)
         else
