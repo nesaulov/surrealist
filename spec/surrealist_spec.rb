@@ -69,18 +69,6 @@ end
 class WithoutSchema
   include Surrealist
 
-  def foo
-    4
-  end
-
-  def bar
-    9 * 3
-  end
-
-  def baz
-    1
-  end
-
   # expecting: Surrealist::UnknownSchemaError
 end
 
