@@ -2,5 +2,5 @@
 
 module Surrealist
   # Defines the version of Surrealist
-  VERSION = '0.1.0'
+  VERSION = '0.1.2'
 end

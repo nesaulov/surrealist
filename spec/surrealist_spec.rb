@@ -9,6 +9,7 @@ class Baz
     {
       foo:    Integer,
       bar:    Array,
+      anything: Any,
       nested: {
         left_side:  String,
         right_side: Boolean,
@@ -24,6 +25,12 @@ class Baz
     [1, 3, 5]
   end
 
+  protected
+
+  def anything
+    [{ some: 'thing' }]
+  end
+
   private
 
   def left_side
@@ -36,7 +43,9 @@ class Baz
 
   # expecting:
   # {
-  #   foo: 4, bar: [1, 3, 5], nested: {
+  #   foo: 4, bar: [1, 3, 5],
+  #   anything: [{ some: 'thing' }],
+  #   nested: {
   #     left_side: 'left',
   #     right_side: true
   #   }
@@ -185,26 +194,24 @@ RSpec.describe Surrealist do
 
         it 'surrealizes' do
           expect(JSON.parse(instance.surrealize))
-            .to eq('foo' => 4, 'bar' => [1, 3, 5], 'nested' => {
-              'left_side'  => 'left',
-              'right_side' => true,
-            })
+            .to eq('foo' => 4, 'bar' => [1, 3, 5], 'anything' => [{ 'some' => 'thing' }],
+                   'nested' => { 'left_side'  => 'left', 'right_side' => true })
         end
 
         it 'builds schema' do
           expect(instance.build_schema)
-            .to eq(foo: 4, bar: [1, 3, 5], nested: { left_side: 'left', right_side: true })
+            .to eq(foo: 4, bar: [1, 3, 5], anything: [{ some: 'thing' }],
+                   nested: { left_side: 'left', right_side: true })
         end
 
         it 'camelizes' do
           expect(JSON.parse(instance.surrealize(camelize: true)))
-            .to eq('foo' => 4, 'bar' => [1, 3, 5], 'nested' => {
-              'leftSide'  => 'left',
-              'rightSide' => true,
-            })
+            .to eq('foo' => 4, 'bar' => [1, 3, 5], 'anything' => [{ 'some' => 'thing' }],
+                   'nested' => { 'leftSide'  => 'left', 'rightSide' => true })
 
           expect(instance.build_schema(camelize: true))
-            .to eq(foo: 4, bar: [1, 3, 5], nested: { leftSide: 'left', rightSide: true })
+            .to eq(foo: 4, bar: [1, 3, 5], anything: [{ some: 'thing' }],
+                   nested: { leftSide: 'left', rightSide: true })
         end
       end
 

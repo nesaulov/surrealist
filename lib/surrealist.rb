@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
-require_relative 'surrealist/class_methods'
-require_relative 'surrealist/instance_methods'
-require_relative 'surrealist/boolean'
-require_relative 'surrealist/utils'
+require 'surrealist/class_methods'
+require 'surrealist/instance_methods'
+require 'surrealist/boolean'
+require 'surrealist/any'
+require 'surrealist/utils'
 require 'json'
 
 # Main module that provides the +json_schema+ class method and +surrealize+ instance method.

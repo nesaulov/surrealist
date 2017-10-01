@@ -4,9 +4,11 @@ cache: bundler
 before_install: gem install bundler
 script: bundle exec rspec
 rvm:
+  - 2.2.0
   - 2.2.5
   - 2.3.1
   - 2.4.0
+  - jruby-9.1.10.0
   - ruby-head
 matrix:
   allow_failures:
