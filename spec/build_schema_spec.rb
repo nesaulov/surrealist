@@ -11,7 +11,7 @@ class Note
       bar:    Array,
       nested: {
         left:  String,
-        right: Boolean,
+        right: Bool,
       },
     }
   end

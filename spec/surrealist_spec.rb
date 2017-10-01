@@ -12,7 +12,7 @@ class Baz
       anything: Any,
       nested: {
         left_side:  String,
-        right_side: Boolean,
+        right_side: Bool,
       },
     }
   end

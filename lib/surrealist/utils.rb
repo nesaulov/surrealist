@@ -8,7 +8,9 @@ module Surrealist
       #
       # @return [Object] a copied object
       def deep_copy(hash)
-        Marshal.load(Marshal.dump(hash))
+        hash.each_with_object({}) do |(key, value), new|
+          new[key] = value.is_a?(Hash) ? deep_copy(value) : value
+        end
       end
 
       # Converts hash's keys to camelCase
