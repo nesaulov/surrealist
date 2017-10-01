@@ -2,9 +2,10 @@
 
 require 'surrealist/class_methods'
 require 'surrealist/instance_methods'
-require 'surrealist/boolean'
+require 'surrealist/bool'
 require 'surrealist/any'
 require 'surrealist/utils'
+require 'surrealist/type_helper'
 require 'json'
 
 # Main module that provides the +json_schema+ class method and +surrealize+ instance method.
