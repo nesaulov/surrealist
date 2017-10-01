@@ -44,7 +44,11 @@ module Surrealist
       #
       # @return [Boolean] is type an instance of dry-type
       def dry_type?(type)
-        type.class.name&.match(DRY_TYPE_CLASS) || type.respond_to?(:primitive)
+        if type.respond_to?(:primitive) || type.class.name.nil?
+          true
+        else
+          type.class.name.match(DRY_TYPE_CLASS)
+        end
       end
     end
   end
