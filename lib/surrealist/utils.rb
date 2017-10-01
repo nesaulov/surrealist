@@ -9,7 +9,7 @@ module Surrealist
       # @return [Object] a copied object
       def deep_copy(hash)
         hash.each_with_object({}) do |(key, value), new|
-          value.is_a?(Hash) ? new[key] = deep_copy(value) : new[key] = value
+          new[key] = value.is_a?(Hash) ? deep_copy(value) : value
         end
       end
 
