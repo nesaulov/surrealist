@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Surrealist
   # A helper class to camelize hash keys and deep copy objects
   class Utils
@@ -55,7 +57,7 @@ module Surrealist
       def camelize(snake_word, first_upper = true)
         if first_upper
           snake_word.to_s
-                    .gsub(/(?:^|_)([^_\s]+)/) { $1.capitalize }
+                    .gsub(/(?:^|_)([^_\s]+)/) { Regexp.last_match[1].capitalize }
         else
           parts = snake_word.split('_', 2)
           parts[0] << camelize(parts[1]) if parts.size > 1

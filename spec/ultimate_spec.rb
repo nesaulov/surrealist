@@ -87,12 +87,13 @@ end
 RSpec.describe Surrealist do
   context 'ultimate spec' do
     let(:human) { Human.new('John', 'Doe') }
+
     it 'surrealizes' do
       expect(JSON.parse(human.surrealize))
         .to eq('name' => 'John', 'last_name' => 'Doe', 'properties' => {
-          'gender' => 'male', 'age' => 42,
+          'gender' => 'male', 'age' => 42
         }, 'credit_card' => {
-          'card_number' => 1234, 'card_holder' => 'John Doe',
+          'card_number' => 1234, 'card_holder' => 'John Doe'
         }, 'children' => {
           'male' => { 'count' => 2 },
           'female' => { 'count' => 1 },
@@ -109,9 +110,9 @@ RSpec.describe Surrealist do
     it 'camelizes' do
       expect(JSON.parse(human.surrealize(camelize: true)))
         .to eq('name' => 'John', 'lastName' => 'Doe', 'properties' => {
-          'gender' => 'male', 'age' => 42,
+          'gender' => 'male', 'age' => 42
         }, 'creditCard' => {
-          'cardNumber' => 1234, 'cardHolder' => 'John Doe',
+          'cardNumber' => 1234, 'cardHolder' => 'John Doe'
         }, 'children' => {
           'male' => { 'count' => 2 },
           'female' => { 'count' => 1 },

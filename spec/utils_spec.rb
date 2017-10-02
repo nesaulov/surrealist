@@ -8,9 +8,9 @@ RSpec.describe Surrealist::Utils do
 
     shared_examples 'object is cloned deeply' do
       specify do
-        expect(subject).to eq(object)
-        expect(subject).to eql(object)
-        expect(subject).not_to equal(object)
+        expect(copy).to eq(object)
+        expect(copy).to eql(object)
+        expect(copy).not_to equal(object)
       end
     end
 
@@ -27,29 +27,29 @@ RSpec.describe Surrealist::Utils do
     context 'not nested hash' do
       let(:hash) { Hash[snake_key: 'some value'] }
 
-      it { expect(subject.keys.first).to eq(:snakeKey) }
+      it { expect(camelized_hash.keys.first).to eq(:snakeKey) }
     end
 
     context 'nested hash' do
       let(:hash) { Hash[snake_key: { nested_key: { one_more_level: true } }] }
 
       it 'camelizes hash recursively' do
-        expect(subject).to eq(snakeKey: { nestedKey: { oneMoreLevel: true } })
+        expect(camelized_hash).to eq(snakeKey: { nestedKey: { oneMoreLevel: true } })
       end
     end
 
     context 'mixed symbols and string' do
-      let(:hash) { Hash[snake_key: { 'nested_key' => { :'one_more_level' => true } }] }
+      let(:hash) { Hash[snake_key: { 'nested_key' => { 'one_more_level': true } }] }
 
       it 'camelizes hash recursively' do
-        expect(subject).to eq(snakeKey: { 'nestedKey' => { :'oneMoreLevel' => true } })
+        expect(camelized_hash).to eq(snakeKey: { 'nestedKey' => { 'oneMoreLevel': true } })
       end
     end
 
     context 'array as hash key' do
       let(:hash) { Hash[['some_key'] => 'value'] }
 
-      it { expect(subject.keys.first).to eq(['some_key']) }
+      it { expect(camelized_hash.keys.first).to eq(['some_key']) }
     end
   end
 end

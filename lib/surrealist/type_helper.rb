@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module Surrealist
   # Service class for type checking
   class TypeHelper
-    DRY_TYPE_CLASS = 'Dry::Types'.freeze
+    DRY_TYPE_CLASS = 'Dry::Types'
 
     class << self
       # Checks if value returned from a method is an instance of type class specified

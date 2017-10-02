@@ -183,7 +183,7 @@ RSpec.describe Surrealist do
         it 'surrealizes' do
           expect(JSON.parse(instance.surrealize))
             .to eq('foo' => 4, 'bar' => [1, 3, 5], 'anything' => [{ 'some' => 'thing' }],
-                   'nested' => { 'left_side'  => 'left', 'right_side' => true })
+                   'nested' => { 'left_side' => 'left', 'right_side' => true })
         end
 
         it 'builds schema' do
@@ -195,7 +195,7 @@ RSpec.describe Surrealist do
         it 'camelizes' do
           expect(JSON.parse(instance.surrealize(camelize: true)))
             .to eq('foo' => 4, 'bar' => [1, 3, 5], 'anything' => [{ 'some' => 'thing' }],
-                   'nested' => { 'leftSide'  => 'left', 'rightSide' => true })
+                   'nested' => { 'leftSide' => 'left', 'rightSide' => true })
 
           expect(instance.build_schema(camelize: true))
             .to eq(foo: 4, bar: [1, 3, 5], anything: [{ some: 'thing' }],

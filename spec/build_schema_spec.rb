@@ -82,7 +82,6 @@ class Infant < Ancestor
   # expecting: { foo: 'foo', bar: [1, 2] }
 end
 
-
 RSpec.describe Surrealist do
   describe '#build_schema' do
     context 'with defined schema' do
