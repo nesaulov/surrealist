@@ -10,3 +10,4 @@
 .ruby-version
 TODO.md
 *.gem
+.rubocop.yml

@@ -6,3 +6,10 @@ Coveralls.wear!
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
 require 'surrealist'
+
+RSpec.configure do |config|
+  config.disable_monkey_patching!
+  config.order = 'random'
+end
+
+srand RSpec.configuration.seed

@@ -176,8 +176,19 @@ class WithValidJsonTypes
   def a_hash; {}; end
 end
 
+class WithValidOptionalAndConstrained
+  include Surrealist
 
+  json_schema do
+    {
+      a_string: Types::String.optional,
+      an_int: Types::Strict::Int.constrained(gteq: 18),
+    }
+  end
 
+  def a_string; end
+  def an_int; 32; end
+end
 
 RSpec.describe 'Dry-types with valid scenarios' do
   context 'with base types' do
@@ -200,9 +211,9 @@ RSpec.describe 'Dry-types with valid scenarios' do
                'a_true' => true, 'a_false' => false, 'a_bool' => true, 'an_int' => 42,
                'a_float' => 42.5, 'a_decimal' => BigDecimal(23).to_s, 'a_string' => 'string',
                'an_array' => [1, 2, 3], 'a_hash' => { 'key' => 'value' }, 'times' => {
-            'a_date' => Date.new(42).to_s, 'a_date_time' => DateTime.new(42).to_s,
-            'a_time' => Time.new(42).to_s
-          })
+                 'a_date' => Date.new(42).to_s, 'a_date_time' => DateTime.new(42).to_s,
+                 'a_time' => Time.new(42).to_s
+               })
     end
 
     it 'camelizes' do
@@ -220,9 +231,9 @@ RSpec.describe 'Dry-types with valid scenarios' do
                'aTrue' => true, 'aFalse' => false, 'aBool' => true, 'anInt' => 42,
                'aFloat' => 42.5, 'aDecimal' => BigDecimal(23).to_s, 'aString' => 'string',
                'anArray' => [1, 2, 3], 'aHash' => { 'key' => 'value' }, 'times' => {
-            'aDate' => Date.new(42).to_s, 'aDateTime' => DateTime.new(42).to_s,
-            'aTime' => Time.new(42).to_s
-          })
+                 'aDate' => Date.new(42).to_s, 'aDateTime' => DateTime.new(42).to_s,
+                 'aTime' => Time.new(42).to_s
+               })
     end
   end
 
@@ -234,9 +245,9 @@ RSpec.describe 'Dry-types with valid scenarios' do
         .to eq(a_nil: nil, a_symbol: :a, a_class: ExampleClass, a_true: true, a_false: false,
                a_bool: true, an_int: 42, a_float: 42.5, a_decimal: 23, a_string: 'string',
                an_array: [1, 2, 3], a_hash: { key: :value }, times: {
-            a_date: Date.new(42), a_date_time: DateTime.new(42),
-            a_time: Time.new(42)
-          })
+                 a_date: Date.new(42), a_date_time: DateTime.new(42),
+                 a_time: Time.new(42)
+               })
     end
 
     it 'surrealizes' do
@@ -245,9 +256,9 @@ RSpec.describe 'Dry-types with valid scenarios' do
                'a_true' => true, 'a_false' => false, 'a_bool' => true, 'an_int' => 42,
                'a_float' => 42.5, 'a_decimal' => BigDecimal(23).to_s, 'a_string' => 'string',
                'an_array' => [1, 2, 3], 'a_hash' => { 'key' => 'value' }, 'times' => {
-            'a_date' => Date.new(42).to_s, 'a_date_time' => DateTime.new(42).to_s,
-            'a_time' => Time.new(42).to_s
-          })
+                 'a_date' => Date.new(42).to_s, 'a_date_time' => DateTime.new(42).to_s,
+                 'a_time' => Time.new(42).to_s
+               })
     end
 
     it 'camelizes' do
@@ -255,18 +266,18 @@ RSpec.describe 'Dry-types with valid scenarios' do
         .to eq(aNil: nil, aSymbol: :a, aClass: ExampleClass, aTrue: true, aFalse: false,
                aBool: true, anInt: 42, aFloat: 42.5, aDecimal: 23, aString: 'string',
                anArray: [1, 2, 3], aHash: { key: :value }, times: {
-            aDate: Date.new(42), aDateTime: DateTime.new(42),
-            aTime: Time.new(42)
-          })
+                 aDate: Date.new(42), aDateTime: DateTime.new(42),
+                 aTime: Time.new(42)
+               })
 
       expect(JSON.parse(instance.surrealize(camelize: true)))
         .to eq('aNil' => nil, 'aSymbol' => 'a', 'aClass' => 'ExampleClass',
                'aTrue' => true, 'aFalse' => false, 'aBool' => true, 'anInt' => 42,
                'aFloat' => 42.5, 'aDecimal' => BigDecimal(23).to_s, 'aString' => 'string',
                'anArray' => [1, 2, 3], 'aHash' => { 'key' => 'value' }, 'times' => {
-            'aDate' => Date.new(42).to_s, 'aDateTime' => DateTime.new(42).to_s,
-            'aTime' => Time.new(42).to_s
-          })
+                 'aDate' => Date.new(42).to_s, 'aDateTime' => DateTime.new(42).to_s,
+                 'aTime' => Time.new(42).to_s
+               })
     end
   end
 
@@ -354,8 +365,22 @@ RSpec.describe 'Dry-types with valid scenarios' do
                'aDateTime' => DateTime.new(42).to_s, 'aTime' => Time.new(42).to_s,
                'aDecimal' => BigDecimal(23).to_s, 'anArray' => [], 'aHash' => {})
     end
+  end
 
+  context 'with optional & constrained types' do
+    let(:instance) { WithValidOptionalAndConstrained.new }
+
+    it 'builds schema' do
+      expect(instance.build_schema).to eq(a_string: nil, an_int: 32)
+    end
+
+    it 'surrealizes' do
+      expect(JSON.parse(instance.surrealize)).to eq('a_string' => nil, 'an_int' => 32)
+    end
+
+    it 'camelizes' do
+      expect(instance.build_schema(camelize: true)).to eq(aString: nil, anInt: 32)
+      expect(JSON.parse(instance.surrealize(camelize: true))).to eq('aString' => nil, 'anInt' => 32)
+    end
   end
 end
-
-

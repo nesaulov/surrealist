@@ -4,7 +4,6 @@ require_relative '../../lib/surrealist'
 require 'dry-types'
 require 'date'
 
-
 module Types
   include Dry::Types.module
 end
@@ -12,7 +11,6 @@ end
 class ExampleClass; end
 
 RSpec.describe 'Dry-types with invalid scenarios' do
-
   shared_examples 'type error is raised' do
     it { expect { instance.build_schema }.to raise_error(Surrealist::InvalidTypeError) }
   end
@@ -168,6 +166,53 @@ RSpec.describe 'Dry-types with invalid scenarios' do
           json_schema { { a_hash: Types::Strict::Hash } }
 
           def a_hash; 23; end
+        end.new
+      end
+
+      it_behaves_like 'type error is raised'
+    end
+  end
+
+  context 'with constrainted types' do
+    context 'integer' do
+      let(:instance) do
+        Class.new(Object) do
+          include Surrealist
+          json_schema { { an_int: Types::Strict::Int.constrained(gteq: 29) } }
+
+          def an_int; 23; end
+        end.new
+      end
+
+      it_behaves_like 'type error is raised'
+    end
+
+    context 'string - format' do
+      let(:instance) do
+        Class.new do
+          include Surrealist
+          json_schema do
+            {
+              a_string: Types::Strict::String.constrained(
+                format: /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i,
+              ),
+            }
+          end
+
+          def a_string; 'johndoeATemail.com'; end
+        end.new
+      end
+
+      it_behaves_like 'type error is raised'
+    end
+
+    context 'string - size' do
+      let(:instance) do
+        Class.new do
+          include Surrealist
+          json_schema { { a_string: Types::Strict::String.constrained(min_size: 3) } }
+
+          def a_string; '2'; end
         end.new
       end
 
