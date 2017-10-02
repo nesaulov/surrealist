@@ -140,7 +140,7 @@ class User
 end
 
 User.new.surrealize
-# => '{ "name": "John Doe", "credit_card": { "number" :1234, "cvv": 322 } }'
+# => '{ "name": "John Doe", "credit_card": { "number": 1234, "cvv": 322 } }'
 
 ```
 
@@ -149,7 +149,7 @@ You can use `Dry::Types` for type checking. Note that Surrealist does not ship
 with dry-types by default, so you should do the [installation and configuration](http://dry-rb.org/gems/dry-types/)
 by yourself. All built-in features of dry-types work, so if you use, say, `Types::Coercible::String`,
 your data will be coerced if it is able to, otherwise you will get a TypeError.
-Assuming, that you have defined module called `Types`:
+Assuming that you have defined module called `Types`:
 
 ``` ruby
 require 'dry-types'
@@ -169,25 +169,25 @@ class Car
   end
  
   def age;
-    '7';
+    '7'
   end
  
   def previous_owner;
-    'John Doe';
+    'John Doe'
   end
  
   def horsepower;
-    140;
+    140
   end
  
   def brand;
-    'Toyota';
+    'Toyota'
   end
  
   def doors; end
  
   def fuel_system;
-    'Direct injection';
+    'Direct injection'
   end
 end
 
