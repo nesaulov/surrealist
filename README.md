@@ -15,8 +15,23 @@ of the view context. The schema is described through a hash, so you can build th
 of serialized object independently of its methods and attributes, while also having possibility
 to serialize nested objects and structures.
 
-## Installation
+* [Installation](#installation)
+* [Usage](#usage)
+  * [Simple example](#simple-example)
+  * [Nested structures](#nested-structures)
+  * [Nested objects](#nested-objects)
+  * [Usage with Dry::Types](#usage-with-drytypes)
+  * [Build schema](#build-schema)
+  * [Camelization](#camelization)
+  * [Bool and Any](#bool-and-any)
+  * [Type errors](#type-errors)
+  * [Undefined methods in schema](#undefined-methods-in-schema)
+  * [Other notes](#other-notes)
+* [Contributing](#contributing)
+* [License](#license)
 
+
+## Installation
 Add this line to your application's Gemfile:
 
 ``` ruby
@@ -183,7 +198,7 @@ Car.new.surrealize
 ### Build schema
 If you don't need to dump the hash to json, you can use `#build_schema`
 method on the instance. It calculates values and checks types, but returns
-a hash instead of JSON string. From the previous example:
+a hash instead of a JSON string. From the previous example:
 
 ``` ruby
 Car.new.build_schema
