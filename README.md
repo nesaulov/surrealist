@@ -159,12 +159,12 @@ class Car
  
   json_schema do
     {
-      age: Types::Coercible::Int,
+      age:            Types::Coercible::Int,
+      brand:          Types::Coercible::String,
+      doors:          Types::Int.optional,
+      horsepower:     Types::Strict::Int.constrained(gteq: 20),
+      fuel_system:    Types::Any,
       previous_owner: Types::String,
-      horsepower: Types::Strict::Int.constrained(gteq: 20),
-      brand: Types::Coercible::String,
-      doors: Types::Int.optional,
-      fuel_system: Types::Any,
     }
   end
  
@@ -192,7 +192,7 @@ class Car
 end
 
 Car.new.surrealize
-# => '{ "age": 7, "previous_owner": "John Doe", "horsepower": 140, "brand": "Toyota", "doors": null, "fuel_system": "Direct injection" }'
+# => '{ "age": 7, "brand": "Toyota", "doors": null, "horsepower": 140, "fuel_system": "Direct injection", "previous_owner": "John Doe" }'
 ```
 
 ### Build schema
@@ -202,7 +202,7 @@ a hash instead of a JSON string. From the previous example:
 
 ``` ruby
 Car.new.build_schema
-# => { age: 7, previous_owner: "John Doe", horsepower: 140, brand: "Toyota", doors: nil, fuel_system: "Direct injection" }
+# => { age: 7, brand: "Toyota", doors: nil, horsepower: 140, fuel_system: "Direct injection", previous_owner: "John Doe" }
 ```
 
 ### Camelization
@@ -211,7 +211,7 @@ to `#surrealize`. From the previous example:
 
 ``` ruby
 Car.new.surrealize(camelize: true)
-'{ "age": 7, "previousOwner": "John Doe", "horsepower": 140, "brand": "Toyota", "doors": null, "fuelSystem": "Direct injection" }'
+# => '{ "age": 7, "brand": "Toyota", "doors": null, "horsepower": 140, "fuelSystem": "Direct injection", "previousOwner": "John Doe" }'
 ```
 
 ### Bool and Any
@@ -274,6 +274,7 @@ Car.new.surrealize
 ### Other notes
 * nil values are allowed by default, so if you have, say, `age: String`, but the actual value is nil,
 type check will be passed. If you want to be strict about `nil`s consider using `Dry::Types`.
+* Surrealist requires ruby of version 2.2 and higher.
 
 ## Contributing
 
