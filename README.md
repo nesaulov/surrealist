@@ -5,6 +5,7 @@
 [![Gem Version](https://badge.fury.io/rb/surrealist.svg)](https://rubygems.org/gems/surrealist)
 
 ![Surrealist](surrealist-icon.png)
+ 
 A gem that provides DSL for serialization of plain old Ruby objects to JSON in a declarative style
 by defining a `json_schema`. It also provides a trivial type checking in the runtime before serialization.
 [Yard documentation](http://www.rubydoc.info/github/nesaulov/surrealist/master)
