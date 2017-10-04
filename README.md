@@ -30,6 +30,7 @@ to serialize nested objects and structures.
   * [Undefined methods in schema](#undefined-methods-in-schema)
   * [Other notes](#other-notes)
 * [Contributing](#contributing)
+* [Credits](#credits)
 * [License](#license)
 
 
