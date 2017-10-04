@@ -4,6 +4,8 @@
 [![Inline docs](http://inch-ci.org/github/nesaulov/surrealist.svg?branch=master)](http://inch-ci.org/github/nesaulov/surrealist)
 [![Gem Version](https://badge.fury.io/rb/surrealist.svg)](https://rubygems.org/gems/surrealist)
 
+![Surrealist](surrealist-icon.png)
+ 
 A gem that provides DSL for serialization of plain old Ruby objects to JSON in a declarative style
 by defining a `json_schema`. It also provides a trivial type checking in the runtime before serialization.
 [Yard documentation](http://www.rubydoc.info/github/nesaulov/surrealist/master)
@@ -28,6 +30,7 @@ to serialize nested objects and structures.
   * [Undefined methods in schema](#undefined-methods-in-schema)
   * [Other notes](#other-notes)
 * [Contributing](#contributing)
+* [Credits](#credits)
 * [License](#license)
 
 
@@ -277,11 +280,12 @@ type check will be passed. If you want to be strict about `nil`s consider using 
 * Surrealist requires ruby of version 2.2 and higher.
 
 ## Contributing
-
 Bug reports and pull requests are welcome on GitHub at https://github.com/nesaulov/surrealist.
 This project is intended to be a safe, welcoming space for collaboration, and contributors are expected
 to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
-## License
+## Credits
+The icon was created by [Simon Child from Noun Project](https://thenounproject.com/term/salvador-dali/124566/) and is published under [Creative Commons License](https://creativecommons.org/licenses/by/3.0/us/)
 
+## License
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
