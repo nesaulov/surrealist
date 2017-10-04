@@ -15,7 +15,7 @@ by defining a `json_schema`. It also provides a trivial type checking in the run
 A typical use case for this gem could be, for example, serializing a (decorated) object outside
 of the view context. The schema is described through a hash, so you can build the structure
 of serialized object independently of its methods and attributes, while also having possibility
-to serialize nested objects and structures.
+to serialize nested objects and structures. [Introductory blogpost.](https://medium.com/@billikota/introducing-surrealist-a-gem-to-serialize-ruby-objects-according-to-a-defined-schema-6ca7e550628d)
 
 * [Installation](#installation)
 * [Usage](#usage)
@@ -66,17 +66,14 @@ class Person
   include Surrealist
  
   json_schema do
-    {
-      foo: String,
-      bar: Integer,
-    }
+    { name: String, age: Integer }
   end
  
-  def foo
-    'This is a string'
+  def name
+    'John Doe'
   end
  
-  def bar
+  def age
     42
   end
 end
@@ -86,7 +83,7 @@ end
 
 ``` ruby
 Person.new.surrealize
-# => '{ "foo": "This is a string", "bar" :42 }'
+# => '{ "name": "John Doe", "age": 42 }'
 ```
 
 ### Nested structures
