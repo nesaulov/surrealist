@@ -29,6 +29,7 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
   * [Type errors](#type-errors)
   * [Undefined methods in schema](#undefined-methods-in-schema)
   * [Other notes](#other-notes)
+* [Roadmap](#roadmap)  
 * [Contributing](#contributing)
 * [Credits](#credits)
 * [License](#license)
@@ -274,7 +275,14 @@ Car.new.surrealize
 ### Other notes
 * nil values are allowed by default, so if you have, say, `age: String`, but the actual value is nil,
 type check will be passed. If you want to be strict about `nil`s consider using `Dry::Types`.
-* Surrealist requires ruby of version 2.2 and higher.
+* Surrealist requires MRI ruby of version 2.2 and higher.
+
+## Roadmap
+Here is a list of features that are not implemented yet (contributions are welcome):
+* [ActiveRecord_Relation serialization](https://github.com/nesaulov/surrealist/issues/13)
+* [Collection serialization](https://github.com/nesaulov/surrealist/issues/12)
+* [Having class's name as a root key in JSON](https://github.com/nesaulov/surrealist/issues/10)
+* [Delegating serialization to parent class](https://github.com/nesaulov/surrealist/issues/11)
 
 ## Contributing
 Bug reports and pull requests are welcome on GitHub at https://github.com/nesaulov/surrealist.
