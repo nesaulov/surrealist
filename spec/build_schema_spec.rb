@@ -104,6 +104,26 @@ class Guest < Host
   # expecting: { name: 'Child' }
 end
 
+class FriendOfGuest < Guest
+  def name
+    'Friend'
+  end
+
+  # expecting: { name: 'Friend' }
+end
+
+class Invite < Host; end
+
+class InvitedGuest < Invite
+  delegate_surrealization_to Host
+
+  def name
+    'Invited'
+  end
+
+  # expecting: { name: 'Invited' }
+end
+
 RSpec.describe Surrealist do
   describe '#build_schema' do
     context 'with defined schema' do
@@ -131,6 +151,18 @@ RSpec.describe Surrealist do
     context 'with delegated schema' do
       it 'works' do
         expect(Guest.new.build_schema).to eq(name: 'Child')
+      end
+
+      context 'inheritance of class that has delegated' do
+        it 'uses inherited delegation' do
+          expect(FriendOfGuest.new.build_schema).to eq(name: 'Friend')
+        end
+      end
+
+      context 'inheritance of class that has not delegated but we delegate' do
+        it 'uses current delegation' do
+          expect(InvitedGuest.new.build_schema).to eq(name: 'Invited')
+        end
       end
 
       context 'with invalid ancestor' do

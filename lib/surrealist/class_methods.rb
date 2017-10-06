@@ -92,6 +92,12 @@ module Surrealist
       raise InvalidSchemaDelegation, 'Class not present in ancestors' unless self.ancestors.include?(ancestor)
 
       self.instance_variable_set('@__surrealist_schema_parent', ancestor)
+
+      class << self
+        def inherited(subclass)
+          subclass.instance_variable_set('@__surrealist_schema_parent', @__surrealist_schema_parent)
+        end
+      end
     end
   end
 end
