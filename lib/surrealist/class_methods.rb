@@ -59,9 +59,9 @@ module Surrealist
     end
 
     # A DSL method to delegate schema in a declarative style. Must reference a valid
-    # superclass within the ancestor tree.
+    # class that inclues Surrealist
     #
-    # @param [Class] ancestor
+    # @param [Class] klass
     #
     # @example DSL usage example
     #   class Host
@@ -87,13 +87,11 @@ module Surrealist
     #   Guest.new.surrealize
     #   # => "{\"name\":\"Child\"}"
     #   # For more examples see README
-    def delegate_surrealization_to(ancestor)
-      raise TypeError, "Expected type of Class got #{ancestor.class} instead" unless ancestor.is_a?(Class)
-      # https://stackoverflow.com/a/35838836
-      pseudo_ancestors = ObjectSpace.each_object(Class).select { |c| c.included_modules.include? Surrealist }
-      raise InvalidSchemaDelegation, 'Class does not include Surrealist' unless pseudo_ancestors.include? ancestor
+    def delegate_surrealization_to(klass)
+      raise TypeError, "Expected type of Class got #{klass.class} instead" unless klass.is_a?(Class)
+      raise InvalidSchemaDelegation, 'Class does not include Surrealist' unless klass.included_modules.include?(Surrealist)
 
-      self.instance_variable_set('@__surrealist_schema_parent', ancestor)
+      self.instance_variable_set('@__surrealist_schema_parent', klass)
     end
   end
 end

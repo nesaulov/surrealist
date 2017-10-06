@@ -185,7 +185,7 @@ RSpec.describe Surrealist do
         end
       end
 
-      context 'with invalid ancestor' do
+      context 'with invalid klass' do
         it 'raises RuntimeError' do
           expect { eval 'class IncorrectGuest < Host
                            delegate_surrealization_to Integer

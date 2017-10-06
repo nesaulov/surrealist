@@ -25,7 +25,7 @@ module Surrealist
   # Error class for undefined root keys for schema wrapping.
   class UnknownRootError < RuntimeError; end
 
-  # Error class for undefined ancestor to delegate schema.
+  # Error class for undefined class to delegate schema.
   class InvalidSchemaDelegation < RuntimeError; end
 
   class << self
