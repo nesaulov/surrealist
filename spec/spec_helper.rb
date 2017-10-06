@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 require 'coveralls'
+require 'simplecov'
 
-SimpleCov.start do
+::SimpleCov.start do
   filters.clear
 
   add_filter do |src|
