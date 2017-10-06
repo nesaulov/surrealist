@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'builder'
-require_relative 'schema_definer'
-
 module Surrealist
   # Class methods that are extended by the object.
   module ClassMethods
@@ -59,7 +56,7 @@ module Surrealist
     end
 
     # A DSL method to delegate schema in a declarative style. Must reference a valid
-    # class that inclues Surrealist
+    # class that includes Surrealist
     #
     # @param [Class] klass
     #
@@ -89,17 +86,12 @@ module Surrealist
     #   # For more examples see README
     def delegate_surrealization_to(klass)
       raise TypeError, "Expected type of Class got #{klass.class} instead" unless klass.is_a?(Class)
-      raise_invalid_schema_delegation! unless klass.included_modules.include?(Surrealist)
+
+      unless klass.included_modules.include?(Surrealist)
+        Surrealist::ExceptionRaiser.raise_invalid_schema_delegation!
+      end
 
       instance_variable_set('@__surrealist_schema_parent', klass)
-    end
-
-    # Raises Surrealist::InvalidSchemaDelegation if destination of delegation does not
-    # include Surrealist.
-    #
-    # @raise Surrealist::InvalidSchemaDelegation
-    def raise_invalid_schema_delegation!
-      raise Surrealist::InvalidSchemaDelegation, 'Class does not include Surrealist'
     end
   end
 end
