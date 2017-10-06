@@ -57,5 +57,41 @@ module Surrealist
     def json_schema(&_block)
       SchemaDefiner.call(self, yield)
     end
+
+    # A DSL method to delegate schema in a declarative style. Must reference a valid
+    # superclass within the ancestor tree.
+    #
+    # @param [Class] ancestor
+    #
+    # @example DSL usage example
+    #   class Host
+    #     include Surrealist
+    #
+    #     json_schema do
+    #       { name: String }
+    #     end
+    #
+    #     def name
+    #       'Parent'
+    #     end
+    #   end
+    #
+    #   class Guest < Host
+    #     delegate_surrealization_to Host
+    #
+    #     def name
+    #       'Child'
+    #     end
+    #   end
+    #
+    #   Guest.new.surrealize
+    #   # => "{\"name\":\"Child\"}"
+    #   # For more examples see README
+    def delegate_surrealization_to(ancestor)
+      raise TypeError, "Expected type of Class got #{ancestor.class} instead" unless ancestor.is_a?(Class)
+      raise InvalidSchemaDelegation, 'Class not present in ancestors' unless self.ancestors.include?(ancestor)
+
+      self.instance_variable_set('@__surrealist_schema_parent', ancestor)
+    end
   end
 end

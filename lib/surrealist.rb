@@ -25,6 +25,9 @@ module Surrealist
   # Error class for undefined root keys for schema wrapping.
   class UnknownRootError < RuntimeError; end
 
+  # Error class for undefined ancestor to delegate schema.
+  class InvalidSchemaDelegation < RuntimeError; end
+
   class << self
     # @param [Class] base class to include/extend +Surrealist+.
     def included(base)
@@ -120,7 +123,8 @@ module Surrealist
     #   # => { name: 'Nikita', age: 23 }
     #   # For more examples see README
     def build_schema(instance:, camelize:, include_root:)
-      schema = instance.class.instance_variable_get('@__surrealist_schema')
+      delegatee = instance.class.instance_variable_get('@__surrealist_schema_parent')
+      schema = (delegatee || instance.class).instance_variable_get('@__surrealist_schema')
 
       raise_unknown_schema!(instance) if schema.nil?
 

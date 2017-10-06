@@ -82,6 +82,28 @@ class Infant < Ancestor
   # expecting: { foo: 'foo', bar: [1, 2] }
 end
 
+class Host
+  include Surrealist
+
+  json_schema do
+    { name: String }
+  end
+
+  def name
+    'Parent'
+  end
+end
+
+class Guest < Host
+  delegate_surrealization_to Host
+
+  def name
+    'Child'
+  end
+
+  # expecting: { name: 'Child' }
+end
+
 RSpec.describe Surrealist do
   describe '#build_schema' do
     context 'with defined schema' do
@@ -104,6 +126,11 @@ RSpec.describe Surrealist do
         it 'works' do
           expect(Infant.new.build_schema).to eq(foo: 'foo', bar: [1, 2])
         end
+      end
+    end
+    context 'with delegated schema' do
+      it 'works' do
+        expect(Guest.new.build_schema).to eq(name: 'Child')
       end
     end
   end
