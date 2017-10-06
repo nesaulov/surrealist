@@ -89,15 +89,11 @@ module Surrealist
     #   # For more examples see README
     def delegate_surrealization_to(ancestor)
       raise TypeError, "Expected type of Class got #{ancestor.class} instead" unless ancestor.is_a?(Class)
-      raise InvalidSchemaDelegation, 'Class not present in ancestors' unless self.ancestors.include?(ancestor)
+      # https://stackoverflow.com/a/35838836
+      pseudo_ancestors = ObjectSpace.each_object(Class).select { |c| c.included_modules.include? Surrealist }
+      raise InvalidSchemaDelegation, 'Class does not include Surrealist' unless pseudo_ancestors.include? ancestor
 
       self.instance_variable_set('@__surrealist_schema_parent', ancestor)
-
-      class << self
-        def inherited(subclass)
-          subclass.instance_variable_set('@__surrealist_schema_parent', @__surrealist_schema_parent)
-        end
-      end
     end
   end
 end

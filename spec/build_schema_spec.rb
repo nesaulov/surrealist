@@ -108,8 +108,6 @@ class FriendOfGuest < Guest
   def name
     'Friend'
   end
-
-  # expecting: { name: 'Friend' }
 end
 
 class Invite < Host; end
@@ -122,6 +120,26 @@ class InvitedGuest < Invite
   end
 
   # expecting: { name: 'Invited' }
+end
+
+class RandomClass
+  include Surrealist
+
+  json_schema do
+    { name: String }
+  end
+end
+
+class DifferentClass
+  include Surrealist
+
+  delegate_surrealization_to RandomClass
+
+  def name
+    'smth'
+  end
+
+  # expecting: { name: 'smth' }
 end
 
 RSpec.describe Surrealist do
@@ -153,9 +171,11 @@ RSpec.describe Surrealist do
         expect(Guest.new.build_schema).to eq(name: 'Child')
       end
 
-      context 'inheritance of class that has delegated' do
-        it 'uses inherited delegation' do
-          expect(FriendOfGuest.new.build_schema).to eq(name: 'Friend')
+      context 'inheritance of class that has delegated but we don\'t delegate' do
+        it 'raises RuntimeError' do
+          expect { FriendOfGuest.new.build_schema }
+            .to raise_error(Surrealist::UnknownSchemaError,
+              "Can't serialize FriendOfGuest - no schema was provided.")
         end
       end
 
@@ -171,7 +191,7 @@ RSpec.describe Surrealist do
                            delegate_surrealization_to Integer
                          end' }
             .to raise_error(Surrealist::InvalidSchemaDelegation,
-                            'Class not present in ancestors')
+                            'Class does not include Surrealist')
         end
       end
 
@@ -182,6 +202,12 @@ RSpec.describe Surrealist do
                          end" }
             .to raise_error(TypeError,
                             'Expected type of Class got String instead')
+        end
+      end
+
+      context 'with unrelated class' do
+        it 'works' do
+          expect(DifferentClass.new.build_schema).to eq(name: 'smth')
         end
       end
     end
