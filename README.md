@@ -25,6 +25,7 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
   * [Usage with Dry::Types](#usage-with-drytypes)
   * [Build schema](#build-schema)
   * [Camelization](#camelization)
+  * [Include root](#include-root)
   * [Bool and Any](#bool-and-any)
   * [Type errors](#type-errors)
   * [Undefined methods in schema](#undefined-methods-in-schema)
@@ -208,12 +209,53 @@ Car.new.build_schema
 
 ### Camelization
 If you need to have keys in camelBack, you can pass optional `camelize` argument
-to `#surrealize`. From the previous example:
+to `#surrealize or #build_schema`. From the previous example:
 
 ``` ruby
 Car.new.surrealize(camelize: true)
 # => '{ "age": 7, "brand": "Toyota", "doors": null, "horsepower": 140, "fuelSystem": "Direct injection", "previousOwner": "John Doe" }'
 ```
+
+### Include root
+If you want to wrap the resulting JSON into a root key, you can pass optional `include_root` argument
+to `#surrealize` or `#build_schema`. The root key in this case will be taken from the class name of the
+surrealizable object.
+``` ruby
+class Cat
+  include Surrealist
+ 
+  json_schema do
+    { weight: String }
+  end
+ 
+  def weight
+    '3 kilos'
+  end
+end
+ 
+Cat.new.surrealize(include_root: true)
+# => '{ "cat": { "weight": "3 kilos" } }'
+```
+With nested classes the last namespace will be taken as root key:
+``` ruby
+class Animal
+  class Dog
+    include Surrealist
+ 
+    json_schema do
+      { breed: String }
+    end
+ 
+    def breed
+      'Collie'
+    end
+  end
+end
+
+Dog::Animal.new.surrealize(include_root: true)
+# => '{ "dog": { "breed": "Collie" } }'
+```
+Nesting namespaces are [yet to be implemented.](https://github.com/nesaulov/surrealist/issues/14)
 
 ### Bool and Any
 If you have a parameter that is of boolean type, or if you don't care about the type, you
@@ -281,8 +323,8 @@ type check will be passed. If you want to be strict about `nil`s consider using 
 Here is a list of features that are not implemented yet (contributions are welcome):
 * [ActiveRecord_Relation serialization](https://github.com/nesaulov/surrealist/issues/13)
 * [Collection serialization](https://github.com/nesaulov/surrealist/issues/12)
-* [Having class's name as a root key in JSON](https://github.com/nesaulov/surrealist/issues/10)
 * [Delegating serialization to parent class](https://github.com/nesaulov/surrealist/issues/11)
+* [Having nested namespaces being surrealized](https://github.com/nesaulov/surrealist/issues/14)
 
 ## Contributing
 Bug reports and pull requests are welcome on GitHub at https://github.com/nesaulov/surrealist.
