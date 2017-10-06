@@ -89,9 +89,17 @@ module Surrealist
     #   # For more examples see README
     def delegate_surrealization_to(klass)
       raise TypeError, "Expected type of Class got #{klass.class} instead" unless klass.is_a?(Class)
-      raise InvalidSchemaDelegation, 'Class does not include Surrealist' unless klass.included_modules.include?(Surrealist)
+      raise_invalid_schema_delegation! unless klass.included_modules.include?(Surrealist)
 
-      self.instance_variable_set('@__surrealist_schema_parent', klass)
+      instance_variable_set('@__surrealist_schema_parent', klass)
+    end
+
+    # Raises Surrealist::InvalidSchemaDelegation if destination of delegation does not
+    # include Surrealist.
+    #
+    # @raise Surrealist::InvalidSchemaDelegation
+    def raise_invalid_schema_delegation!
+      raise Surrealist::InvalidSchemaDelegation, 'Class does not include Surrealist'
     end
   end
 end
