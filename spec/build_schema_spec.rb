@@ -132,6 +132,26 @@ RSpec.describe Surrealist do
       it 'works' do
         expect(Guest.new.build_schema).to eq(name: 'Child')
       end
+
+      context 'with invalid ancestor' do
+        it 'raises RuntimeError' do
+          expect { eval 'class IncorrectGuest < Host
+                           delegate_surrealization_to Integer
+                         end' }
+            .to raise_error(Surrealist::InvalidSchemaDelegation,
+                            'Class not present in ancestors')
+        end
+      end
+
+      context 'with invalid arguement type' do
+        it 'raises TypeError' do
+          expect { eval "class InvalidGuest < Host
+                           delegate_surrealization_to 'InvalidHost'
+                         end" }
+            .to raise_error(TypeError,
+                            'Expected type of Class got String instead')
+        end
+      end
     end
   end
 end
