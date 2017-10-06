@@ -1,17 +1,10 @@
 # frozen_string_literal: true
 
 require 'coveralls'
-require 'simplecov'
 
-::SimpleCov.start do
-  filters.clear
-
-  add_filter do |src|
-    src.filename =~ /^#{SimpleCov.root}\/lib/
-  end
+Coveralls.wear! do
+  add_filter '/spec/'
 end
-
-Coveralls.wear!
 
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
