@@ -142,6 +142,24 @@ class DifferentClass
   # expecting: { name: 'smth' }
 end
 
+class Vegetable; include Surrealist; end
+
+class Potato < Vegetable
+  delegate_surrealization_to Host
+
+  def name
+    'Potato'
+  end
+  # expecting: { name: 'Potato' }
+end
+
+class Chips < Potato
+  def name
+    'Lays'
+  end
+  # expecting: Surrealist::UnknownSchemaError
+end
+
 RSpec.describe Surrealist do
   describe '#build_schema' do
     context 'with defined schema' do
@@ -208,6 +226,14 @@ RSpec.describe Surrealist do
       context 'with unrelated class' do
         it 'works' do
           expect(DifferentClass.new.build_schema).to eq(name: 'smth')
+        end
+      end
+
+      context 'when parent class includes surrealist, but delegation is not specified' do
+        it 'raises RuntimeError' do
+          expect { Chips.new.surrealize }
+            .to raise_error(Surrealist::UnknownSchemaError,
+              "Can't serialize Chips - no schema was provided.")
         end
       end
     end
