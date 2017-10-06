@@ -4,7 +4,7 @@ require 'surrealist/class_methods'
 require 'surrealist/instance_methods'
 require 'surrealist/bool'
 require 'surrealist/any'
-require 'surrealist/utils'
+require 'surrealist/hash_utils'
 require 'surrealist/type_helper'
 require 'json'
 
@@ -22,102 +22,123 @@ module Surrealist
   # Error class for failed type-checks.
   class InvalidTypeError < TypeError; end
 
-  # @param [Class] base class to include/extend +Surrealist+.
-  def self.included(base)
-    base.extend(Surrealist::ClassMethods)
-    base.include(Surrealist::InstanceMethods)
-  end
-
-  # Dumps the object's methods corresponding to the schema
-  # provided in the object's class and type-checks the values.
-  #
-  # @param [Object] instance of a class that has +Surrealist+ included.
-  #
-  # @return [String] a json-formatted string corresponding to the schema
-  #   provided in the object's class. Values will be taken from the return values
-  #   of appropriate methods from the object.
-  #
-  # @raise +Surrealist::UnknownSchemaError+ if no schema was provided in the object's class.
-  #
-  # @raise +Surrealist::InvalidTypeError+ if type-check failed at some point.
-  #
-  # @raise +Surrealist::UndefinedMethodError+ if a key defined in the schema
-  #   does not have a corresponding method on the object.
-  #
-  # @example Define a schema and surrealize the object
-  #   class User
-  #     include Surrealist
-  #
-  #     json_schema do
-  #       {
-  #         name: String,
-  #         age: Integer,
-  #       }
-  #     end
-  #
-  #     def name
-  #       'Nikita'
-  #     end
-  #
-  #     def age
-  #       23
-  #     end
-  #   end
-  #
-  #   User.new.surrealize
-  #   # => "{\"name\":\"Nikita\",\"age\":23}"
-  #   # For more examples see README
-  def self.surrealize(instance, camelize:)
-    ::JSON.dump(build_schema(instance, camelize: camelize))
-  end
-
-  # Builds hash from schema provided in the object's class and type-checks the values.
-  #
-  # @param [Object] instance of a class that has +Surrealist+ included.
-  #
-  # @return [Hash] a hash corresponding to the schema
-  #   provided in the object's class. Values will be taken from the return values
-  #   of appropriate methods from the object.
-  #
-  # @raise +Surrealist::UnknownSchemaError+ if no schema was provided in the object's class.
-  #
-  # @raise +Surrealist::InvalidTypeError+ if type-check failed at some point.
-  #
-  # @raise +Surrealist::UndefinedMethodError+ if a key defined in the schema
-  #   does not have a corresponding method on the object.
-  #
-  # @example Define a schema and surrealize the object
-  #   class User
-  #     include Surrealist
-  #
-  #     json_schema do
-  #       {
-  #         name: String,
-  #         age: Integer,
-  #       }
-  #     end
-  #
-  #     def name
-  #       'Nikita'
-  #     end
-  #
-  #     def age
-  #       23
-  #     end
-  #   end
-  #
-  #   User.new.build_schema
-  #   # => { name: 'Nikita', age: 23 }
-  #   # For more examples see README
-  def self.build_schema(instance, camelize:)
-    schema = instance.class.instance_variable_get('@__surrealist_schema')
-
-    if schema.nil?
-      raise Surrealist::UnknownSchemaError, "Can't serialize #{instance.class} - no schema was provided."
+  class << self
+    # @param [Class] base class to include/extend +Surrealist+.
+    def included(base)
+      base.extend(Surrealist::ClassMethods)
+      base.include(Surrealist::InstanceMethods)
     end
 
-    hash = Builder.call(schema: Surrealist::Utils.deep_copy(schema), instance: instance)
+    # Dumps the object's methods corresponding to the schema
+    # provided in the object's class and type-checks the values.
+    #
+    # @param [Object] instance of a class that has +Surrealist+ included.
+    # @param [Boolean] camelize optional argument for converting hash to camelBack.
+    # @param [Boolean] include_root optional argument for having the root key of the resulting hash
+    #   as instance's class name.
+    #
+    # @return [String] a json-formatted string corresponding to the schema
+    #   provided in the object's class. Values will be taken from the return values
+    #   of appropriate methods from the object.
+    #
+    # @raise +Surrealist::UnknownSchemaError+ if no schema was provided in the object's class.
+    #
+    # @raise +Surrealist::InvalidTypeError+ if type-check failed at some point.
+    #
+    # @raise +Surrealist::UndefinedMethodError+ if a key defined in the schema
+    #   does not have a corresponding method on the object.
+    #
+    # @example Define a schema and surrealize the object
+    #   class User
+    #     include Surrealist
+    #
+    #     json_schema do
+    #       {
+    #         name: String,
+    #         age: Integer,
+    #       }
+    #     end
+    #
+    #     def name
+    #       'Nikita'
+    #     end
+    #
+    #     def age
+    #       23
+    #     end
+    #   end
+    #
+    #   User.new.surrealize
+    #   # => "{\"name\":\"Nikita\",\"age\":23}"
+    #   # For more examples see README
+    def surrealize(instance:, camelize:, include_root:)
+      ::JSON.dump(build_schema(instance: instance, camelize: camelize, include_root: include_root))
+    end
 
-    camelize ? Surrealist::Utils.camelize_hash(hash) : hash
+    # Builds hash from schema provided in the object's class and type-checks the values.
+    #
+    # @param [Object] instance of a class that has +Surrealist+ included.
+    # @param [Boolean] camelize optional argument for converting hash to camelBack.
+    # @param [Boolean] include_root optional argument for having the root key of the resulting hash
+    #   as instance's class name.
+    #
+    # @return [Hash] a hash corresponding to the schema
+    #   provided in the object's class. Values will be taken from the return values
+    #   of appropriate methods from the object.
+    #
+    # @raise +Surrealist::UnknownSchemaError+ if no schema was provided in the object's class.
+    #
+    # @raise +Surrealist::InvalidTypeError+ if type-check failed at some point.
+    #
+    # @raise +Surrealist::UndefinedMethodError+ if a key defined in the schema
+    #   does not have a corresponding method on the object.
+    #
+    # @example Define a schema and surrealize the object
+    #   class User
+    #     include Surrealist
+    #
+    #     json_schema do
+    #       {
+    #         name: String,
+    #         age: Integer,
+    #       }
+    #     end
+    #
+    #     def name
+    #       'Nikita'
+    #     end
+    #
+    #     def age
+    #       23
+    #     end
+    #   end
+    #
+    #   User.new.build_schema
+    #   # => { name: 'Nikita', age: 23 }
+    #   # For more examples see README
+    def build_schema(instance:, camelize:, include_root:)
+      schema = instance.class.instance_variable_get('@__surrealist_schema')
+
+      raise_unknown_schema!(instance) if schema.nil?
+
+      normalized_schema = Surrealist::HashUtils.deep_copy(
+        hash:         schema,
+        include_root: include_root,
+        camelize:     camelize,
+        klass:        instance.class.name,
+      )
+
+      hash = Builder.call(schema: normalized_schema, instance: instance)
+      camelize ? Surrealist::HashUtils.camelize_hash(hash) : hash
+    end
+
+    # Raises Surrealist::UnknownSchemaError
+    #
+    # @param [Object] instance instance of the class without schema defined.
+    #
+    # @raise Surrealist::UnknownSchemaError
+    def raise_unknown_schema!(instance)
+      raise Surrealist::UnknownSchemaError, "Can't serialize #{instance.class} - no schema was provided."
+    end
   end
 end

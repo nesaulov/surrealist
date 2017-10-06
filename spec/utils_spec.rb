@@ -2,9 +2,9 @@
 
 require_relative '../lib/surrealist'
 
-RSpec.describe Surrealist::Utils do
+RSpec.describe Surrealist::HashUtils do
   describe '#deep_copy' do
-    subject(:copy) { described_class.deep_copy(object) }
+    subject(:copy) { described_class.deep_copy(hash: object) }
 
     shared_examples 'object is cloned deeply' do
       specify do

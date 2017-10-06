@@ -24,11 +24,11 @@ class SeriousCat
 
   json_schema do
     {
-      weight: Types::String,
+      weight:   Types::String,
       cat_food: {
         amount: Types::Strict::Int,
-        brand: Types::Strict::String,
-      }
+        brand:  Types::Strict::String,
+      },
     }
   end
 
@@ -46,7 +46,51 @@ class CatFood
 
   def initialize(amount:, brand:)
     @amount = amount
-    @brand = brand
+    @brand  = brand
+  end
+end
+
+class Animal
+  class Dog
+    include Surrealist
+
+    json_schema do
+      { breed: String }
+    end
+
+    def breed
+      'Collie'
+    end
+  end
+end
+
+module Instrument
+  class Guitar
+    include Surrealist
+
+    json_schema do
+      { brand_name: Types::Strict::String }
+    end
+
+    def brand_name
+      'Fender'
+    end
+  end
+end
+
+class Code
+  class Language
+    class Ruby
+      include Surrealist
+
+      json_schema do
+        { age: Types::String }
+      end
+
+      def age
+        '22 years'
+      end
+    end
   end
 end
 
@@ -73,7 +117,6 @@ RSpec.describe Surrealist do
       end
     end
 
-
     context 'with nested objects' do
       let(:instance) { SeriousCat.new }
 
@@ -84,8 +127,8 @@ RSpec.describe Surrealist do
 
       it 'surrealizes' do
         expect(JSON.parse(instance.surrealize(include_root: true)))
-          .to eq('serious_cat' => { 'weight' => '3 kilos',
-                                    'cat_food' => {'amount' => 3, 'brand' => 'Whiskas' } })
+          .to eq('serious_cat' => { 'weight'   => '3 kilos',
+                                    'cat_food' => { 'amount' => 3, 'brand' => 'Whiskas' } })
       end
 
       it 'camelizes' do
@@ -93,8 +136,73 @@ RSpec.describe Surrealist do
           .to eq(seriousCat: { weight: '3 kilos', catFood: { amount: 3, brand: 'Whiskas' } })
 
         expect(JSON.parse(instance.surrealize(include_root: true, camelize: true)))
-          .to eq('seriousCat' => { 'weight' => '3 kilos',
-                                    'catFood' => {'amount' => 3, 'brand' => 'Whiskas' } })
+          .to eq('seriousCat' => { 'weight'  => '3 kilos',
+                                   'catFood' => { 'amount' => 3, 'brand' => 'Whiskas' } })
+      end
+    end
+
+    context 'with nested classes' do
+      let(:instance) { Animal::Dog.new }
+
+      it 'builds schema' do
+        expect(instance.build_schema(include_root: true)).to eq(dog: { breed: 'Collie' })
+      end
+
+      it 'surrealizes' do
+        expect(JSON.parse(instance.surrealize(include_root: true)))
+          .to eq('dog' => { 'breed' => 'Collie' })
+      end
+
+      it 'camelizes' do
+        expect(instance.build_schema(include_root: true, camelize: true))
+          .to eq(dog: { breed: 'Collie' })
+
+        expect(JSON.parse(instance.surrealize(include_root: true, camelize: true)))
+          .to eq('dog' => { 'breed' => 'Collie' })
+      end
+    end
+
+    context 'Module::Class' do
+      let(:instance) { Instrument::Guitar.new }
+
+      it 'builds schema' do
+        expect(instance.build_schema(include_root: true))
+          .to eq(guitar: { brand_name: 'Fender' })
+      end
+
+      it 'surrealizes' do
+        expect(JSON.parse(instance.surrealize(include_root: true)))
+          .to eq('guitar' => { 'brand_name' => 'Fender' })
+      end
+
+      it 'camelizes' do
+        expect(instance.build_schema(include_root: true, camelize: true))
+          .to eq(guitar: { brandName: 'Fender' })
+
+        expect(JSON.parse(instance.surrealize(include_root: true, camelize: true)))
+          .to eq('guitar' => { 'brandName' => 'Fender' })
+      end
+    end
+
+    context 'triple nesting' do
+      let(:instance) { Code::Language::Ruby.new }
+
+      it 'builds schema' do
+        expect(instance.build_schema(include_root: true))
+          .to eq(ruby: { age: '22 years' })
+      end
+
+      it 'surrealizes' do
+        expect(JSON.parse(instance.surrealize(include_root: true)))
+          .to eq('ruby' => { 'age' => '22 years' })
+      end
+
+      it 'camelizes' do
+        expect(instance.build_schema(include_root: true, camelize: true))
+          .to eq(ruby: { age: '22 years' })
+
+        expect(JSON.parse(instance.surrealize(include_root: true, camelize: true)))
+          .to eq('ruby' => { 'age' => '22 years' })
       end
     end
   end
