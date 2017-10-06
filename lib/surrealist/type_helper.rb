@@ -3,6 +3,7 @@
 module Surrealist
   # Service class for type checking
   class TypeHelper
+    # Dry-types class matcher
     DRY_TYPE_CLASS = 'Dry::Types'
 
     class << self

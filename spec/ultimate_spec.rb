@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'json'
 require_relative '../lib/surrealist'
 
 class Human
@@ -122,6 +121,27 @@ RSpec.describe Surrealist do
         .to eq(name: 'John', lastName: 'Doe', properties: { gender: 'male', age: 42 },
                creditCard: { cardNumber: 1234, cardHolder: 'John Doe' },
                children: { male: { count: 2 }, female: { count: 1 } })
+    end
+
+    it 'includes root' do
+      expect(JSON.parse(human.surrealize(camelize: true, include_root: true)))
+        .to eq('human' => {
+          'name'          => 'John', 'lastName' => 'Doe', 'properties' => {
+            'gender' => 'male', 'age' => 42
+          }, 'creditCard' => {
+            'cardNumber' => 1234, 'cardHolder' => 'John Doe'
+          }, 'children'   => {
+            'male'   => { 'count' => 2 },
+            'female' => { 'count' => 1 },
+          }
+        })
+
+      expect(human.build_schema(camelize: true, include_root: true))
+        .to eq(human: {
+          name: 'John', lastName: 'Doe', properties: { gender: 'male', age: 42 },
+          creditCard: { cardNumber: 1234, cardHolder: 'John Doe' },
+          children:   { male: { count: 2 }, female: { count: 1 } }
+        })
     end
   end
 end

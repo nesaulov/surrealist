@@ -299,12 +299,48 @@ RSpec.describe Surrealist do
     context 'with undefined schema' do
       let(:error) { "Can't serialize WithoutSchema - no schema was provided." }
 
-      it 'raises error on #surrealize' do
+      it 'raises Surrealist::UnknownSchemaError on #surrealize' do
         expect { WithoutSchema.new.surrealize }
           .to raise_error(Surrealist::UnknownSchemaError, error)
 
         expect { WithoutSchema.new.surrealize(camelize: true) }
           .to raise_error(Surrealist::UnknownSchemaError, error)
+      end
+    end
+
+    context 'with anonymous classes' do
+      context 'with `include_root` passed' do
+        let(:error) { "Can't wrap schema in root key - class name was not passed" }
+        let(:instance) do
+          Class.new do
+            include Surrealist
+
+            json_schema { { name: String } }
+
+            def name; 'string'; end
+          end.new
+        end
+
+        it 'raises Surrealist::UnknownRootError on #surrealize' do
+          expect { instance.surrealize(include_root: true) }
+            .to raise_error(Surrealist::UnknownRootError, error)
+        end
+      end
+
+      context 'without `include_root`' do
+        let(:instance) do
+          Class.new do
+            include Surrealist
+
+            json_schema { { name: String } }
+
+            def name; 'string'; end
+          end.new
+        end
+
+        it 'surrealizes' do
+          expect(JSON.parse(instance.surrealize)).to eq('name' => 'string')
+        end
       end
     end
   end
