@@ -252,7 +252,7 @@ class Animal
   end
 end
 
-Dog::Animal.new.surrealize(include_root: true)
+Animal::Dog.new.surrealize(include_root: true)
 # => '{ "dog": { "breed": "Collie" } }'
 ```
 Nesting namespaces are [yet to be implemented.](https://github.com/nesaulov/surrealist/issues/14)
