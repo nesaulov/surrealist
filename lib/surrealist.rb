@@ -1,33 +1,18 @@
 # frozen_string_literal: true
 
-require 'surrealist/class_methods'
-require 'surrealist/instance_methods'
-require 'surrealist/bool'
 require 'surrealist/any'
+require 'surrealist/bool'
+require 'surrealist/builder'
+require 'surrealist/class_methods'
+require 'surrealist/exception_raiser'
 require 'surrealist/hash_utils'
+require 'surrealist/instance_methods'
+require 'surrealist/schema_definer'
 require 'surrealist/type_helper'
 require 'json'
 
 # Main module that provides the +json_schema+ class method and +surrealize+ instance method.
 module Surrealist
-  # Error class for classes without defined +schema+.
-  class UnknownSchemaError < RuntimeError; end
-
-  # Error class for classes with +json_schema+ defined not as a hash.
-  class InvalidSchemaError < RuntimeError; end
-
-  # Error class for +NoMethodError+.
-  class UndefinedMethodError < RuntimeError; end
-
-  # Error class for failed type-checks.
-  class InvalidTypeError < TypeError; end
-
-  # Error class for undefined root keys for schema wrapping.
-  class UnknownRootError < RuntimeError; end
-
-  # Error class for undefined class to delegate schema.
-  class InvalidSchemaDelegation < RuntimeError; end
-
   class << self
     # @param [Class] base class to include/extend +Surrealist+.
     def included(base)
@@ -126,7 +111,7 @@ module Surrealist
       delegatee = instance.class.instance_variable_get('@__surrealist_schema_parent')
       schema = (delegatee || instance.class).instance_variable_get('@__surrealist_schema')
 
-      raise_unknown_schema!(instance) if schema.nil?
+      Surrealist::ExceptionRaiser.raise_unknown_schema!(instance) if schema.nil?
 
       normalized_schema = Surrealist::HashUtils.deep_copy(
         hash:         schema,
@@ -137,15 +122,6 @@ module Surrealist
 
       hash = Builder.call(schema: normalized_schema, instance: instance)
       camelize ? Surrealist::HashUtils.camelize_hash(hash) : hash
-    end
-
-    # Raises Surrealist::UnknownSchemaError
-    #
-    # @param [Object] instance instance of the class without schema defined.
-    #
-    # @raise Surrealist::UnknownSchemaError
-    def raise_unknown_schema!(instance)
-      raise Surrealist::UnknownSchemaError, "Can't serialize #{instance.class} - no schema was provided."
     end
   end
 end

@@ -178,12 +178,14 @@ RSpec.describe Surrealist do
                             'Wrong type for key `foo`. Expected Integer, got String.')
         end
       end
+
       context 'with inheritance' do
         it 'works' do
           expect(Infant.new.build_schema).to eq(foo: 'foo', bar: [1, 2])
         end
       end
     end
+
     context 'with delegated schema' do
       it 'works' do
         expect(Guest.new.build_schema).to eq(name: 'Child')
@@ -193,7 +195,7 @@ RSpec.describe Surrealist do
         it 'raises RuntimeError' do
           expect { FriendOfGuest.new.build_schema }
             .to raise_error(Surrealist::UnknownSchemaError,
-              "Can't serialize FriendOfGuest - no schema was provided.")
+                            "Can't serialize FriendOfGuest - no schema was provided.")
         end
       end
 
@@ -205,19 +207,23 @@ RSpec.describe Surrealist do
 
       context 'with invalid klass' do
         it 'raises RuntimeError' do
-          expect { eval 'class IncorrectGuest < Host
+          expect do
+            eval 'class IncorrectGuest < Host
                            delegate_surrealization_to Integer
-                         end' }
+                         end'
+          end
             .to raise_error(Surrealist::InvalidSchemaDelegation,
                             'Class does not include Surrealist')
         end
       end
 
-      context 'with invalid arguement type' do
+      context 'with invalid argument type' do
         it 'raises TypeError' do
-          expect { eval "class InvalidGuest < Host
+          expect do
+            eval "class InvalidGuest < Host
                            delegate_surrealization_to 'InvalidHost'
-                         end" }
+                         end"
+          end
             .to raise_error(TypeError,
                             'Expected type of Class got String instead')
         end
@@ -233,7 +239,7 @@ RSpec.describe Surrealist do
         it 'raises RuntimeError' do
           expect { Chips.new.surrealize }
             .to raise_error(Surrealist::UnknownSchemaError,
-              "Can't serialize Chips - no schema was provided.")
+                            "Can't serialize Chips - no schema was provided.")
         end
       end
     end
