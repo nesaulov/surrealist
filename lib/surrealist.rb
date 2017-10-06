@@ -22,6 +22,9 @@ module Surrealist
   # Error class for failed type-checks.
   class InvalidTypeError < TypeError; end
 
+  # Error class for undefined root keys for schema wrapping.
+  class UnknownRootError < RuntimeError; end
+
   class << self
     # @param [Class] base class to include/extend +Surrealist+.
     def included(base)
@@ -123,9 +126,9 @@ module Surrealist
 
       normalized_schema = Surrealist::HashUtils.deep_copy(
         hash:         schema,
-        include_root: include_root,
-        camelize:     camelize,
         klass:        instance.class.name,
+        camelize:     camelize,
+        include_root: include_root,
       )
 
       hash = Builder.call(schema: normalized_schema, instance: instance)

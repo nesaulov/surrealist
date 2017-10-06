@@ -12,8 +12,9 @@ module Surrealist
       # @param [String] klass instance's class name.
       #
       # @return [Object] a copied object
-      def deep_copy(hash:, include_root: false, camelize: false, klass: '')
+      def deep_copy(hash:, include_root: false, camelize: false, klass: false)
         return copy_hash(hash) unless include_root
+        raise_unknown_root! if include_root && !klass
 
         actual_class = extract_class(klass)
         root_key = camelize ? camelize(actual_class, false).to_sym : underscore(actual_class).to_sym
@@ -117,6 +118,13 @@ module Surrealist
       # @return [String] extracted class
       def extract_class(string)
         uncapitalize(string.split('::').last)
+      end
+
+      # Raises Surrealist::UnknownRootError if class's name is unknown.
+      #
+      # @raise Surrealist::UnknownRootError
+      def raise_unknown_root!
+        raise Surrealist::UnknownRootError, "Can't wrap schema in root key - class name was not passed"
       end
     end
   end
