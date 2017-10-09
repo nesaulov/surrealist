@@ -92,14 +92,14 @@ module Surrealist
     # @param [Boolean] include_root optional argument for having the root key of the resulting hash
     #   as instance's class name.
     #
-    # @return [Object] the Collection#map! with elements being json-formatted string corresponding
+    # @return [Object] the Collection#map with elements being json-formatted string corresponding
     #   to the schema provided in the object's class. Values will be taken from the return values
     #   of appropriate methods from the object.
     #
     # @raise +Surrealist::InvalidCollectionError+ if invalid collection passed.
     #
     # @example surrealize a given collection of Surrealist objects
-    #   User.all.surrealize
+    #   Surrealist.surrealize_collection(User.all)
     #   # => "[{\"name\":\"Nikita\",\"age\":23}, {\"name\":\"Alessandro\",\"age\":24}]"
     #   # For more examples see README
     def surrealize_collection(collection, camelize: false, include_root: false)
