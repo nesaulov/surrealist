@@ -28,6 +28,7 @@ module Surrealist
   # Error class for undefined class to delegate schema.
   class InvalidSchemaDelegation < RuntimeError; end
 
+  # Error class for invalid object given to iteratively apply surrealize.
   class InvalidCollectionError < ArgumentError; end
 
   class << self
@@ -83,6 +84,24 @@ module Surrealist
       ::JSON.dump(build_schema(instance: instance, camelize: camelize, include_root: include_root))
     end
 
+    # Iterates over a collection of Surrealist Objects and
+    # maps surrealize to each record.
+    #
+    # @param [Object] Collection of instances of a class that has +Surrealist+ included.
+    # @param [Boolean] camelize optional argument for converting hash to camelBack.
+    # @param [Boolean] include_root optional argument for having the root key of the resulting hash
+    #   as instance's class name.
+    #
+    # @return [Object] the Collection#map! with elements being json-formatted string corresponding
+    #   to the schema provided in the object's class. Values will be taken from the return values
+    #   of appropriate methods from the object.
+    #
+    # @raise +Surrealist::InvalidCollectionError+ if invalid collection passed.
+    #
+    # @example surrealize a given collection of Surrealist objects
+    #   User.all.surrealize
+    #   # => "[{\"name\":\"Nikita\",\"age\":23}, {\"name\":\"Alessandro\",\"age\":24}]"
+    #   # For more examples see README
     def surrealize_collection(collection, camelize: false, include_root: false)
       raise raise_invalid_collection! unless collection.respond_to?(:each)
       collection.map do |record|
@@ -157,6 +176,9 @@ module Surrealist
       raise Surrealist::UnknownSchemaError, "Can't serialize #{instance.class} - no schema was provided."
     end
 
+    # Raises Surrealist::InvalidCollectionError
+    #
+    # @raise Surrealist::InvalidCollectionError
     def raise_invalid_collection!
       raise Surrealist::InvalidCollectionError, "Can't serialize collection - must respond to :each"
     end
