@@ -28,6 +28,8 @@ module Surrealist
   # Error class for undefined class to delegate schema.
   class InvalidSchemaDelegation < RuntimeError; end
 
+  class InvalidCollectionError < ArgumentError; end
+
   class << self
     # @param [Class] base class to include/extend +Surrealist+.
     def included(base)
@@ -79,6 +81,13 @@ module Surrealist
     #   # For more examples see README
     def surrealize(instance:, camelize:, include_root:)
       ::JSON.dump(build_schema(instance: instance, camelize: camelize, include_root: include_root))
+    end
+
+    def surrealize_collection(collection, camelize: false, include_root: false)
+      raise raise_invalid_collection! unless collection.respond_to?(:each)
+      collection.map do |record|
+        surrealize(instance: record, camelize: camelize, include_root: include_root)
+      end
     end
 
     # Builds hash from schema provided in the object's class and type-checks the values.
@@ -146,6 +155,10 @@ module Surrealist
     # @raise Surrealist::UnknownSchemaError
     def raise_unknown_schema!(instance)
       raise Surrealist::UnknownSchemaError, "Can't serialize #{instance.class} - no schema was provided."
+    end
+
+    def raise_invalid_collection!
+      raise Surrealist::InvalidCollectionError, "Can't serialize collection - must respond to :each"
     end
   end
 end
