@@ -46,7 +46,7 @@ class Item
   json_schema do { name: String } end
   attr_reader :id, :name
   def initialize(attributes)
-    @id, @name, @email = attributes.values_at(:id, :name)
+    @id, @name = attributes.values_at(:id, :name)
   end
 end
 class ItemsMapper < ROM::Mapper
