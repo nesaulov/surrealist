@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Surrealist
+  # A helper class for hashes transformations.
   class HashUtils
     class << self
       # Converts hash's keys to camelBack keys.

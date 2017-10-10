@@ -15,6 +15,9 @@ require 'json'
 
 # Main module that provides the +json_schema+ class method and +surrealize+ instance method.
 module Surrealist
+  # Default namespaces nesting level
+  DEFAULT_NESTING_LEVEL = 666
+
   class << self
     # @param [Class] base class to include/extend +Surrealist+.
     def included(base)

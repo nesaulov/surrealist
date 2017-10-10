@@ -22,6 +22,7 @@ module Surrealist
   # Error class for cases where +namespaces_nesting_level+ is set to 0.
   class InvalidNestingLevel < RuntimeError; end
 
+  # A class that raises all Surrealist exceptions
   class ExceptionRaiser
     class << self
       # Raises Surrealist::InvalidSchemaDelegation if destination of delegation does not
