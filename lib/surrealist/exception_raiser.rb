@@ -19,6 +19,9 @@ module Surrealist
   # Error class for undefined class to delegate schema.
   class InvalidSchemaDelegation < RuntimeError; end
 
+  # Error class for cases where +namespaces_nesting_level+ is set to 0.
+  class InvalidNestingLevel < RuntimeError; end
+
   class ExceptionRaiser
     class << self
       # Raises Surrealist::InvalidSchemaDelegation if destination of delegation does not
@@ -44,6 +47,14 @@ module Surrealist
       # @raise Surrealist::UnknownRootError
       def raise_unknown_root!
         raise Surrealist::UnknownRootError, "Can't wrap schema in root key - class name was not passed"
+      end
+
+      # Raises Surrealist::InvalidNestingLevel if +namespaces_nesting_level+ is set to 0.
+      #
+      # @raise Surrealist::InvalidNestingLevel
+      def raise_invalid_nesting_level!
+        raise Surrealist::InvalidNestingLevel,
+              'There is no point in specifying `namespaces_nesting_level: 0`'
       end
     end
   end
