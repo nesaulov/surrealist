@@ -34,7 +34,7 @@ module Surrealist
         end
       end
 
-      # Extract last class from a namespace.
+      # Extracts bottom-level class from a namespace.
       #
       # @param [String] string full namespace
       #
