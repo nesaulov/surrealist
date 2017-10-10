@@ -4,10 +4,12 @@ require 'surrealist/any'
 require 'surrealist/bool'
 require 'surrealist/builder'
 require 'surrealist/class_methods'
+require 'surrealist/copier'
 require 'surrealist/exception_raiser'
 require 'surrealist/hash_utils'
 require 'surrealist/instance_methods'
 require 'surrealist/schema_definer'
+require 'surrealist/string_utils'
 require 'surrealist/type_helper'
 require 'json'
 
@@ -62,8 +64,16 @@ module Surrealist
     #   User.new.surrealize
     #   # => "{\"name\":\"Nikita\",\"age\":23}"
     #   # For more examples see README
-    def surrealize(instance:, camelize:, include_root:)
-      ::JSON.dump(build_schema(instance: instance, camelize: camelize, include_root: include_root))
+    def surrealize(instance:, camelize:, include_root:, include_namespaces:, namespaces_nesting_level:)
+      ::JSON.dump(
+        build_schema(
+          instance:           instance,
+          camelize:           camelize,
+          include_root:       include_root,
+          include_namespaces: include_namespaces,
+          namespaces_nesting_level: namespaces_nesting_level,
+        ),
+      )
     end
 
     # Builds hash from schema provided in the object's class and type-checks the values.
@@ -107,17 +117,19 @@ module Surrealist
     #   User.new.build_schema
     #   # => { name: 'Nikita', age: 23 }
     #   # For more examples see README
-    def build_schema(instance:, camelize:, include_root:)
+    def build_schema(instance:, camelize:, include_root:, include_namespaces:, namespaces_nesting_level:)
       delegatee = instance.class.instance_variable_get('@__surrealist_schema_parent')
       schema = (delegatee || instance.class).instance_variable_get('@__surrealist_schema')
 
       Surrealist::ExceptionRaiser.raise_unknown_schema!(instance) if schema.nil?
 
-      normalized_schema = Surrealist::HashUtils.deep_copy(
-        hash:         schema,
-        klass:        instance.class.name,
-        camelize:     camelize,
-        include_root: include_root,
+      normalized_schema = Surrealist::Copier.deep_copy(
+        hash:               schema,
+        klass:              instance.class.name,
+        camelize:           camelize,
+        include_root:       include_root,
+        nesting_level:      namespaces_nesting_level,
+        include_namespaces: include_namespaces,
       )
 
       hash = Builder.call(schema: normalized_schema, instance: instance)
