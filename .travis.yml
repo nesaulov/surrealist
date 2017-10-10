@@ -1,6 +1,7 @@
 language: ruby
 sudo: false
 cache: bundler
+env: JRUBY_OPTS= --debug
 before_install: gem install bundler
 script: bundle exec rspec
 rvm:
@@ -8,7 +9,11 @@ rvm:
   - 2.2.5
   - 2.3.1
   - 2.4.0
+  - jruby-9.0.0.0
+  - jruby-9.1.13.0
+  - jruby-head
   - ruby-head
 matrix:
   allow_failures:
     - rvm: ruby-head
+    - rvm: jruby-head
