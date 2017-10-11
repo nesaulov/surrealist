@@ -48,7 +48,7 @@ module Surrealist
         raise Surrealist::ExceptionRaiser.raise_invalid_collection!
       end
       collection.map do |record|
-        surrealize(instance: record, camelize: camelize, include_root: include_root)
+        record.surrealize(camelize: camelize, include_root: include_root)
       end
     end
 
