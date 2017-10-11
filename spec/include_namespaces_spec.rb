@@ -103,8 +103,8 @@ RSpec.describe Surrealist do
       describe '#build_schema' do
         it 'works with all numbers' do
           expect { instance.build_schema(include_namespaces: true, namespaces_nesting_level: 0) }
-            .to raise_error(Surrealist::InvalidNestingLevel,
-                            'There is no point in specifying `namespaces_nesting_level: 0`')
+            .to raise_error(ArgumentError,
+                            'Expected `namespaces_nesting_level` to be a positive integer, got: 0')
 
           expect(instance.build_schema(include_namespaces: true, namespaces_nesting_level: 1))
             .to eq(withdraws: { withdraws_amount: 34 })
@@ -133,8 +133,8 @@ RSpec.describe Surrealist do
             instance.build_schema(include_namespaces: true,
                                   namespaces_nesting_level: 0,
                                   camelize: true)
-          end.to raise_error(Surrealist::InvalidNestingLevel,
-                             'There is no point in specifying `namespaces_nesting_level: 0`')
+          end.to raise_error(ArgumentError,
+                             'Expected `namespaces_nesting_level` to be a positive integer, got: 0')
 
           expect(instance.build_schema(include_namespaces: true,
                                        namespaces_nesting_level: 1,
@@ -175,8 +175,8 @@ RSpec.describe Surrealist do
             instance.build_schema(include_namespaces: true,
                                   namespaces_nesting_level: 0,
                                   include_root: true)
-          end.to raise_error(Surrealist::InvalidNestingLevel,
-                             'There is no point in specifying `namespaces_nesting_level: 0`')
+          end.to raise_error(ArgumentError,
+                             'Expected `namespaces_nesting_level` to be a positive integer, got: 0')
 
           expect(instance.build_schema(include_namespaces: true,
                                        namespaces_nesting_level: 1,
@@ -216,8 +216,8 @@ RSpec.describe Surrealist do
           specify 'with `include_root`' do
             expect do
               instance.build_schema(namespaces_nesting_level: 0, include_root: true)
-            end.to raise_error(Surrealist::InvalidNestingLevel,
-                               'There is no point in specifying `namespaces_nesting_level: 0`')
+            end.to raise_error(ArgumentError,
+                               'Expected `namespaces_nesting_level` to be a positive integer, got: 0')
 
             expect(instance.build_schema(namespaces_nesting_level: 1, include_root: true))
               .to eq(withdraws: { withdraws_amount: 34 })
@@ -244,8 +244,8 @@ RSpec.describe Surrealist do
           specify 'with `camelize`' do
             expect do
               instance.build_schema(namespaces_nesting_level: 0, camelize: true)
-            end.to raise_error(Surrealist::InvalidNestingLevel,
-                               'There is no point in specifying `namespaces_nesting_level: 0`')
+            end.to raise_error(ArgumentError,
+                               'Expected `namespaces_nesting_level` to be a positive integer, got: 0')
 
             expect(instance.build_schema(namespaces_nesting_level: 1, camelize: true))
               .to eq(withdraws: { withdrawsAmount: 34 })
@@ -271,8 +271,8 @@ RSpec.describe Surrealist do
 
           specify 'only with `namespaces_nesting_level`' do
             expect { instance.build_schema(namespaces_nesting_level: 0) }
-              .to raise_error(Surrealist::InvalidNestingLevel,
-                              'There is no point in specifying `namespaces_nesting_level: 0`')
+              .to raise_error(ArgumentError,
+                              'Expected `namespaces_nesting_level` to be a positive integer, got: 0')
 
             expect(instance.build_schema(namespaces_nesting_level: 1))
               .to eq(withdraws: { withdraws_amount: 34 })

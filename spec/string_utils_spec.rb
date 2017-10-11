@@ -130,8 +130,8 @@ RSpec.describe Surrealist::StringUtils do
 
       it 'raises exception on nesting_level == 0' do
         expect { described_class.break_namespaces(klass, camelize: true, nesting_level: 0) }
-          .to raise_error(Surrealist::InvalidNestingLevel,
-                          'There is no point in specifying `namespaces_nesting_level: 0`')
+          .to raise_error(ArgumentError,
+                          'Expected `namespaces_nesting_level` to be a positive integer, got: 0')
       end
     end
 
