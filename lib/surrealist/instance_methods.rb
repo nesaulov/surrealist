@@ -3,14 +3,70 @@
 module Surrealist
   # Instance methods that are included to the object's class
   module InstanceMethods
-    # Invokes +Surrealist+'s class method +surrealize+
-    def surrealize(camelize: false, include_root: false)
-      Surrealist.surrealize(instance: self, camelize: camelize, include_root: include_root)
+    # Dumps the object's methods corresponding to the schema
+    # provided in the object's class and type-checks the values.
+    #
+    # @param [Boolean] camelize optional argument for converting hash to camelBack.
+    # @param [Boolean] include_root optional argument for having the root key of the resulting hash
+    #   as instance's class name.
+    # @param [Boolean] include_namespaces optional argument for having root key as a nested hash of
+    #   instance's namespaces. Animal::Cat.new.surrealize -> (animal: { cat: { weight: '3 kilos' } })
+    # @param [Integer] namespaces_nesting_level level of namespaces nesting.
+    #
+    # @return [String] a json-formatted string corresponding to the schema
+    #   provided in the object's class. Values will be taken from the return values
+    #   of appropriate methods from the object.
+    #
+    # @raise +Surrealist::UnknownSchemaError+ if no schema was provided in the object's class.
+    #
+    # @raise +Surrealist::InvalidTypeError+ if type-check failed at some point.
+    #
+    # @raise +Surrealist::UndefinedMethodError+ if a key defined in the schema
+    #   does not have a corresponding method on the object.
+    #
+    # @example Define a schema and surrealize the object
+    #   class User
+    #     include Surrealist
+    #
+    #     json_schema do
+    #       {
+    #         name: String,
+    #         age: Integer,
+    #       }
+    #     end
+    #
+    #     def name
+    #       'Nikita'
+    #     end
+    #
+    #     def age
+    #       23
+    #     end
+    #   end
+    #
+    #   User.new.surrealize
+    #   # => "{\"name\":\"Nikita\",\"age\":23}"
+    #   # For more examples see README
+    def surrealize(camelize: false, include_root: false, include_namespaces: false, namespaces_nesting_level: DEFAULT_NESTING_LEVEL) # rubocop:disable Metrics/LineLength
+      JSON.dump(
+        build_schema(
+          camelize: camelize,
+          include_root: include_root,
+          include_namespaces: include_namespaces,
+          namespaces_nesting_level: namespaces_nesting_level,
+        ),
+      )
     end
 
     # Invokes +Surrealist+'s class method +build_schema+
-    def build_schema(camelize: false, include_root: false)
-      Surrealist.build_schema(instance: self, camelize: camelize, include_root: include_root)
+    def build_schema(camelize: false, include_root: false, include_namespaces: false, namespaces_nesting_level: DEFAULT_NESTING_LEVEL) # rubocop:disable Metrics/LineLength
+      Surrealist.build_schema(
+        instance: self,
+        camelize: camelize,
+        include_root: include_root,
+        include_namespaces: include_namespaces,
+        namespaces_nesting_level: namespaces_nesting_level,
+      )
     end
   end
 end
