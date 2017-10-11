@@ -3,6 +3,7 @@
 require 'surrealist/any'
 require 'surrealist/bool'
 require 'surrealist/builder'
+require 'surrealist/carrier'
 require 'surrealist/class_methods'
 require 'surrealist/copier'
 require 'surrealist/exception_raiser'
@@ -28,9 +29,7 @@ module Surrealist
     # Builds hash from schema provided in the object's class and type-checks the values.
     #
     # @param [Object] instance of a class that has +Surrealist+ included.
-    # @param [Boolean] camelize optional argument for converting hash to camelBack.
-    # @param [Boolean] include_root optional argument for having the root key of the resulting hash
-    #   as instance's class name.
+    # @param [Object] carrier instance of Carrier class that carries arguments passed to +surrealize+
     #
     # @return [Hash] a hash corresponding to the schema
     #   provided in the object's class. Values will be taken from the return values
@@ -66,23 +65,20 @@ module Surrealist
     #   User.new.build_schema
     #   # => { name: 'Nikita', age: 23 }
     #   # For more examples see README
-    def build_schema(instance:, camelize:, include_root:, include_namespaces:, namespaces_nesting_level:)
+    def build_schema(instance:, carrier:)
       delegatee = instance.class.instance_variable_get('@__surrealist_schema_parent')
       schema = (delegatee || instance.class).instance_variable_get('@__surrealist_schema')
 
       Surrealist::ExceptionRaiser.raise_unknown_schema!(instance) if schema.nil?
 
       normalized_schema = Surrealist::Copier.deep_copy(
-        hash:               schema,
-        klass:              instance.class.name,
-        camelize:           camelize,
-        include_root:       include_root,
-        nesting_level:      namespaces_nesting_level,
-        include_namespaces: include_namespaces,
+        hash:    schema,
+        klass:   instance.class.name,
+        carrier: carrier,
       )
 
       hash = Builder.call(schema: normalized_schema, instance: instance)
-      camelize ? Surrealist::HashUtils.camelize_hash(hash) : hash
+      carrier.camelize ? Surrealist::HashUtils.camelize_hash(hash) : hash
     end
   end
 end
