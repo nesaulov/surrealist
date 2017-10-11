@@ -61,7 +61,7 @@ module Surrealist
       #
       # @return [Hash] a nested hash.
       def break_namespaces(klass, camelize:, nesting_level:)
-        Surrealist::ExceptionRaiser.raise_invalid_nesting_level! if nesting_level.zero?
+        Surrealist::ExceptionRaiser.raise_invalid_nesting_level! unless nesting_level.positive?
         arr = klass.split('::')
         arr.last(nesting_level).reverse.inject({}) do |a, n|
           camelize ? Hash[camelize(uncapitalize(n), false).to_sym => a] : Hash[underscore(n).to_sym => a]

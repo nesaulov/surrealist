@@ -225,5 +225,15 @@ RSpec.describe Surrealist::Copier do
 
       it_behaves_like 'schema is camelized and wrapped in the klass root key'
     end
+
+    context 'nesting_level is not an Integer' do
+      let(:copy) { described_class.deep_copy(hash: object, nesting_level: 'wut', klass: klass) }
+
+      it 'raises ArgumentError' do
+        expect { copy }
+          .to raise_error(ArgumentError,
+                          'Expected `namespaces_nesting_level` to be a positive integer, got: wut')
+      end
+    end
   end
 end

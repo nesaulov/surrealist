@@ -20,6 +20,7 @@ module Surrealist
         Surrealist::ExceptionRaiser.raise_unknown_root! unless klass
 
         if include_namespaces || nesting_level != DEFAULT_NESTING_LEVEL
+          Surrealist::ExceptionRaiser.raise_invalid_nesting!(nesting_level) unless nesting_level.is_a?(Integer)
           nested_hash = Surrealist::StringUtils.break_namespaces(klass,
                                                                  camelize: camelize,
                                                                  nesting_level: nesting_level)

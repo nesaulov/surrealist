@@ -50,6 +50,14 @@ module Surrealist
         raise Surrealist::UnknownRootError, "Can't wrap schema in root key - class name was not passed"
       end
 
+      # Raises ArgumentError if namespaces_nesting_level is not an integer.
+      #
+      # @raise ArgumentError
+      def raise_invalid_nesting!(value)
+        raise ArgumentError,
+              "Expected `namespaces_nesting_level` to be a positive integer, got: #{value}"
+      end
+
       # Raises Surrealist::InvalidNestingLevel if +namespaces_nesting_level+ is set to 0.
       #
       # @raise Surrealist::InvalidNestingLevel
