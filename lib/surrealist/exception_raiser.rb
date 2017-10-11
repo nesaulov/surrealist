@@ -22,6 +22,10 @@ module Surrealist
   # Error class for invalid object given to iteratively apply surrealize.
   class InvalidCollectionError < ArgumentError; end
 
+  # Error class for cases where +namespaces_nesting_level+ is set to 0.
+  class InvalidNestingLevel < RuntimeError; end
+
+  # A class that raises all Surrealist exceptions
   class ExceptionRaiser
     class << self
       # Raises Surrealist::InvalidSchemaDelegation if destination of delegation does not
@@ -54,6 +58,22 @@ module Surrealist
       # @raise Surrealist::InvalidCollectionError
       def raise_invalid_collection!
         raise Surrealist::InvalidCollectionError, "Can't serialize collection - must respond to :each"
+      end
+
+      # Raises ArgumentError if namespaces_nesting_level is not an integer.
+      #
+      # @raise ArgumentError
+      def raise_invalid_nesting!(value)
+        raise ArgumentError,
+              "Expected `namespaces_nesting_level` to be a positive integer, got: #{value}"
+      end
+
+      # Raises Surrealist::InvalidNestingLevel if +namespaces_nesting_level+ is set to 0.
+      #
+      # @raise Surrealist::InvalidNestingLevel
+      def raise_invalid_nesting_level!
+        raise Surrealist::InvalidNestingLevel,
+              'There is no point in specifying `namespaces_nesting_level: 0`'
       end
     end
   end
