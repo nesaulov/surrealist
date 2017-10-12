@@ -60,13 +60,14 @@ module Surrealist
 
     # Invokes +Surrealist+'s class method +build_schema+
     def build_schema(camelize: false, include_root: false, include_namespaces: false, namespaces_nesting_level: DEFAULT_NESTING_LEVEL) # rubocop:disable Metrics/LineLength
-      Surrealist.build_schema(
-        instance: self,
+      carrier = Surrealist::Carrier.call(
         camelize: camelize,
-        include_root: include_root,
         include_namespaces: include_namespaces,
+        include_root: include_root,
         namespaces_nesting_level: namespaces_nesting_level,
       )
+
+      Surrealist.build_schema(instance: self, carrier: carrier)
     end
   end
 end

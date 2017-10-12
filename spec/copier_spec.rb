@@ -2,9 +2,20 @@
 
 require_relative '../lib/surrealist'
 
+class NullCarrier
+  attr_reader :camelize, :include_root, :include_namespaces, :namespaces_nesting_level
+
+  def initialize(camelize = false)
+    @camelize                 = camelize
+    @include_root             = false
+    @include_namespaces       = false
+    @namespaces_nesting_level = Surrealist::DEFAULT_NESTING_LEVEL
+  end
+end
+
 RSpec.describe Surrealist::Copier do
   describe '#deep_copy' do
-    shared_examples 'hash is cloned deeply and it`s structure is not changed`' do
+    shared_examples 'hash is cloned deeply and it`s structure is not changed' do
       specify do
         expect(copy).to eq(object)
         expect(copy).to eql(object)
@@ -34,205 +45,92 @@ RSpec.describe Surrealist::Copier do
     let(:klass) { 'SomeClass' }
     let(:error) { "Can't wrap schema in root key - class name was not passed" }
 
-    context 'only `hash`' do
-      let(:copy) { described_class.deep_copy(hash: object) }
+    args_with_root_and_camelize = [
+      { camelize: true, include_namespaces: true, include_root: true, namespaces_nesting_level: 3 },
+      { camelize: true, include_namespaces: true, include_root: true, namespaces_nesting_level: 666 },
+      { camelize: true, include_namespaces: false, include_root: true, namespaces_nesting_level: 3 },
+      { camelize: true, include_namespaces: false, include_root: true, namespaces_nesting_level: 666 },
+      { camelize: true, include_namespaces: true, include_root: false, namespaces_nesting_level: 3 },
+      { camelize: true, include_namespaces: true, include_root: false, namespaces_nesting_level: 666 },
+      { camelize: true, include_namespaces: false, include_root: false, namespaces_nesting_level: 3 },
+    ]
 
-      it_behaves_like 'hash is cloned deeply and it`s structure is not changed`'
+    args_with_root_and_without_camelize = [
+      { camelize: false, include_namespaces: true, include_root: true, namespaces_nesting_level: 3 },
+      { camelize: false, include_namespaces: true, include_root: true, namespaces_nesting_level: 666 },
+      { camelize: false, include_namespaces: false, include_root: true, namespaces_nesting_level: 3 },
+      { camelize: false, include_namespaces: false, include_root: true, namespaces_nesting_level: 666 },
+      { camelize: false, include_namespaces: true, include_root: false, namespaces_nesting_level: 3 },
+      { camelize: false, include_namespaces: true, include_root: false, namespaces_nesting_level: 666 },
+      { camelize: false, include_namespaces: false, include_root: false, namespaces_nesting_level: 3 },
+    ]
+
+    args_without_root = [
+      { camelize: false, include_namespaces: false, include_root: false, namespaces_nesting_level: 666 },
+      { camelize: true, include_namespaces: false, include_root: false, namespaces_nesting_level: 666 },
+    ]
+
+    context 'with `camelize: true`' do
+      args_with_root_and_camelize.each do |hash|
+        carrier = Surrealist::Carrier.call(hash)
+        it_behaves_like 'schema is camelized and wrapped in the klass root key' do
+          let(:copy) { described_class.deep_copy(hash: object, klass: klass, carrier: carrier) }
+        end
+      end
     end
 
-    context '`hash` & `include_root`' do
-      let(:copy) { described_class.deep_copy(hash: object, include_root: true) }
-
-      it_behaves_like 'UnknownRootError is raised'
+    context 'with `camelize: false`' do
+      args_with_root_and_without_camelize.each do |hash|
+        carrier = Surrealist::Carrier.call(hash)
+        it_behaves_like 'schema is wrapped in the klass root key' do
+          let(:copy) { described_class.deep_copy(hash: object, klass: klass, carrier: carrier) }
+        end
+      end
     end
 
-    context '`hash` & `camelize`' do
-      let(:copy) { described_class.deep_copy(hash: object, camelize: true) }
-
-      it_behaves_like 'hash is cloned deeply and it`s structure is not changed`'
+    context 'without klass' do
+      args_with_root_and_camelize.zip(args_with_root_and_without_camelize).flatten.compact.each do |hash|
+        carrier = Surrealist::Carrier.call(hash)
+        it_behaves_like 'UnknownRootError is raised' do
+          let(:copy) { described_class.deep_copy(hash: object, carrier: carrier) }
+        end
+      end
     end
 
-    context '`hash` & `klass`' do
-      let(:copy) { described_class.deep_copy(hash: object, klass: klass) }
-
-      it_behaves_like 'hash is cloned deeply and it`s structure is not changed`'
+    context 'without wrapping' do
+      args_without_root.each do |hash|
+        carrier = Surrealist::Carrier.call(hash)
+        it_behaves_like 'hash is cloned deeply and it`s structure is not changed' do
+          let(:copy) { described_class.deep_copy(hash: object, klass: klass, carrier: carrier) }
+        end
+      end
     end
 
-    context '`hash` & `include_namespaces`' do
-      let(:copy) { described_class.deep_copy(hash: object, include_namespaces: true) }
+    context 'with NullCarrier' do
+      context 'hash & carrier' do
+        let(:copy) { described_class.deep_copy(hash: object, carrier: NullCarrier.new) }
 
-      it_behaves_like 'UnknownRootError is raised'
-    end
-
-    context '`hash` & `nesting_level`' do
-      let(:copy) { described_class.deep_copy(hash: object, nesting_level: 45) }
-
-      it_behaves_like 'UnknownRootError is raised'
-    end
-
-    context '`hash` & `include_root` & `camelize`' do
-      let(:copy) { described_class.deep_copy(hash: object, include_root: true, camelize: true) }
-
-      it_behaves_like 'UnknownRootError is raised'
-    end
-
-    context '`hash` & `include_root` & `klass`' do
-      let(:copy) do
-        described_class.deep_copy(hash: object, include_root: true, klass: klass)
+        it_behaves_like 'hash is cloned deeply and it`s structure is not changed'
       end
 
-      it_behaves_like 'schema is wrapped in the klass root key'
-    end
+      context 'with camelize' do
+        let(:copy) { described_class.deep_copy(hash: object, carrier: NullCarrier.new(true)) }
 
-    context '`hash` & `include_root` & `include_namespaces`' do
-      let(:copy) do
-        described_class.deep_copy(hash: object, include_namespaces: true, include_root: true)
+        it_behaves_like 'hash is cloned deeply and it`s structure is not changed'
       end
 
-      it_behaves_like 'UnknownRootError is raised'
-    end
+      context 'with klass' do
+        let(:copy) { described_class.deep_copy(hash: object, klass: klass, carrier: NullCarrier.new) }
 
-    context '`hash` & `include_root` & `nesting_level`' do
-      let(:copy) do
-        described_class.deep_copy(hash: object, include_root: true, nesting_level: 4)
+        it_behaves_like 'hash is cloned deeply and it`s structure is not changed'
       end
 
-      it_behaves_like 'UnknownRootError is raised'
-    end
+      context 'with klass and camelize' do
+        let(:copy) do
+          described_class.deep_copy(hash: object, klass: klass, carrier: NullCarrier.new(true))
+        end
 
-    context '`hash` & `camelize` & `klass`' do
-      let(:copy) { described_class.deep_copy(hash: object, camelize: true, klass: klass) }
-
-      it_behaves_like 'hash is cloned deeply and it`s structure is not changed`'
-    end
-
-    context '`hash` & `camelize` & `include_namespaces`' do
-      let(:copy) do
-        described_class.deep_copy(hash: object, camelize: true, include_namespaces: true)
-      end
-
-      it_behaves_like 'UnknownRootError is raised'
-    end
-
-    context '`hash` & `camelize` & `nesting_level`' do
-      let(:copy) do
-        described_class.deep_copy(hash: object, camelize: true, nesting_level: 43)
-      end
-
-      it_behaves_like 'UnknownRootError is raised'
-    end
-
-    context '`hash` & `klass` & `include_namespaces`' do
-      let(:copy) do
-        described_class.deep_copy(hash: object, include_namespaces: true, klass: klass)
-      end
-
-      it_behaves_like 'schema is wrapped in the klass root key'
-    end
-
-    context '`hash` & `klass` & `nesting_level`' do
-      let(:copy) do
-        described_class.deep_copy(hash: object, nesting_level: 23, klass: klass)
-      end
-
-      it_behaves_like 'schema is wrapped in the klass root key'
-    end
-
-    context '`hash` & `include_namespaces` & `nesting_level`' do
-      let(:copy) do
-        described_class.deep_copy(hash: object, include_namespaces: true, nesting_level: 43)
-      end
-
-      it_behaves_like 'UnknownRootError is raised'
-    end
-
-    context '`hash` & `include_root` & `klass` & `camelize`' do
-      let(:copy) do
-        described_class.deep_copy(hash: object, include_root: true, klass: klass, camelize: true)
-      end
-
-      it_behaves_like 'schema is camelized and wrapped in the klass root key'
-    end
-
-    context '`hash` & `include_root` & `klass` & `include_namespaces`' do
-      let(:copy) do
-        described_class.deep_copy(hash: object, include_root: true,
-                                  klass: klass, include_namespaces: true)
-      end
-
-      it_behaves_like 'schema is wrapped in the klass root key'
-    end
-
-    context '`hash` & `include_root` & `klass` & `nesting_level`' do
-      let(:copy) do
-        described_class.deep_copy(hash: object, include_root: true,
-                                  klass: klass, nesting_level: 34)
-      end
-
-      it_behaves_like 'schema is wrapped in the klass root key'
-    end
-
-    context '`hash` & `include_root` & `camelize` & `include_namespaces`' do
-      let(:copy) do
-        described_class.deep_copy(hash: object, include_root: true,
-                                  camelize: true, include_namespaces: true)
-      end
-
-      it_behaves_like 'UnknownRootError is raised'
-    end
-
-    context '`hash` & `include_root` & `camelize` & `nesting_level`' do
-      let(:copy) do
-        described_class.deep_copy(hash: object, include_root: true,
-                                  camelize: true, nesting_level: 23)
-      end
-
-      it_behaves_like 'UnknownRootError is raised'
-    end
-
-    context '`hash` & `include_root` & `include_namespaces` & `nesting_level`' do
-      let(:copy) do
-        described_class.deep_copy(hash: object, include_root: true,
-                                  include_namespaces: true, nesting_level: 23)
-      end
-
-      it_behaves_like 'UnknownRootError is raised'
-    end
-
-    context '`hash` & `include_root` & `klass` & `nesting_level`' do
-      let(:copy) do
-        described_class.deep_copy(hash: object, include_root: true,
-                                  klass: klass, nesting_level: 3)
-      end
-
-      it_behaves_like 'schema is wrapped in the klass root key'
-    end
-
-    context '`hash` & `include_root` & `klass` & `camelize` & `include_namespaces`' do
-      let(:copy) do
-        described_class.deep_copy(hash: object, include_root: true,
-                                  klass: klass, camelize: true, include_namespaces: true)
-      end
-
-      it_behaves_like 'schema is camelized and wrapped in the klass root key'
-    end
-
-    context '`hash` & `include_root` & `klass` & `camelize` & `nesting_level`' do
-      let(:copy) do
-        described_class.deep_copy(hash: object, include_root: true,
-                                  klass: klass, camelize: true, nesting_level: 3)
-      end
-
-      it_behaves_like 'schema is camelized and wrapped in the klass root key'
-    end
-
-    context 'nesting_level is not an Integer' do
-      let(:copy) { described_class.deep_copy(hash: object, nesting_level: 'wut', klass: klass) }
-
-      it 'raises ArgumentError' do
-        expect { copy }
-          .to raise_error(ArgumentError,
-                          'Expected `namespaces_nesting_level` to be a positive integer, got: wut')
+        it_behaves_like 'hash is cloned deeply and it`s structure is not changed'
       end
     end
   end

@@ -67,14 +67,6 @@ module Surrealist
         raise ArgumentError,
               "Expected `namespaces_nesting_level` to be a positive integer, got: #{value}"
       end
-
-      # Raises Surrealist::InvalidNestingLevel if +namespaces_nesting_level+ is set to 0.
-      #
-      # @raise Surrealist::InvalidNestingLevel
-      def raise_invalid_nesting_level!
-        raise Surrealist::InvalidNestingLevel,
-              'There is no point in specifying `namespaces_nesting_level: 0`'
-      end
     end
   end
 end

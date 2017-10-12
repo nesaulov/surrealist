@@ -4,7 +4,7 @@ module Surrealist
   # Service class for type checking
   class TypeHelper
     # Dry-types class matcher
-    DRY_TYPE_CLASS = 'Dry::Types'
+    DRY_TYPE_CLASS = 'Dry::Types'.freeze
 
     class << self
       # Checks if value returned from a method is an instance of type class specified
