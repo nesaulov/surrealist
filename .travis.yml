@@ -3,7 +3,7 @@ sudo: false
 cache: bundler
 env: JRUBY_OPTS= --debug
 before_install: gem install bundler
-script: bundle exec rspec
+script: JRUBY_OPTS="--1.9 -Xcext.enabled=true" bundle exec rspec
 rvm:
   - 2.2.0
   - 2.2.5

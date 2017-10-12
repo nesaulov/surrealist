@@ -1,2 +1,3 @@
 backtrace.style=full
 debug.fullTrace=true
+cext.enabled=true
