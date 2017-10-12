@@ -43,7 +43,8 @@ end
 class TestAR < ActiveRecord::Base
   include Surrealist
 
-  scope :dummy, ->{ where(type: 'InheritAR' )}
+  scope :sub_collection, ->{ where(type: 'InheritAR' )}
+  scope :sub_record, -> { find_by(type: 'InheritAR' ) }
 
   json_schema do { name: String } end
 end

@@ -35,14 +35,24 @@ RSpec.describe Surrealist do
         InheritWithoutSchemaAR.all.destroy_all
       end
 
-      it 'works with scopes' do
-        expect(subject.surrealize_collection(TestAR.dummy))
-          .to eq([{name: 'testing active record inherit'}.to_json])
+      context 'scopes' do
+        it 'works if returns collection of records' do
+          expect(subject.surrealize_collection(TestAR.sub_collection))
+            .to eq([{name: 'testing active record inherit'}.to_json])
+        end
+
+        it 'fails if returns single record' do
+          expect { subject.surrealize_collection(TestAR.sub_record) }
+            .to raise_error Surrealist::InvalidCollectionError
+        end
       end
 
       context 'associations' do
         it 'works' do
-          expect(subject.surrealize_collection(Book.all).length).to eq(3)
+          expect(subject.surrealize_collection(Book.all).length)
+            .to eq(3)
+          expect(subject.surrealize_collection(Book.all))
+            .to respond_to(:each)
         end
 
         it 'fails with belongs_to' do
