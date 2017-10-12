@@ -101,199 +101,192 @@ RSpec.describe Surrealist do
 
     context 'with `namespaces_nesting_level`' do
       describe '#build_schema' do
-        it 'works with all numbers' do
-          expect { instance.build_schema(include_namespaces: true, namespaces_nesting_level: 0) }
-            .to raise_error(ArgumentError,
-                            'Expected `namespaces_nesting_level` to be a positive integer, got: 0')
-
-          expect(instance.build_schema(include_namespaces: true, namespaces_nesting_level: 1))
-            .to eq(withdraws: { withdraws_amount: 34 })
-
-          expect(instance.build_schema(include_namespaces: true, namespaces_nesting_level: 2))
-            .to eq(report_system: { withdraws: { withdraws_amount: 34 } })
-
-          expect(instance.build_schema(include_namespaces: true, namespaces_nesting_level: 3))
-            .to eq(cashout: { report_system: { withdraws: { withdraws_amount: 34 } } })
-
-          expect(instance.build_schema(include_namespaces: true, namespaces_nesting_level: 4))
-            .to eq(business_system: { cashout: { report_system: { withdraws:
-                                                                    { withdraws_amount: 34 } } } })
-
-          expect(instance.build_schema(include_namespaces: true, namespaces_nesting_level: 5))
-            .to eq(business_system: { cashout: { report_system: { withdraws:
-                                                                    { withdraws_amount: 34 } } } })
-
-          expect(instance.build_schema(include_namespaces: true, namespaces_nesting_level: 9933))
-            .to eq(business_system: { cashout: { report_system: { withdraws:
-                                                                    { withdraws_amount: 34 } } } })
+        let(:expectations) do
+          [
+            { withdraws: { withdraws_amount: 34 } },
+            { report_system: { withdraws: { withdraws_amount: 34 } } },
+            { cashout: { report_system: { withdraws: { withdraws_amount: 34 } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { withdraws: { withdraws_amount: 34 } },
+            { report_system: { withdraws: { withdraws_amount: 34 } } },
+            { cashout: { report_system: { withdraws: { withdraws_amount: 34 } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { withdraws: { withdrawsAmount: 34 } },
+            { reportSystem: { withdraws: { withdrawsAmount: 34 } } },
+            { cashout: { reportSystem: { withdraws: { withdrawsAmount: 34 } } } },
+            { businessSystem: { cashout: { reportSystem: { withdraws:
+                                                               { withdrawsAmount: 34 } } } } },
+            { businessSystem: { cashout: { reportSystem: { withdraws:
+                                                             { withdrawsAmount: 34 } } } } },
+            { businessSystem: { cashout: { reportSystem: { withdraws:
+                                                             { withdrawsAmount: 34 } } } } },
+            { businessSystem: { cashout: { reportSystem: { withdraws:
+                                                             { withdrawsAmount: 34 } } } } },
+            { businessSystem: { cashout: { reportSystem: { withdraws:
+                                                             { withdrawsAmount: 34 } } } } },
+            { businessSystem: { cashout: { reportSystem: { withdraws:
+                                                             { withdrawsAmount: 34 } } } } },
+            { businessSystem: { cashout: { reportSystem: { withdraws:
+                                                             { withdrawsAmount: 34 } } } } },
+            { businessSystem: { cashout: { reportSystem: { withdraws:
+                                                             { withdrawsAmount: 34 } } } } },
+            { withdraws: { withdraws_amount: 34 } },
+            { report_system: { withdraws: { withdraws_amount: 34 } } },
+            { cashout: { report_system: { withdraws: { withdraws_amount: 34 } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+            { business_system: { cashout: { report_system: { withdraws:
+                                                               { withdraws_amount: 34 } } } } },
+          ]
         end
 
-        it 'camelizes' do
-          expect do
-            instance.build_schema(include_namespaces: true,
-                                  namespaces_nesting_level: 0,
-                                  camelize: true)
-          end.to raise_error(ArgumentError,
-                             'Expected `namespaces_nesting_level` to be a positive integer, got: 0')
-
-          expect(instance.build_schema(include_namespaces: true,
-                                       namespaces_nesting_level: 1,
-                                       camelize: true))
-            .to eq(withdraws: { withdrawsAmount: 34 })
-
-          expect(instance.build_schema(include_namespaces: true,
-                                       namespaces_nesting_level: 2,
-                                       camelize: true))
-            .to eq(reportSystem: { withdraws: { withdrawsAmount: 34 } })
-
-          expect(instance.build_schema(include_namespaces: true,
-                                       namespaces_nesting_level: 3,
-                                       camelize: true))
-            .to eq(cashout: { reportSystem: { withdraws: { withdrawsAmount: 34 } } })
-
-          expect(instance.build_schema(include_namespaces: true,
-                                       namespaces_nesting_level: 4,
-                                       camelize: true))
-            .to eq(businessSystem: { cashout: { reportSystem: { withdraws:
-                                                                    { withdrawsAmount: 34 } } } })
-
-          expect(instance.build_schema(include_namespaces: true,
-                                       namespaces_nesting_level: 5,
-                                       camelize: true))
-            .to eq(businessSystem: { cashout: { reportSystem: { withdraws:
-                                                                    { withdrawsAmount: 34 } } } })
-
-          expect(instance.build_schema(include_namespaces: true,
-                                       namespaces_nesting_level: 9933,
-                                       camelize: true))
-            .to eq(businessSystem: { cashout: { reportSystem: { withdraws:
-                                                                    { withdrawsAmount: 34 } } } })
-        end
-
-        it 'ignores include_root' do
-          expect do
-            instance.build_schema(include_namespaces: true,
-                                  namespaces_nesting_level: 0,
-                                  include_root: true)
-          end.to raise_error(ArgumentError,
-                             'Expected `namespaces_nesting_level` to be a positive integer, got: 0')
-
-          expect(instance.build_schema(include_namespaces: true,
-                                       namespaces_nesting_level: 1,
-                                       include_root: true))
-            .to eq(withdraws: { withdraws_amount: 34 })
-
-          expect(instance.build_schema(include_namespaces: true,
-                                       namespaces_nesting_level: 2,
-                                       include_root: true))
-            .to eq(report_system: { withdraws: { withdraws_amount: 34 } })
-
-          expect(instance.build_schema(include_namespaces: true,
-                                       namespaces_nesting_level: 3,
-                                       include_root: true))
-            .to eq(cashout: { report_system: { withdraws: { withdraws_amount: 34 } } })
-
-          expect(instance.build_schema(include_namespaces: true,
-                                       namespaces_nesting_level: 4,
-                                       include_root: true))
-            .to eq(business_system: { cashout: { report_system: { withdraws:
-                                                                    { withdraws_amount: 34 } } } })
-
-          expect(instance.build_schema(include_namespaces: true,
-                                       namespaces_nesting_level: 5,
-                                       include_root: true))
-            .to eq(business_system: { cashout: { report_system: { withdraws:
-                                                                    { withdraws_amount: 34 } } } })
-
-          expect(instance.build_schema(include_namespaces: true,
-                                       namespaces_nesting_level: 9933,
-                                       include_root: true))
-            .to eq(business_system: { cashout: { report_system: { withdraws:
-                                                                    { withdraws_amount: 34 } } } })
-        end
-
-        context 'treats `include_namespaces` as true if `namespaces_nesting_level` is provided' do
-          specify 'with `include_root`' do
-            expect do
-              instance.build_schema(namespaces_nesting_level: 0, include_root: true)
-            end.to raise_error(ArgumentError,
-                               'Expected `namespaces_nesting_level` to be a positive integer, got: 0')
-
-            expect(instance.build_schema(namespaces_nesting_level: 1, include_root: true))
-              .to eq(withdraws: { withdraws_amount: 34 })
-
-            expect(instance.build_schema(namespaces_nesting_level: 2, include_root: true))
-              .to eq(report_system: { withdraws: { withdraws_amount: 34 } })
-
-            expect(instance.build_schema(namespaces_nesting_level: 3, include_root: true))
-              .to eq(cashout: { report_system: { withdraws: { withdraws_amount: 34 } } })
-
-            expect(instance.build_schema(namespaces_nesting_level: 4, include_root: true))
-              .to eq(business_system: { cashout: { report_system: { withdraws:
-                                                                      { withdraws_amount: 34 } } } })
-
-            expect(instance.build_schema(namespaces_nesting_level: 5, include_root: true))
-              .to eq(business_system: { cashout: { report_system: { withdraws:
-                                                                      { withdraws_amount: 34 } } } })
-
-            expect(instance.build_schema(namespaces_nesting_level: 9933, include_root: true))
-              .to eq(business_system: { cashout: { report_system: { withdraws:
-                                                                      { withdraws_amount: 34 } } } })
+        [
+          { include_namespaces: true, namespaces_nesting_level: 1 },
+          { include_namespaces: true, namespaces_nesting_level: 2 },
+          { include_namespaces: true, namespaces_nesting_level: 3 },
+          { include_namespaces: true, namespaces_nesting_level: 4 },
+          { include_namespaces: true, namespaces_nesting_level: 5 },
+          { include_namespaces: true, namespaces_nesting_level: 6 },
+          { include_namespaces: true, namespaces_nesting_level: 7 },
+          { include_namespaces: true, namespaces_nesting_level: 8 },
+          { include_namespaces: true, namespaces_nesting_level: 9 },
+          { include_namespaces: true, namespaces_nesting_level: 10 },
+          { include_namespaces: true, namespaces_nesting_level: 999 },
+          { namespaces_nesting_level: 1, include_root: true },
+          { namespaces_nesting_level: 2, include_root: true },
+          { namespaces_nesting_level: 3, include_root: true },
+          { namespaces_nesting_level: 4, include_root: true },
+          { namespaces_nesting_level: 5, include_root: true },
+          { namespaces_nesting_level: 6, include_root: true },
+          { namespaces_nesting_level: 7, include_root: true },
+          { namespaces_nesting_level: 8, include_root: true },
+          { namespaces_nesting_level: 9, include_root: true },
+          { namespaces_nesting_level: 10, include_root: true },
+          { namespaces_nesting_level: 999, include_root: true },
+          { namespaces_nesting_level: 1, camelize: true },
+          { namespaces_nesting_level: 2, camelize: true },
+          { namespaces_nesting_level: 3, camelize: true },
+          { namespaces_nesting_level: 4, camelize: true },
+          { namespaces_nesting_level: 5, camelize: true },
+          { namespaces_nesting_level: 6, camelize: true },
+          { namespaces_nesting_level: 7, camelize: true },
+          { namespaces_nesting_level: 8, camelize: true },
+          { namespaces_nesting_level: 9, camelize: true },
+          { namespaces_nesting_level: 10, camelize: true },
+          { namespaces_nesting_level: 999, camelize: true },
+          { namespaces_nesting_level: 1 },
+          { namespaces_nesting_level: 2 },
+          { namespaces_nesting_level: 3 },
+          { namespaces_nesting_level: 4 },
+          { namespaces_nesting_level: 5 },
+          { namespaces_nesting_level: 6 },
+          { namespaces_nesting_level: 7 },
+          { namespaces_nesting_level: 8 },
+          { namespaces_nesting_level: 9 },
+          { namespaces_nesting_level: 10 },
+          { namespaces_nesting_level: 999 },
+        ].each_with_index do |hash, index|
+          it "works with #{hash} arguments" do
+            expect(instance.build_schema(hash))
+              .to eq(expectations[index])
           end
+        end
 
-          specify 'with `camelize`' do
-            expect do
-              instance.build_schema(namespaces_nesting_level: 0, camelize: true)
-            end.to raise_error(ArgumentError,
-                               'Expected `namespaces_nesting_level` to be a positive integer, got: 0')
-
-            expect(instance.build_schema(namespaces_nesting_level: 1, camelize: true))
-              .to eq(withdraws: { withdrawsAmount: 34 })
-
-            expect(instance.build_schema(namespaces_nesting_level: 2, camelize: true))
-              .to eq(reportSystem: { withdraws: { withdrawsAmount: 34 } })
-
-            expect(instance.build_schema(namespaces_nesting_level: 3, camelize: true))
-              .to eq(cashout: { reportSystem: { withdraws: { withdrawsAmount: 34 } } })
-
-            expect(instance.build_schema(namespaces_nesting_level: 4, camelize: true))
-              .to eq(businessSystem: { cashout: { reportSystem: { withdraws:
-                                                                    { withdrawsAmount: 34 } } } })
-
-            expect(instance.build_schema(namespaces_nesting_level: 5, camelize: true))
-              .to eq(businessSystem: { cashout: { reportSystem: { withdraws:
-                                                                    { withdrawsAmount: 34 } } } })
-
-            expect(instance.build_schema(namespaces_nesting_level: 9933, camelize: true))
-              .to eq(businessSystem: { cashout: { reportSystem: { withdraws:
-                                                                    { withdrawsAmount: 34 } } } })
-          end
-
-          specify 'only with `namespaces_nesting_level`' do
-            expect { instance.build_schema(namespaces_nesting_level: 0) }
-              .to raise_error(ArgumentError,
-                              'Expected `namespaces_nesting_level` to be a positive integer, got: 0')
-
-            expect(instance.build_schema(namespaces_nesting_level: 1))
-              .to eq(withdraws: { withdraws_amount: 34 })
-
-            expect(instance.build_schema(namespaces_nesting_level: 2))
-              .to eq(report_system: { withdraws: { withdraws_amount: 34 } })
-
-            expect(instance.build_schema(namespaces_nesting_level: 3))
-              .to eq(cashout: { report_system: { withdraws: { withdraws_amount: 34 } } })
-
-            expect(instance.build_schema(namespaces_nesting_level: 4))
-              .to eq(business_system: { cashout: { report_system: { withdraws:
-                                                                      { withdraws_amount: 34 } } } })
-
-            expect(instance.build_schema(namespaces_nesting_level: 5))
-              .to eq(business_system: { cashout: { report_system: { withdraws:
-                                                                      { withdraws_amount: 34 } } } })
-
-            expect(instance.build_schema(namespaces_nesting_level: 9933))
-              .to eq(business_system: { cashout: { report_system: { withdraws:
-                                                                      { withdraws_amount: 34 } } } })
+        context 'with invalid namespaces_nesting_level provided' do
+          [
+            { include_namespaces: true, namespaces_nesting_level: 0 },
+            { include_namespaces: true, namespaces_nesting_level: -2 },
+            { include_namespaces: true, namespaces_nesting_level: '2' },
+            { include_namespaces: true, namespaces_nesting_level: 2.4 },
+            { include_namespaces: true, namespaces_nesting_level: -4.4 },
+            { include_namespaces: true, namespaces_nesting_level: '-4' },
+            { include_namespaces: true, namespaces_nesting_level: true },
+            { include_namespaces: true, namespaces_nesting_level: 'none' },
+            { include_namespaces: true, namespaces_nesting_level: String },
+            { include_root: true, include_namespaces: true, namespaces_nesting_level: 0 },
+            { include_root: true, include_namespaces: true, namespaces_nesting_level: -2 },
+            { include_root: true, include_namespaces: true, namespaces_nesting_level: '2' },
+            { include_root: true, include_namespaces: true, namespaces_nesting_level: 2.4 },
+            { include_root: true, include_namespaces: true, namespaces_nesting_level: -4.4 },
+            { include_root: true, include_namespaces: true, namespaces_nesting_level: '-4' },
+            { include_root: true, include_namespaces: true, namespaces_nesting_level: true },
+            { include_root: true, include_namespaces: true, namespaces_nesting_level: 'none' },
+            { include_root: true, include_namespaces: true, namespaces_nesting_level: String },
+            { camelize: true, include_namespaces: true, namespaces_nesting_level: 0 },
+            { camelize: true, include_namespaces: true, namespaces_nesting_level: -2 },
+            { camelize: true, include_namespaces: true, namespaces_nesting_level: '2' },
+            { camelize: true, include_namespaces: true, namespaces_nesting_level: 2.4 },
+            { camelize: true, include_namespaces: true, namespaces_nesting_level: -4.4 },
+            { camelize: true, include_namespaces: true, namespaces_nesting_level: '-4' },
+            { camelize: true, include_namespaces: true, namespaces_nesting_level: true },
+            { camelize: true, include_namespaces: true, namespaces_nesting_level: 'none' },
+            { camelize: true, include_namespaces: true, namespaces_nesting_level: String },
+            { include_root: true, camelize: true, include_namespaces: true,
+              namespaces_nesting_level: 0 },
+            { include_root: true, camelize: true, include_namespaces: true,
+              namespaces_nesting_level: -2 },
+            { include_root: true, camelize: true, include_namespaces: true,
+              namespaces_nesting_level: '2' },
+            { include_root: true, camelize: true, include_namespaces: true,
+              namespaces_nesting_level: 2.4 },
+            { include_root: true, camelize: true, include_namespaces: true,
+              namespaces_nesting_level: -4.4 },
+            { include_root: true, camelize: true, include_namespaces: true,
+              namespaces_nesting_level: '-4' },
+            { include_root: true, camelize: true, include_namespaces: true,
+              namespaces_nesting_level: true },
+            { include_root: true, camelize: true, include_namespaces: true,
+              namespaces_nesting_level: 'none' },
+            { include_root: true, camelize: true, include_namespaces: true,
+              namespaces_nesting_level: String },
+          ].each do |hash|
+            it "raises ArgumentError for nesting_level: #{hash[:namespaces_nesting_level]}" do
+              expect { instance.build_schema(hash) }
+                .to raise_error(ArgumentError,
+                                /Expected `namespaces_nesting_level` to be a positive integer, got/)
+            end
           end
         end
       end
