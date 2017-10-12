@@ -49,14 +49,14 @@ module Surrealist
         raise Surrealist::ExceptionRaiser.raise_invalid_collection!
       end
 
-      collection.map do |record|
-        record.surrealize(
+      JSON.dump(collection.map do |record|
+        record.build_schema(
           camelize: camelize,
           include_root: include_root,
           include_namespaces: include_namespaces,
           namespaces_nesting_level: namespaces_nesting_level
         )
-      end
+      end)
     end
 
     # Builds hash from schema provided in the object's class and type-checks the values.

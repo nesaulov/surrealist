@@ -12,20 +12,20 @@ RSpec.describe Surrealist do
     context 'active record' do
       it 'works' do
         expect(subject.surrealize_collection(TestAR.all))
-          .to eq([{name: 'testing active record'}.to_json,
-            {name: 'testing active record inherit'}.to_json,
-            {name: 'testing active record inherit again'}.to_json])
+          .to eq([{name: 'testing active record'},
+                  {name: 'testing active record inherit'},
+                  {name: 'testing active record inherit again'}].to_json)
       end
 
       it 'works with inheritance' do
         expect(subject.surrealize_collection(InheritAR.all))
-          .to eq([{name: 'testing active record inherit'}.to_json,
-                  {name: 'testing active record inherit again'}.to_json])
+          .to eq([{name: 'testing active record inherit'},
+                  {name: 'testing active record inherit again'}].to_json)
       end
 
       it 'works with nested inheritance' do
         expect(subject.surrealize_collection(InheritAgainAR.all))
-          .to eq([{name: 'testing active record inherit again'}.to_json])
+          .to eq([{name: 'testing active record inherit again'}].to_json)
       end
 
       it 'fails with inheritance and without schema' do
@@ -38,7 +38,7 @@ RSpec.describe Surrealist do
       context 'scopes' do
         it 'works if returns collection of records' do
           expect(subject.surrealize_collection(TestAR.sub_collection))
-            .to eq([{name: 'testing active record inherit'}.to_json])
+            .to eq([{name: 'testing active record inherit'}].to_json)
         end
 
         it 'fails if returns single record' do
@@ -49,9 +49,9 @@ RSpec.describe Surrealist do
 
       context 'associations' do
         it 'works' do
-          expect(subject.surrealize_collection(Book.all).length)
+          expect(JSON.parse(subject.surrealize_collection(Book.all)).length)
             .to eq(3)
-          expect(subject.surrealize_collection(Book.all))
+          expect(JSON.parse(subject.surrealize_collection(Book.all)))
             .to respond_to(:each)
         end
 
@@ -66,40 +66,56 @@ RSpec.describe Surrealist do
         end
 
         it 'works with has_many' do
-          expect(subject.surrealize_collection(Book.first.awards))
+          expect(JSON.parse(subject.surrealize_collection(Book.first.awards)))
             .to respond_to(:each)
         end
 
         it 'works with has_and_belongs_to_many' do
-          expect(subject.surrealize_collection(Book.first.authors))
+          expect(JSON.parse(subject.surrealize_collection(Book.first.authors)))
             .to respond_to(:each)
-          expect(subject.surrealize_collection(Author.first.books))
+          expect(JSON.parse(subject.surrealize_collection(Author.first.books)))
+            .to respond_to(:each)
+        end
+      end
+
+      context 'includes' do
+        it 'works' do
+          expect(JSON.parse(subject.surrealize_collection(Book.includes(:authors))))
+            .to respond_to(:each)
+        end
+      end
+
+      context 'joins' do
+        it 'works' do
+          expect(JSON.parse(subject.surrealize_collection(Book.joins(:genre))))
             .to respond_to(:each)
         end
       end
 
       it 'works with valid surrealization params' do
         VALID_PARAMS.each do |i|
-          expect { subject.surrealize_collection(TestAR.all, **i) }.to_not raise_error
+          expect { subject.surrealize_collection(TestAR.all, **i) }
+            .to_not raise_error
         end
       end
 
       it 'fails with invalid surrealization params' do
         INVALID_PARAMS.each do |i|
-          expect { subject.surrealize_collection(TestAR.all, **i) }.to raise_error ArgumentError
+          expect { subject.surrealize_collection(TestAR.all, **i) }
+            .to raise_error ArgumentError
         end
       end
     end
     context 'sequel' do
       it 'works' do
         expect(subject.surrealize_collection(TestSequel.all))
-          .to eq([{name: 'testing sequel'}.to_json])
+          .to eq([{name: 'testing sequel'}].to_json)
       end
     end
     context 'data mapper' do
       it 'works' do
         expect(subject.surrealize_collection(TestDataMapper.all))
-          .to eq([{name: 'testing data mapper'}.to_json])
+          .to eq([{name: 'testing data mapper'}].to_json)
       end
     end
     context 'rom' do
@@ -115,7 +131,7 @@ RSpec.describe Surrealist do
       rom.command(:items).create.call(name: 'testing rom')
       it 'works' do
         expect(subject.surrealize_collection(rom.relation(:items).all))
-          .to eq([{name: 'testing rom'}.to_json])
+          .to eq([{name: 'testing rom'}].to_json)
       end
     end
     context 'not proper collection' do
