@@ -9,7 +9,15 @@ ActiveRecord::Base.establish_connection(
 )
 ActiveRecord::Schema.define do
   create_table :test_ars do |table|
-      table.column :name, :string
+    table.column :name, :string
+    table.string :type
+  end
+  create_table :books do |table|
+    table.column :name, :string
+    table.column :author_id, :integer
+  end
+  create_table :authors do |table|
+    table.column :name, :string
   end
 end
 class TestAR < ActiveRecord::Base
@@ -17,6 +25,14 @@ class TestAR < ActiveRecord::Base
   json_schema do { name: String } end
 end
 TestAR.create(name: 'testing active record')
+
+class InheritAR < TestAR; delegate_surrealization_to TestAR; end
+InheritAR.create(name: 'testing active record inherit')
+
+class InheritAgainAR < InheritAR; delegate_surrealization_to TestAR; end
+InheritAgainAR.create(name: 'testing active record inherit again')
+
+class InheritWithoutSchemaAR < TestAR; end
 
 require 'sequel'
 Sequel.sqlite.create_table :test_sequels do
@@ -65,12 +81,72 @@ rom = ROM.container(:memory) do |conf|
 end
 rom.command(:items).create.call(name: 'testing rom')
 
+RSpec.shared_examples "some example" do |parameter|
+  let(:something) { parameter }
+  it "uses the given parameter" do
+    expect(subject.surrealize_collection).to eq(parameter)
+  end
+end
+
 RSpec.describe Surrealist do
   describe 'subject.surrealize_collection ORM collections' do
     context 'active record' do
       it 'works' do
         expect(subject.surrealize_collection(TestAR.all))
-          .to eq([{name: 'testing active record'}.to_json])
+          .to eq([{name: 'testing active record'}.to_json,
+            {name: 'testing active record inherit'}.to_json,
+            {name: 'testing active record inherit again'}.to_json])
+      end
+
+      it 'works with inheritance' do
+        expect(subject.surrealize_collection(InheritAR.all))
+          .to eq([{name: 'testing active record inherit'}.to_json,
+                  {name: 'testing active record inherit again'}.to_json])
+      end
+
+      it 'works with nested inheritance' do
+        expect(subject.surrealize_collection(InheritAgainAR.all))
+          .to eq([{name: 'testing active record inherit again'}.to_json])
+      end
+
+      it 'fails with inheritance and without schema' do
+        InheritWithoutSchemaAR.create(name: 'testing active record inherit without schema')
+        expect { subject.surrealize_collection(InheritWithoutSchemaAR.all) }
+          .to raise_error Surrealist::UnknownSchemaError
+        InheritWithoutSchemaAR.all.destroy_all
+      end
+
+      it 'works with valid surrelization params' do
+        [
+          { camelize: true,  include_namespaces: true, include_root: true, namespaces_nesting_level: 3 },
+          { camelize: false, include_namespaces: true, include_root: true, namespaces_nesting_level: 3 },
+          { camelize: false, include_namespaces: false, include_root: true, namespaces_nesting_level: 3 },
+          { camelize: false, include_namespaces: false, include_root: false, namespaces_nesting_level: 3 },
+          { camelize: true,  include_namespaces: false, include_root: false, namespaces_nesting_level: 3 },
+          { camelize: true,  include_namespaces: true, include_root: false, namespaces_nesting_level: 3 },
+          { camelize: true,  include_namespaces: false, include_root: true, namespaces_nesting_level: 3 },
+          { camelize: true,  include_namespaces: false, include_root: true, namespaces_nesting_level: 435 },
+          { camelize: true,  include_namespaces: false, include_root: true, namespaces_nesting_level: 666 },
+        ].each do |i|
+          expect { subject.surrealize_collection(TestAR.all, **i) }.to_not raise_error
+        end
+      end
+
+      it 'fails with invalid surrealization params' do
+        [
+          { camelize: 'NO', include_namespaces: false, include_root: true, namespaces_nesting_level: 3 },
+          { camelize: true, include_namespaces: 'false', include_root: true, namespaces_nesting_level: 3 },
+          { camelize: true, include_namespaces: false, include_root: true, namespaces_nesting_level: 0 },
+          { camelize: true, include_namespaces: false, include_root: false, namespaces_nesting_level: -3 },
+          { camelize: true, include_namespaces: false, include_root: 'yep', namespaces_nesting_level: 3 },
+          { camelize: 'NO', include_namespaces: false, include_root: true, namespaces_nesting_level: '3' },
+          { camelize: 'NO', include_namespaces: false, include_root: true, namespaces_nesting_level: 3.14 },
+          { camelize: Integer, include_namespaces: false, include_root: true, namespaces_nesting_level: 3 },
+          { camelize: 'NO', include_namespaces: 'no', include_root: true, namespaces_nesting_level: '3.4' },
+          { camelize: 'f', include_namespaces: false, include_root: 't', namespaces_nesting_level: true },
+        ].each do |i|
+          expect { subject.surrealize_collection(TestAR.all, **i) }.to raise_error ArgumentError
+        end
       end
     end
     context 'sequel' do
