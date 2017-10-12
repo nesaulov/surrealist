@@ -1,9 +1,9 @@
 language: ruby
 sudo: false
 cache: bundler
-env: JRUBY_OPTS= --debug
+env: JRUBY_OPTS= --debug --1.9 -Xcext.enabled=true
 before_install: gem install bundler
-script: JRUBY_OPTS="--1.9 -Xcext.enabled=true" bundle exec rspec
+script: bundle exec rspec
 rvm:
   - 2.2.0
   - 2.2.5
