@@ -21,7 +21,7 @@ module Surrealist
         if namespaces_condition
           wrap_schema_into_namespace(schema: hash, klass: klass, carrier: carrier)
         elsif carrier.include_root
-          wrap_schema_into_root(schema: hash, klass: klass, camelize: carrier.camelize)
+          wrap_schema_into_root(schema: hash, klass: klass, carrier: carrier)
         end
       end
 
@@ -43,12 +43,12 @@ module Surrealist
       #
       # @param [Hash] schema schema hash.
       # @param [String] klass name of the class where schema is defined.
-      # @param [Boolean] camelize optional camelize argument.
+      # @param [Object] carrier instance of Carrier class that carries arguments passed to +surrealize+
       #
       # @return [Hash] a hash with schema wrapped inside a root key.
-      def wrap_schema_into_root(schema:, klass:, camelize:)
+      def wrap_schema_into_root(schema:, klass:, carrier:)
         actual_class = Surrealist::StringUtils.extract_class(klass)
-        root_key = if camelize
+        root_key = if carrier.camelize
                      Surrealist::StringUtils.camelize(actual_class, false).to_sym
                    else
                      Surrealist::StringUtils.underscore(actual_class).to_sym
