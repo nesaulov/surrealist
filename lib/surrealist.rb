@@ -44,7 +44,7 @@ module Surrealist
     #   Surrealist.surrealize_collection(User.all)
     #   # => "[{\"name\":\"Nikita\",\"age\":23}, {\"name\":\"Alessandro\",\"age\":24}]"
     #   # For more examples see README
-    def surrealize_collection(collection, camelize: false, include_root: false, include_namespaces: false, namespaces_nesting_level: DEFAULT_NESTING_LEVEL) # rubocop:disable Metrics/LineLength
+    def surrealize_collection(collection, camelize: false, include_root: false, include_namespaces: false, root: nil, namespaces_nesting_level: DEFAULT_NESTING_LEVEL) # rubocop:disable Metrics/LineLength
       unless collection.respond_to?(:each)
         raise Surrealist::ExceptionRaiser.raise_invalid_collection!
       end
@@ -54,6 +54,7 @@ module Surrealist
           camelize: camelize,
           include_root: include_root,
           include_namespaces: include_namespaces,
+          root: root,
           namespaces_nesting_level: namespaces_nesting_level
         )
       end)
