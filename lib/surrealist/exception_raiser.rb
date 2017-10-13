@@ -19,6 +19,9 @@ module Surrealist
   # Error class for undefined class to delegate schema.
   class InvalidSchemaDelegation < RuntimeError; end
 
+  # Error class for invalid object given to iteratively apply surrealize.
+  class InvalidCollectionError < ArgumentError; end
+
   # Error class for cases where +namespaces_nesting_level+ is set to 0.
   class InvalidNestingLevel < RuntimeError; end
 
@@ -48,6 +51,13 @@ module Surrealist
       # @raise Surrealist::UnknownRootError
       def raise_unknown_root!
         raise Surrealist::UnknownRootError, "Can't wrap schema in root key - class name was not passed"
+      end
+
+      # Raises Surrealist::InvalidCollectionError
+      #
+      # @raise Surrealist::InvalidCollectionError
+      def raise_invalid_collection!
+        raise Surrealist::InvalidCollectionError, "Can't serialize collection - must respond to :each"
       end
 
       # Raises ArgumentError if namespaces_nesting_level is not an integer.

@@ -26,6 +26,39 @@ module Surrealist
       base.include(Surrealist::InstanceMethods)
     end
 
+    # Iterates over a collection of Surrealist Objects and
+    # maps surrealize to each record.
+    #
+    # @param [Object] Collection of instances of a class that has +Surrealist+ included.
+    # @param [Boolean] camelize optional argument for converting hash to camelBack.
+    # @param [Boolean] include_root optional argument for having the root key of the resulting hash
+    #   as instance's class name.
+    #
+    # @return [Object] the Collection#map with elements being json-formatted string corresponding
+    #   to the schema provided in the object's class. Values will be taken from the return values
+    #   of appropriate methods from the object.
+    #
+    # @raise +Surrealist::InvalidCollectionError+ if invalid collection passed.
+    #
+    # @example surrealize a given collection of Surrealist objects
+    #   Surrealist.surrealize_collection(User.all)
+    #   # => "[{\"name\":\"Nikita\",\"age\":23}, {\"name\":\"Alessandro\",\"age\":24}]"
+    #   # For more examples see README
+    def surrealize_collection(collection, camelize: false, include_root: false, include_namespaces: false, namespaces_nesting_level: DEFAULT_NESTING_LEVEL) # rubocop:disable Metrics/LineLength
+      unless collection.respond_to?(:each)
+        raise Surrealist::ExceptionRaiser.raise_invalid_collection!
+      end
+
+      JSON.dump(collection.map do |record|
+        record.build_schema(
+          camelize: camelize,
+          include_root: include_root,
+          include_namespaces: include_namespaces,
+          namespaces_nesting_level: namespaces_nesting_level
+        )
+      end)
+    end
+
     # Builds hash from schema provided in the object's class and type-checks the values.
     #
     # @param [Object] instance of a class that has +Surrealist+ included.
