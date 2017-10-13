@@ -317,7 +317,7 @@ Car.new.surrealize
 ### Other notes
 * nil values are allowed by default, so if you have, say, `age: String`, but the actual value is nil,
 type check will be passed. If you want to be strict about `nil`s consider using `Dry::Types`.
-* Surrealist [is known to work](https://travis-ci.org/nesaulov/surrealist) on MRI Ruby 2.2+ and JRuby 9.0.0.0+.
+* Surrealist [officially supports](https://travis-ci.org/nesaulov/surrealist) MRI Ruby 2.2+ but should be working on other platforms as well.
 
 ## Roadmap
 Here is a list of features that are not implemented yet (contributions are welcome):
