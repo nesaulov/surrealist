@@ -14,14 +14,16 @@ module Surrealist
       def deep_copy(hash:, klass: false, carrier:)
         namespaces_condition = carrier.include_namespaces || carrier.namespaces_nesting_level != DEFAULT_NESTING_LEVEL # rubocop:disable Metrics/LineLength
 
-        return copy_hash(hash) unless carrier.include_root || namespaces_condition
-
-        Surrealist::ExceptionRaiser.raise_unknown_root! unless klass
+        if !klass && (carrier.include_root || namespaces_condition)
+          Surrealist::ExceptionRaiser.raise_unknown_root!
+        end
 
         if namespaces_condition
           wrap_schema_into_namespace(schema: hash, klass: klass, carrier: carrier)
         elsif carrier.include_root
           wrap_schema_into_root(schema: hash, klass: klass, carrier: carrier)
+        else
+          copy_hash(hash)
         end
       end
 
