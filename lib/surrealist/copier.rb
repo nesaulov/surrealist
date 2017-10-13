@@ -18,6 +18,26 @@ module Surrealist
           Surrealist::ExceptionRaiser.raise_unknown_root!
         end
 
+        copy_before_root = copied_and_possibly_wrapped_hash(hash, klass, carrier, namespaces_condition)
+
+        if carrier.root
+          wrap_schema_into_specified_root(schema: copy_before_root, klass: klass, carrier: carrier)
+        else
+          copy_before_root
+        end
+      end
+
+      private
+
+      # Deeply copies the schema hash and wraps it if there is a need to.
+      #
+      # @param [Object] hash object to be copied.
+      # @param [String] klass instance's class name.
+      # @param [Object] carrier instance of Carrier class that carries arguments passed to +surrealize+
+      # @param [Bool] whether to wrap into namespace.
+      #
+      # @return [Hash] deeply copied hash, possibly wrapped.
+      def copied_and_possibly_wrapped_hash(hash, klass, carrier, namespaces_condition)
         if namespaces_condition
           wrap_schema_into_namespace(schema: hash, klass: klass, carrier: carrier)
         elsif carrier.include_root
@@ -26,8 +46,6 @@ module Surrealist
           copy_hash(hash)
         end
       end
-
-      private
 
       # Goes through the hash recursively and deeply copies it.
       #
@@ -54,6 +72,25 @@ module Surrealist
                      Surrealist::StringUtils.camelize(actual_class, false).to_sym
                    else
                      Surrealist::StringUtils.underscore(actual_class).to_sym
+                   end
+        result = Hash[root_key => {}]
+        copy_hash(schema, wrapper: result[root_key])
+
+        result
+      end
+
+      # Wraps schema into the specified root key if `root` is passed as not nil to Surrealist.
+      #
+      # @param [Hash] schema schema hash.
+      # @param [String] klass name of the class where schema is defined.
+      # @param [Object] carrier instance of Carrier class that carries arguments passed to +surrealize+
+      #
+      # @return [Hash] a hash with schema wrapped inside the specified root key.
+      def wrap_schema_into_specified_root(schema:, klass:, carrier:)
+        root_key = if carrier.camelize
+                     Surrealist::StringUtils.camelize(carrier.root, false).to_sym
+                   else
+                     Surrealist::StringUtils.underscore(carrier.root).to_sym
                    end
         result = Hash[root_key => {}]
         copy_hash(schema, wrapper: result[root_key])

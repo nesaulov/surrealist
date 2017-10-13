@@ -100,20 +100,20 @@ RSpec.describe Surrealist do
       let(:instance) { Cat.new }
 
       it 'builds schema' do
-        expect(instance.build_schema(root: nil)).to eq(cat: { cat_weight: '3 kilos' })
+        expect(instance.build_schema(root: nil)).to eq(cat_weight: '3 kilos')
       end
 
       it 'surrealizes' do
         expect(JSON.parse(instance.surrealize(root: nil)))
-          .to eq('cat' => { 'cat_weight' => '3 kilos' })
+          .to eq('cat_weight' => '3 kilos')
       end
 
       it 'camelizes' do
         expect(instance.build_schema(root: nil, camelize: true))
-          .to eq(kitten: { catWeight: '3 kilos' })
+          .to eq(catWeight: '3 kilos')
 
         expect(JSON.parse(instance.surrealize(root: nil, camelize: true)))
-          .to eq('cat' => { 'catWeight' => '3 kilos' })
+          .to eq('catWeight' => '3 kilos')
       end
     end
 
@@ -152,16 +152,16 @@ RSpec.describe Surrealist do
       end
 
       it 'surrealizes' do
-        expect(JSON.parse(instance.surrealize(root: 'kitten')))
+        expect(JSON.parse(instance.surrealize(root: 'serious_kitten')))
           .to eq('serious_kitten' => { 'weight'   => '3 kilos',
                                        'cat_food' => { 'amount' => 3, 'brand' => 'Whiskas' } })
       end
 
       it 'camelizes' do
-        expect(instance.build_schema(root: 'kitten', camelize: true))
+        expect(instance.build_schema(root: 'serious_kitten', camelize: true))
           .to eq(seriousKitten: { weight: '3 kilos', catFood: { amount: 3, brand: 'Whiskas' } })
 
-        expect(JSON.parse(instance.surrealize(root: 'kitten', camelize: true)))
+        expect(JSON.parse(instance.surrealize(root: 'serious_kitten', camelize: true)))
           .to eq('seriousKitten' => { 'weight'  => '3 kilos',
                                       'catFood' => { 'amount' => 3, 'brand' => 'Whiskas' } })
       end
