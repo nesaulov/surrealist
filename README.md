@@ -29,6 +29,7 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
   * [Include root](#include-root)
   * [Include namespaces](#include-namespaces)
   * [Collection Surrealization](#collection-surrealization)
+  * [Root](#root)
   * [Bool and Any](#bool-and-any)
   * [Type errors](#type-errors)
   * [Undefined methods in schema](#undefined-methods-in-schema)
@@ -356,16 +357,15 @@ Guides on where to use `#surrealize_collection` vs `#surrealize` for all ORMs ar
 
 ### Root
 If you want to wrap the resulting JSON into a specified root key, you can pass optional `root` argument
-to `#surrealize` or `#build_schema`. The root key in this case will be taken from the class name of the
-surrealizable object.
+to `#surrealize` or `#build_schema`.
 ``` ruby
 class Cat
   include Surrealist
-
+ 
   json_schema do
     { weight: String }
   end
-
+ 
   def weight
     '3 kilos'
   end
