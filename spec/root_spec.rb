@@ -174,13 +174,15 @@ RSpec.describe Surrealist do
       it 'wraps include_root' do
         expect(JSON.parse(instance.surrealize(root: 'serious_kitten', include_root: true)))
           .to eq('serious_kitten' => { 'serious_cat' => { 'weight'   => '3 kilos',
-                                                          'cat_food' => { 'amount' => 3, 'brand' => 'Whiskas' } } })
+                                                          'cat_food' => { 'amount' => 3,
+                                                                          'brand' => 'Whiskas' } } })
       end
 
       it 'wraps include_namespaces' do
         expect(JSON.parse(instance.surrealize(root: 'serious_kitten', include_namespaces: true)))
           .to eq('serious_kitten' => { 'serious_cat' => { 'weight'   => '3 kilos',
-                                                          'cat_food' => { 'amount' => 3, 'brand' => 'Whiskas' } } })
+                                                          'cat_food' => { 'amount' => 3,
+                                                                          'brand' => 'Whiskas' } } })
       end
     end
 

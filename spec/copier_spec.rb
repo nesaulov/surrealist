@@ -47,28 +47,44 @@ RSpec.describe Surrealist::Copier do
     let(:error) { "Can't wrap schema in root key - class name was not passed" }
 
     args_with_root_and_camelize = [
-      { camelize: true, include_namespaces: true, include_root: true, root: nil, namespaces_nesting_level: 3 },
-      { camelize: true, include_namespaces: true, include_root: true, root: nil, namespaces_nesting_level: 666 },
-      { camelize: true, include_namespaces: false, include_root: true, root: nil, namespaces_nesting_level: 3 },
-      { camelize: true, include_namespaces: false, include_root: true, root: nil, namespaces_nesting_level: 666 },
-      { camelize: true, include_namespaces: true, include_root: false, root: nil, namespaces_nesting_level: 3 },
-      { camelize: true, include_namespaces: true, include_root: false, root: nil, namespaces_nesting_level: 666 },
-      { camelize: true, include_namespaces: false, include_root: false, root: nil, namespaces_nesting_level: 3 },
+      { camelize: true, include_namespaces: true, include_root: true,
+        root: nil, namespaces_nesting_level: 3 },
+      { camelize: true, include_namespaces: true, include_root: true,
+        root: nil, namespaces_nesting_level: 666 },
+      { camelize: true, include_namespaces: false, include_root: true,
+        root: nil, namespaces_nesting_level: 3 },
+      { camelize: true, include_namespaces: false, include_root: true,
+        root: nil, namespaces_nesting_level: 666 },
+      { camelize: true, include_namespaces: true, include_root: false,
+        root: nil, namespaces_nesting_level: 3 },
+      { camelize: true, include_namespaces: true, include_root: false,
+        root: nil, namespaces_nesting_level: 666 },
+      { camelize: true, include_namespaces: false, include_root: false,
+        root: nil, namespaces_nesting_level: 3 },
     ]
 
     args_with_root_and_without_camelize = [
-      { camelize: false, include_namespaces: true, include_root: true, root: nil, namespaces_nesting_level: 3 },
-      { camelize: false, include_namespaces: true, include_root: true, root: nil, namespaces_nesting_level: 666 },
-      { camelize: false, include_namespaces: false, include_root: true, root: nil, namespaces_nesting_level: 3 },
-      { camelize: false, include_namespaces: false, include_root: true, root: nil, namespaces_nesting_level: 666 },
-      { camelize: false, include_namespaces: true, include_root: false, root: nil, namespaces_nesting_level: 3 },
-      { camelize: false, include_namespaces: true, include_root: false, root: nil, namespaces_nesting_level: 666 },
-      { camelize: false, include_namespaces: false, include_root: false, root: nil, namespaces_nesting_level: 3 },
+      { camelize: false, include_namespaces: true, include_root: true,
+        root: nil, namespaces_nesting_level: 3 },
+      { camelize: false, include_namespaces: true, include_root: true,
+        root: nil, namespaces_nesting_level: 666 },
+      { camelize: false, include_namespaces: false, include_root: true,
+        root: nil, namespaces_nesting_level: 3 },
+      { camelize: false, include_namespaces: false, include_root: true,
+        root: nil, namespaces_nesting_level: 666 },
+      { camelize: false, include_namespaces: true, include_root: false,
+        root: nil, namespaces_nesting_level: 3 },
+      { camelize: false, include_namespaces: true, include_root: false,
+        root: nil, namespaces_nesting_level: 666 },
+      { camelize: false, include_namespaces: false, include_root: false,
+        root: nil, namespaces_nesting_level: 3 },
     ]
 
     args_without_root = [
-      { camelize: false, include_namespaces: false, include_root: false, root: nil, namespaces_nesting_level: 666 },
-      { camelize: true, include_namespaces: false, include_root: false, root: nil, namespaces_nesting_level: 666 },
+      { camelize: false, include_namespaces: false, include_root: false,
+        root: nil, namespaces_nesting_level: 666 },
+      { camelize: true, include_namespaces: false, include_root: false,
+        root: nil, namespaces_nesting_level: 666 },
     ]
 
     context 'with `camelize: true`' do
