@@ -1,0 +1,133 @@
+AllCops:
+  TargetRubyVersion: 2.2
+
+# Layout
+
+Layout/AlignParameters:
+  Enabled: true
+
+Layout/EmptyLineBetweenDefs:
+  Exclude:
+    - spec/**/*rb
+
+Layout/IndentArray:
+  EnforcedStyle: consistent
+
+Layout/IndentHash:
+  EnforcedStyle: consistent
+
+Layout/MultilineMethodCallIndentation:
+  Enabled: false
+
+Layout/MultilineOperationIndentation:
+  Enabled: false
+
+Layout/SpaceInLambdaLiteral:
+  EnforcedStyle: require_space
+
+Layout/SpaceInsideBrackets:
+  Enabled: false
+
+# Lint
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+
+Lint/AmbiguousOperator:
+  Enabled: false
+
+Lint/EmptyWhen:
+  Enabled: false
+
+Lint/NonLocalExitFromIterator:
+  Enabled: false
+
+Lint/RescueType:
+  Enabled: true
+
+# Metrics
+
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*rb
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/MethodLength:
+  Max: 15
+
+Metrics/LineLength:
+  Max: 106
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Metrics/ParameterLists:
+  Enabled: false
+
+# Naming
+
+Naming/AccessorMethodName:
+  Enabled: false
+
+Naming/PredicateName:
+  NamePrefixBlacklist:
+    - is_
+
+# Performance
+
+Performance/Caller:
+  Enabled: true
+
+Performance/Casecmp:
+  Enabled: true
+
+Performance/UnfreezeString:
+  Enabled: true
+
+# Style
+
+Style/SingleLineMethods:
+  Exclude:
+    - spec/**/*rb
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/Dir:
+  Enabled: true
+
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+  ConsistentQuotesInMultiline: true
+
+Style/FormatStringToken:
+  Enabled: true
+
+Style/IfUnlessModifier:
+  Enabled: true
+
+Style/GuardClause:
+  Enabled: false
+
+Style/MultipleComparison:
+  Enabled: true
+
+Style/PerlBackrefs:
+  Enabled: true
+
+Style/RedundantConditional:
+  Enabled: true
+
+Style/RegexpLiteral:
+  EnforcedStyle: mixed
+  Enabled: true
+
+Style/SignalException:
+  EnforcedStyle: only_raise
+
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInLiteral:
+  EnforcedStyleForMultiline: comma
