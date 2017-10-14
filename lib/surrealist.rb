@@ -33,6 +33,7 @@ module Surrealist
     # @param [Boolean] camelize optional argument for converting hash to camelBack.
     # @param [Boolean] include_root optional argument for having the root key of the resulting hash
     #   as instance's class name.
+    # @param [String] root optional argument for using a specified root key for the resulting hash
     #
     # @return [Object] the Collection#map with elements being json-formatted string corresponding
     #   to the schema provided in the object's class. Values will be taken from the return values

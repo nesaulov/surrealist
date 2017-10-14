@@ -10,6 +10,7 @@ module Surrealist
     #   as instance's class name.
     # @param [Boolean] include_namespaces optional argument for having root key as a nested hash of
     #   instance's namespaces. Animal::Cat.new.surrealize -> (animal: { cat: { weight: '3 kilos' } })
+    # @param [String] root optional argument for using a specified root key for the resulting hash
     # @param [Integer] namespaces_nesting_level level of namespaces nesting.
     #
     # @raise ArgumentError if types of arguments are wrong.
