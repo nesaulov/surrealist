@@ -1,3 +1,10 @@
+# 0.2.0
+## Added
+* `delegate_surrealization_to` class method
+* `include_namespaces` optional argument
+* `namespaces_nesting_level` optional argument
+* `Surrealist.surrealize_collection` method for collection serialization
+
 # 0.1.4
 ## Added
 * Optional `include_root` argument to wrap schema in a root key. [#15](https://github.com/nesaulov/surrealist/pull/15)
