@@ -54,7 +54,7 @@ module Surrealist
           camelize: camelize,
           include_root: include_root,
           include_namespaces: include_namespaces,
-          namespaces_nesting_level: namespaces_nesting_level
+          namespaces_nesting_level: namespaces_nesting_level,
         )
       end)
     end

@@ -2,7 +2,7 @@ language: ruby
 sudo: false
 cache: bundler
 before_install: gem install bundler
-script: bundle exec rspec
+script: bundle exec rake
 rvm:
   - 2.2.0
   - 2.2.5

@@ -1,8 +1,8 @@
 require 'active_record'
 
 ActiveRecord::Base.establish_connection(
-    :adapter => "sqlite3",
-    :database  => ":memory:"
+  adapter: 'sqlite3',
+  database: ':memory:',
 )
 
 ActiveRecord::Schema.define do
@@ -43,10 +43,10 @@ end
 class TestAR < ActiveRecord::Base
   include Surrealist
 
-  scope :sub_collection, ->{ where(type: 'InheritAR' )}
-  scope :sub_record, -> { find_by(type: 'InheritAR' ) }
+  scope :sub_collection, -> { where(type: 'InheritAR') }
+  scope :sub_record, -> { find_by(type: 'InheritAR') }
 
-  json_schema do { name: String } end
+  json_schema { { name: String } }
 end
 TestAR.create(name: 'testing active record')
 
@@ -70,7 +70,7 @@ class Book < ActiveRecord::Base
 
   include Surrealist
 
-  json_schema do { name: String } end
+  json_schema { { name: String } }
 end
 
 class Author < ActiveRecord::Base
@@ -78,29 +78,29 @@ class Author < ActiveRecord::Base
 
   include Surrealist
 
-  json_schema do { name: String } end
+  json_schema { { name: String } }
 end
 
 class Publisher < ActiveRecord::Base
   include Surrealist
 
-  json_schema do { name: String } end
+  json_schema { { name: String } }
 end
 
 class Award < ActiveRecord::Base
   include Surrealist
 
-  json_schema do { name: String } end
+  json_schema { { name: String } }
 end
 
 class Genre < ActiveRecord::Base
   include Surrealist
 
-  json_schema do { name: String } end
+  json_schema { { name: String } }
 end
 
-3.times { Genre.create(name: ('a'..'z').to_a.shuffle[0,8].join) }
-3.times { Author.create(name: ('a'..'z').to_a.shuffle[0,8].join) }
-3.times { Book.create(name: ('a'..'z').to_a.shuffle[0,8].join, genre_id: Genre.all.sample.id) }
-3.times { Publisher.create(name: ('a'..'z').to_a.shuffle[0,8].join, book_id: Book.all.sample.id) }
-3.times { Award.create(name: ('a'..'z').to_a.shuffle[0,8].join, book_id: Book.all.sample.id) }
+3.times { Genre.create(name: ('a'..'z').to_a.sample(8).join) }
+3.times { Author.create(name: ('a'..'z').to_a.sample(8).join) }
+3.times { Book.create(name: ('a'..'z').to_a.sample(8).join, genre_id: Genre.all.sample.id) }
+3.times { Publisher.create(name: ('a'..'z').to_a.sample(8).join, book_id: Book.all.sample.id) }
+3.times { Award.create(name: ('a'..'z').to_a.sample(8).join, book_id: Book.all.sample.id) }
