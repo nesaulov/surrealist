@@ -5,7 +5,7 @@
 [![Gem Version](https://badge.fury.io/rb/surrealist.svg)](https://rubygems.org/gems/surrealist)
 
 ![Surrealist](surrealist-icon.png)
-
+ 
 A gem that provides DSL for serialization of plain old Ruby objects to JSON in a declarative style
 by defining a `json_schema`. It also provides a trivial type checking in the runtime before serialization.
 [Yard documentation](http://www.rubydoc.info/github/nesaulov/surrealist/master)
@@ -33,7 +33,7 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
   * [Type errors](#type-errors)
   * [Undefined methods in schema](#undefined-methods-in-schema)
   * [Other notes](#other-notes)
-* [Roadmap](#roadmap)
+* [Roadmap](#roadmap)  
 * [Contributing](#contributing)
 * [Credits](#credits)
 * [License](#license)
@@ -69,15 +69,15 @@ that will be used for type-checks.
 ``` ruby
 class Person
   include Surrealist
-
+ 
   json_schema do
     { name: String, age: Integer }
   end
-
+ 
   def name
     'John Doe'
   end
-
+ 
   def age
     42
   end
@@ -96,7 +96,7 @@ Person.new.surrealize
 ``` ruby
 class Person
   include Surrealist
-
+ 
   json_schema do
     {
       foo: String,
@@ -111,7 +111,7 @@ class Person
   end
   # ... method definitions
 end
-
+ 
 Person.find_by(email: 'example@email.com').surrealize
 # => '{ "foo": "Some string", "name": "John Doe", "nested": { "at": { "any": 42, "level": true } } }'
 ```
@@ -123,7 +123,7 @@ define a method that calls nested object:
 ``` ruby
 class User
   include Surrealist
-
+  
   json_schema do
     {
       name: String,
@@ -133,11 +133,11 @@ class User
       },
     }
   end
-
+ 
   def name
     'John Doe'
   end
-
+ 
   def credit_card
     # Assuming that instance of a CreditCard has methods #number and #cvv defined
     CreditCard.find_by(holder: name)
@@ -207,7 +207,7 @@ require 'dry-types'
 
 class Car
   include Surrealist
-
+ 
   json_schema do
     {
       age:            Types::Coercible::Int,
@@ -218,25 +218,25 @@ class Car
       previous_owner: Types::String,
     }
   end
-
+ 
   def age;
     '7'
   end
-
+ 
   def previous_owner;
     'John Doe'
   end
-
+ 
   def horsepower;
     140
   end
-
+ 
   def brand;
     'Toyota'
   end
-
+ 
   def doors; end
-
+ 
   def fuel_system;
     'Direct injection'
   end
@@ -272,16 +272,16 @@ surrealizable object.
 ``` ruby
 class Cat
   include Surrealist
-
+ 
   json_schema do
     { weight: String }
   end
-
+ 
   def weight
     '3 kilos'
   end
 end
-
+ 
 Cat.new.surrealize(include_root: true)
 # => '{ "cat": { "weight": "3 kilos" } }'
 ```
@@ -290,11 +290,11 @@ With nested classes the last namespace will be taken as root key:
 class Animal
   class Dog
     include Surrealist
-
+ 
     json_schema do
       { breed: String }
     end
-
+ 
     def breed
       'Collie'
     end
@@ -389,7 +389,7 @@ can use `Bool` and `Any` respectively.
 ``` ruby
 class User
   include Surrealist
-
+ 
   json_schema do
     {
       age: Any,
@@ -405,13 +405,13 @@ end
 ``` ruby
 class CreditCard
   include Surrealist
-
+ 
   json_schema do
     { number: Integer }
   end
-
+ 
   def number
-    'string'
+    'string'  
   end
 end
 
@@ -426,7 +426,7 @@ a corresponding method defined in the object.
 ``` ruby
 class Car
   include Surrealist
-
+ 
   json_schema do
     { weight: Integer }
   end
