@@ -56,7 +56,7 @@ module Surrealist
           include_root: include_root,
           include_namespaces: include_namespaces,
           root: root,
-          namespaces_nesting_level: namespaces_nesting_level
+          namespaces_nesting_level: namespaces_nesting_level,
         )
       end)
     end

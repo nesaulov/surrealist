@@ -22,10 +22,13 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
   * [Simple example](#simple-example)
   * [Nested structures](#nested-structures)
   * [Nested objects](#nested-objects)
+  * [Delegating Surrealization](#delegating-surrealization)
   * [Usage with Dry::Types](#usage-with-drytypes)
   * [Build schema](#build-schema)
   * [Camelization](#camelization)
   * [Include root](#include-root)
+  * [Include namespaces](#include-namespaces)
+  * [Collection Surrealization](#collection-surrealization)
   * [Bool and Any](#bool-and-any)
   * [Type errors](#type-errors)
   * [Undefined methods in schema](#undefined-methods-in-schema)
@@ -146,6 +149,52 @@ User.new.surrealize
 
 ```
 
+### Delegating surrealization
+You can share the `json_schema` between classes:
+``` ruby
+class Host
+  include Surrealist
+ 
+  json_schema do
+    { name: String }
+  end
+ 
+  def name
+    'Host'
+  end
+end
+
+class Guest
+  delegate_surrealization_to Host
+ 
+  def name
+    'Guest'
+  end
+end
+
+Host.new.surrealize
+# => '{ "name": "Host" }'
+Guest.new.surrealize
+# => '{ "name": "Guest" }'
+```
+Schema delegation works without inheritance as well, so if you wish you can
+delegate surrealization not only to parent classes, but to any class. Please note that
+in this case you have to `include Surrealist` in class that delegates schema as well.
+``` ruby
+class Potato
+  include Surrealist
+  delegate_surrealization_to Host
+ 
+  def name
+    'Potato'
+  end
+end
+
+Potato.new.surrealize
+# => '{ "name": "Potato" }'
+```
+
+
 ### Usage with Dry::Types
 You can use `Dry::Types` for type checking. Note that Surrealist does not ship
 with dry-types by default, so you should do the [installation and configuration](http://dry-rb.org/gems/dry-types/)
@@ -255,7 +304,55 @@ end
 Animal::Dog.new.surrealize(include_root: true)
 # => '{ "dog": { "breed": "Collie" } }'
 ```
-Nesting namespaces are [yet to be implemented.](https://github.com/nesaulov/surrealist/issues/14)
+
+### Include namespaces
+You can build wrap schema into a nested hash from namespaces of the object's class.
+``` ruby
+class BusinessSystem::Cashout::ReportSystem::Withdraws
+  include Surrealist
+ 
+  json_schema do
+    { withdraws_amount: Integer }
+  end
+ 
+  def withdraws_amount
+    34
+  end
+end
+ 
+withdraws = BusinessSystem::Cashout::ReportSystem::Withdraws.new
+ 
+withdraws.surrealize(include_namespaces: true)
+# => '{ "business_system": { "cashout": { "report_system": { "withdraws": { "withdraws_amount": 34 } } } } }' 
+```
+By default all namespaces will be taken. If you want you can explicitly specify the level of nesting:
+``` ruby
+withdraws.surrealize(include_namespaces: true, namespaces_nesting_level: 2)
+# => '{ "report_system": { "withdraws": { "withdraws_amount": 34 } } }'
+```
+
+### Collection Surrealization
+Since 0.2.0 Surrealist has API for collection serialization. Example for ActiveRecord:
+``` ruby
+class User < ActiveRecord::Base
+  include Surrealist
+ 
+  json_schema do
+    { name: String, age: Integer }
+  end
+end
+ 
+users = User.all
+# => [#<User:0x007fa1485de878 id: 1, name: "Nikita", age: 23>, #<User:0x007fa1485de5f8 id: 2, name: "Alessandro", age: 24>]
+ 
+Surrealist.surrealize_collection(users)
+# => '[{ "name": "Nikita", "age": 23 }, { "name": "Alessandro", "age": 24 }]'
+```
+You can find motivation behind introducing new API versus monkey-patching [here](https://alessandrominali.github.io/monkey_patching_real_example).  
+`#surrealize_collection` works for all data structures that respond to `#each`. All ActiveRecord
+features (like associations, inheritance etc) are supported and covered. Other ORMs should work without
+issues as well, tests are in progress. All optional arguments (`camelize`, `include_root` etc) are also supported.
+Guides on where to use `#surrealize_collection` vs `#surrealize` for all ORMs are coming.
 
 ### Root
 If you want to wrap the resulting JSON into a specified root key, you can pass optional `root` argument
@@ -302,9 +399,7 @@ class User
 end
 ```
 
-
 ### Type Errors
-
 `Surrealist::InvalidTypeError` is thrown if types (and dry-types) mismatch.
 
 ``` ruby
@@ -325,7 +420,6 @@ CreditCard.new.surrealize
 ```
 
 ### Undefined methods in schema
-
 `Surrealist::UndefinedMethodError` is thrown if a key defined in the schema does not have
 a corresponding method defined in the object.
 
@@ -349,10 +443,7 @@ type check will be passed. If you want to be strict about `nil`s consider using 
 
 ## Roadmap
 Here is a list of features that are not implemented yet (contributions are welcome):
-* [ActiveRecord_Relation serialization](https://github.com/nesaulov/surrealist/issues/13)
 * [Collection serialization](https://github.com/nesaulov/surrealist/issues/12)
-* [Delegating serialization to parent class](https://github.com/nesaulov/surrealist/issues/11)
-* [Having nested namespaces being surrealized](https://github.com/nesaulov/surrealist/issues/14)
 
 ## Contributing
 Bug reports and pull requests are welcome on GitHub at https://github.com/nesaulov/surrealist.
