@@ -12,20 +12,20 @@ RSpec.describe Surrealist do
     context 'active record' do
       it 'works' do
         expect(subject.surrealize_collection(TestAR.all))
-          .to eq([{name: 'testing active record'},
-                  {name: 'testing active record inherit'},
-                  {name: 'testing active record inherit again'}].to_json)
+          .to eq([{ name: 'testing active record' },
+                  { name: 'testing active record inherit' },
+                  { name: 'testing active record inherit again' }].to_json)
       end
 
       it 'works with inheritance' do
         expect(subject.surrealize_collection(InheritAR.all))
-          .to eq([{name: 'testing active record inherit'},
-                  {name: 'testing active record inherit again'}].to_json)
+          .to eq([{ name: 'testing active record inherit' },
+                  { name: 'testing active record inherit again' }].to_json)
       end
 
       it 'works with nested inheritance' do
         expect(subject.surrealize_collection(InheritAgainAR.all))
-          .to eq([{name: 'testing active record inherit again'}].to_json)
+          .to eq([{ name: 'testing active record inherit again' }].to_json)
       end
 
       it 'fails with inheritance and without schema' do
@@ -38,7 +38,7 @@ RSpec.describe Surrealist do
       context 'scopes' do
         it 'works if returns collection of records' do
           expect(subject.surrealize_collection(TestAR.sub_collection))
-            .to eq([{name: 'testing active record inherit'}].to_json)
+            .to eq([{ name: 'testing active record inherit' }].to_json)
         end
 
         it 'fails if returns single record' do
@@ -109,20 +109,20 @@ RSpec.describe Surrealist do
     context 'sequel' do
       it 'works' do
         expect(subject.surrealize_collection(TestSequel.all))
-          .to eq([{name: 'testing sequel'}].to_json)
+          .to eq([{ name: 'testing sequel' }].to_json)
       end
     end
     context 'data mapper' do
       it 'works' do
         expect(subject.surrealize_collection(TestDataMapper.all))
-          .to eq([{name: 'testing data mapper'}].to_json)
+          .to eq([{ name: 'testing data mapper' }].to_json)
       end
     end
     context 'rom' do
       rom = ROM.container(:memory) do |conf|
         conf.register_mapper(ItemsMapper)
         conf.relation(:items) do
-          def all; self.as(:item_obj).to_a; end
+          def all; as(:item_obj).to_a; end
         end
         conf.commands(:items) do
           define(:create)
@@ -131,14 +131,14 @@ RSpec.describe Surrealist do
       rom.command(:items).create.call(name: 'testing rom')
       it 'works' do
         expect(subject.surrealize_collection(rom.relation(:items).all))
-          .to eq([{name: 'testing rom'}].to_json)
+          .to eq([{ name: 'testing rom' }].to_json)
       end
     end
     context 'not proper collection' do
       it 'fails' do
         expect { subject.surrealize_collection(Object) }
           .to raise_error(Surrealist::InvalidCollectionError,
-            'Can\'t serialize collection - must respond to :each')
+                          'Can\'t serialize collection - must respond to :each')
       end
     end
   end

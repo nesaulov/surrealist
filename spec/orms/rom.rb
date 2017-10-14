@@ -3,7 +3,7 @@ require 'rom'
 class Item
   include Surrealist
 
-  json_schema do { name: String } end
+  json_schema { { name: String } }
 
   attr_reader :id, :name
 

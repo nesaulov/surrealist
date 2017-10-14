@@ -6,7 +6,7 @@ class TestDataMapper
   include DataMapper::Resource
   include Surrealist
 
-  json_schema do { name: String } end
+  json_schema { { name: String } }
 
   property :id,   Serial
   property :name, Text

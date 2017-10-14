@@ -7,6 +7,6 @@ end
 class TestSequel < Sequel::Model
   include Surrealist
 
-  json_schema do { name: String } end
+  json_schema { { name: String } }
 end
 TestSequel.insert(name: 'testing sequel')
