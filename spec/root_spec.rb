@@ -141,6 +141,11 @@ RSpec.describe Surrealist do
         expect(JSON.parse(instance.surrealize(root: 'kitten', include_root: true)))
           .to eq('kitten' => { 'cat' => { 'cat_weight' => '3 kilos' } })
       end
+
+      it 'wraps include_namespaces' do
+        expect(JSON.parse(instance.surrealize(root: 'kitten', include_namespaces: true)))
+          .to eq('kitten' => { 'cat' => { 'cat_weight' => '3 kilos' } })
+      end
     end
 
     context 'with nested objects' do
@@ -165,6 +170,18 @@ RSpec.describe Surrealist do
           .to eq('seriousKitten' => { 'weight'  => '3 kilos',
                                       'catFood' => { 'amount' => 3, 'brand' => 'Whiskas' } })
       end
+
+      it 'wraps include_root' do
+        expect(JSON.parse(instance.surrealize(root: 'serious_kitten', include_root: true)))
+          .to eq('serious_kitten' => { 'serious_cat' => { 'weight'   => '3 kilos',
+                                                          'cat_food' => { 'amount' => 3, 'brand' => 'Whiskas' } } })
+      end
+
+      it 'wraps include_namespaces' do
+        expect(JSON.parse(instance.surrealize(root: 'serious_kitten', include_namespaces: true)))
+          .to eq('serious_kitten' => { 'serious_cat' => { 'weight'   => '3 kilos',
+                                                          'cat_food' => { 'amount' => 3, 'brand' => 'Whiskas' } } })
+      end
     end
 
     context 'with nested classes' do
@@ -185,6 +202,16 @@ RSpec.describe Surrealist do
 
         expect(JSON.parse(instance.surrealize(root: 'dog', camelize: true)))
           .to eq('dog' => { 'breed' => 'Collie' })
+      end
+
+      it 'wraps include_root' do
+        expect(JSON.parse(instance.surrealize(root: 'dog', include_root: true)))
+          .to eq('dog' => { 'dog' => { 'breed' => 'Collie' } })
+      end
+
+      it 'wraps include_namespaces' do
+        expect(JSON.parse(instance.surrealize(root: 'dog', include_namespaces: true)))
+          .to eq('dog' => { 'animal' => { 'dog' => { 'breed' => 'Collie' } } })
       end
     end
 
@@ -208,6 +235,16 @@ RSpec.describe Surrealist do
         expect(JSON.parse(instance.surrealize(root: 'guitar', camelize: true)))
           .to eq('guitar' => { 'brandName' => 'Fender' })
       end
+
+      it 'include_root' do
+        expect(JSON.parse(instance.surrealize(root: 'guitar', include_root: true)))
+          .to eq('guitar' => { 'guitar' => { 'brand_name' => 'Fender' } })
+      end
+
+      it 'include_namespaces' do
+        expect(JSON.parse(instance.surrealize(root: 'guitar', include_namespaces: true)))
+          .to eq('guitar' => { 'instrument' => { 'guitar' => { 'brand_name' => 'Fender' } } })
+      end
     end
 
     context 'triple nesting' do
@@ -229,6 +266,16 @@ RSpec.describe Surrealist do
 
         expect(JSON.parse(instance.surrealize(root: 'ruby', camelize: true)))
           .to eq('ruby' => { 'age' => '22 years' })
+      end
+
+      it 'include_root' do
+        expect(JSON.parse(instance.surrealize(root: 'ruby', include_root: true)))
+          .to eq('ruby' => { 'ruby' => { 'age' => '22 years' } })
+      end
+
+      it 'include_namespaces' do
+        expect(JSON.parse(instance.surrealize(root: 'ruby', include_namespaces: true)))
+          .to eq('ruby' => { 'code' => { 'language' => { 'ruby' => { 'age' => '22 years' } } } })
       end
     end
   end
