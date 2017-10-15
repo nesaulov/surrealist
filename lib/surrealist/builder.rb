@@ -19,11 +19,11 @@ module Surrealist
           if schema_value.is_a?(Hash)
             parse_hash(hash: schema_value, schema: schema, instance: instance, key: schema_key)
           else
-            type = schema_value
-            schema_value = instance.is_a?(Hash) ? instance[schema_key] : instance.send(schema_key)
-            assign_value(method: schema_key, value: schema_value, type: type) do |coerced_value|
-              schema[schema_key] = coerced_value
-            end
+            value = instance.is_a?(Hash) ? instance[schema_key] : instance.send(schema_key)
+            assign_value(instance: instance,
+                         method: schema_key,
+                         value: value,
+                         type: schema_value) { |coerced_value| schema[schema_key] = coerced_value }
           end
         end
       rescue NoMethodError => e
@@ -87,7 +87,7 @@ module Surrealist
           parse_hash(hash: value, schema: hash, instance: result, key: key)
         else
           type = value
-          assign_value(method: key, value: result, type: type) do |coerced_value|
+          assign_value(instance: instance, method: key, value: result, type: type) do |coerced_value|
             schema[method] = schema[method].merge(key => coerced_value)
           end
         end
@@ -102,10 +102,16 @@ module Surrealist
       # @raise +Surrealist::InvalidTypeError+ if type-check failed at some point.
       #
       # @return [Hash] schema
-      def assign_value(method:, value:, type:, &_block)
+      def assign_value(instance:, method:, value:, type:, &_block)
         if TypeHelper.valid_type?(value: value, type: type)
           value = TypeHelper.coerce(type: type, value: value)
-          yield value
+          return yield value unless value.respond_to?(:build_schema)
+
+          @stack ||= []
+          return yield if @stack.include?(value.class)
+          @stack << instance.class
+          yield value.build_schema
+          @stack.delete(instance.class)
         else
           raise Surrealist::InvalidTypeError,
                 "Wrong type for key `#{method}`. Expected #{type}, got #{value.class}."
