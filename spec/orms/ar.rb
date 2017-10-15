@@ -53,10 +53,6 @@ ActiveRecord::Schema.define do
     table.integer :ceo_id
   end
 
-  create_table :ceos do |table|
-    table.column :name, :string
-  end
-
   create_table :assistants do |table|
     table.column :name, :string
     table.integer :executive_id
@@ -137,14 +133,6 @@ class Genre < ActiveRecord::Base
   json_schema { { name: String } }
 end
 
-class CEO < ActiveRecord::Base
-  has_many :executives
-
-  include Surrealist
-
-  json_schema { { name: String, exe: CEO } }
-end
-
 class Executive < ActiveRecord::Base
   has_one :assistant
 
@@ -213,7 +201,6 @@ end
 3.times { Book.create(name: name_string, genre_id: Genre.all.sample.id) }
 3.times { Publisher.create(name: name_string, book_id: Book.all.sample.id) }
 3.times { Award.create(name: name_string, book_id: Book.all.sample.id) }
-CEO.create(name: name_string)
 2.times { Executive.create(name: name_string, ceo_id: CEO.all.sample.id) }
 3.times { Manager.create(name: name_string) }
 5.times { Employee.create(name: name_string, manager_id: Manager.all.sample.id) }
