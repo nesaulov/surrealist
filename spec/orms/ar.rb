@@ -201,7 +201,7 @@ end
 3.times { Book.create(name: name_string, genre_id: Genre.all.sample.id) }
 3.times { Publisher.create(name: name_string, book_id: Book.all.sample.id) }
 3.times { Award.create(name: name_string, book_id: Book.all.sample.id) }
-2.times { Executive.create(name: name_string, ceo_id: CEO.all.sample.id) }
+2.times { Executive.create(name: name_string) }
 3.times { Manager.create(name: name_string) }
 5.times { Employee.create(name: name_string, manager_id: Manager.all.sample.id) }
 Assistant.create(name: name_string, executive_id: Executive.first.id)
