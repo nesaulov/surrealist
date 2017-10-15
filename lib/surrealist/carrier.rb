@@ -36,6 +36,7 @@ module Surrealist
     def sanitize!
       check_booleans!
       check_namespaces_nesting!
+      check_root!
       self
     end
 
@@ -65,6 +66,14 @@ module Surrealist
 
       if namespaces_nesting_level <= 0
         Surrealist::ExceptionRaiser.raise_invalid_nesting!(namespaces_nesting_level)
+      end
+    end
+
+    # Checks if root is not nil, a non-empty string, or symbol
+    # @raise ArgumentError
+    def check_root!
+      unless root.nil? || (root.is_a?(String) && root.present?) || root.is_a?(Symbol)
+        Surrealist::ExceptionRaiser.raise_invalid_root!(root)
       end
     end
   end

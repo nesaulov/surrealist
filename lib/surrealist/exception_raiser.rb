@@ -67,6 +67,14 @@ module Surrealist
         raise ArgumentError,
               "Expected `namespaces_nesting_level` to be a positive integer, got: #{value}"
       end
+
+      # Raises ArgumentError if root is not nil, a non-empty stringk or symbol.
+      #
+      # @raise ArgumentError
+      def raise_invalid_root!(value)
+        raise ArgumentError,
+              "Expected `root` to be nil, a non-empty string, or symbol, got: #{value}"
+      end
     end
   end
 end

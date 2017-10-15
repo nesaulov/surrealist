@@ -21,7 +21,7 @@ module Surrealist
         copy_before_root = copied_and_possibly_wrapped_hash(hash, klass, carrier, namespaces_condition)
 
         if carrier.root
-          wrap_schema_into_root(schema: copy_before_root, carrier: carrier, root: carrier.root)
+          wrap_schema_into_root(schema: copy_before_root, carrier: carrier, root: carrier.root.to_s)
         else
           copy_before_root
         end

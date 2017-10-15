@@ -371,12 +371,14 @@ class Cat
   end
 end
 
-Cat.new.surrealize(root: "kitten")
+Cat.new.surrealize(root: :kitten)
+# => '{ "kitten": { "weight": "3 kilos" } }'
+Cat.new.surrealize(root: 'kitten')
 # => '{ "kitten": { "weight": "3 kilos" } }'
 ```
 This works with the `include_root` and `include_namespaces` arguments too.
 ``` ruby
-Animal::Cat.new.surrealize(include_root: true, root: 'kitten')
+Animal::Cat.new.surrealize(include_root: true, root: :kitten)
 # => '{ "kitten": { "cat": { "weight": "3 kilos" } } }'
 Animal::Cat.new.surrealize(include_namespaces: true, root: 'kitten')
 # => '{ "kitten": { "animal": { "cat": { "weight": "3 kilos" } } } }'
