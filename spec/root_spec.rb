@@ -128,14 +128,14 @@ RSpec.describe Surrealist do
           .to eq('kitten' => { 'catWeight' => '3 kilos' })
       end
 
-      it 'wraps include_root' do
+      it 'overrides include_root' do
         expect(JSON.parse(instance.surrealize(root: 'kitten', include_root: true)))
-          .to eq('kitten' => { 'cat' => { 'cat_weight' => '3 kilos' } })
+          .to eq('kitten' => { 'cat_weight' => '3 kilos' })
       end
 
-      it 'wraps include_namespaces' do
+      it 'overrides include_namespaces' do
         expect(JSON.parse(instance.surrealize(root: 'kitten', include_namespaces: true)))
-          .to eq('kitten' => { 'cat' => { 'cat_weight' => '3 kilos' } })
+          .to eq('kitten' => { 'cat_weight' => '3 kilos' })
       end
     end
 
@@ -159,14 +159,14 @@ RSpec.describe Surrealist do
           .to eq('kitten' => { 'catWeight' => '3 kilos' })
       end
 
-      it 'wraps include_root' do
+      it 'overrides include_root' do
         expect(JSON.parse(instance.surrealize(root: :kitten, include_root: true)))
-          .to eq('kitten' => { 'cat' => { 'cat_weight' => '3 kilos' } })
+          .to eq('kitten' => { 'cat_weight' => '3 kilos' })
       end
 
-      it 'wraps include_namespaces' do
+      it 'overrides include_namespaces' do
         expect(JSON.parse(instance.surrealize(root: :kitten, include_namespaces: true)))
-          .to eq('kitten' => { 'cat' => { 'cat_weight' => '3 kilos' } })
+          .to eq('kitten' => { 'cat_weight' => '3 kilos' })
       end
     end
 
@@ -193,18 +193,18 @@ RSpec.describe Surrealist do
                                       'catFood' => { 'amount' => 3, 'brand' => 'Whiskas' } })
       end
 
-      it 'wraps include_root' do
+      it 'overrides include_root' do
         expect(JSON.parse(instance.surrealize(root: 'serious_kitten', include_root: true)))
-          .to eq('serious_kitten' => { 'serious_cat' => { 'weight'   => '3 kilos',
-                                                          'cat_food' => { 'amount' => 3,
-                                                                          'brand' => 'Whiskas' } } })
+          .to eq('serious_kitten' => { 'weight'   => '3 kilos',
+                                       'cat_food' => { 'amount' => 3,
+                                                       'brand' => 'Whiskas' } })
       end
 
-      it 'wraps include_namespaces' do
+      it 'overrides include_namespaces' do
         expect(JSON.parse(instance.surrealize(root: 'serious_kitten', include_namespaces: true)))
-          .to eq('serious_kitten' => { 'serious_cat' => { 'weight'   => '3 kilos',
-                                                          'cat_food' => { 'amount' => 3,
-                                                                          'brand' => 'Whiskas' } } })
+          .to eq('serious_kitten' => { 'weight'   => '3 kilos',
+                                       'cat_food' => { 'amount' => 3,
+                                                       'brand' => 'Whiskas' } })
       end
     end
 
@@ -212,30 +212,30 @@ RSpec.describe Surrealist do
       let(:instance) { Animal::Dog.new }
 
       it 'builds schema' do
-        expect(instance.build_schema(root: 'dog')).to eq(dog: { breed: 'Collie' })
+        expect(instance.build_schema(root: 'new_dog')).to eq(new_dog: { breed: 'Collie' })
       end
 
       it 'surrealizes' do
-        expect(JSON.parse(instance.surrealize(root: 'dog')))
-          .to eq('dog' => { 'breed' => 'Collie' })
+        expect(JSON.parse(instance.surrealize(root: 'new_dog')))
+          .to eq('new_dog' => { 'breed' => 'Collie' })
       end
 
       it 'camelizes' do
-        expect(instance.build_schema(root: 'dog', camelize: true))
-          .to eq(dog: { breed: 'Collie' })
+        expect(instance.build_schema(root: 'newDog', camelize: true))
+          .to eq(newDog: { breed: 'Collie' })
 
-        expect(JSON.parse(instance.surrealize(root: 'dog', camelize: true)))
-          .to eq('dog' => { 'breed' => 'Collie' })
+        expect(JSON.parse(instance.surrealize(root: 'new_dog', camelize: true)))
+          .to eq('newDog' => { 'breed' => 'Collie' })
       end
 
-      it 'wraps include_root' do
-        expect(JSON.parse(instance.surrealize(root: 'dog', include_root: true)))
-          .to eq('dog' => { 'dog' => { 'breed' => 'Collie' } })
+      it 'overrides include_root' do
+        expect(JSON.parse(instance.surrealize(root: 'new_dog', include_root: true)))
+          .to eq('new_dog' => { 'breed' => 'Collie' })
       end
 
-      it 'wraps include_namespaces' do
-        expect(JSON.parse(instance.surrealize(root: 'dog', include_namespaces: true)))
-          .to eq('dog' => { 'animal' => { 'dog' => { 'breed' => 'Collie' } } })
+      it 'overrides include_namespaces' do
+        expect(JSON.parse(instance.surrealize(root: 'new_dog', include_namespaces: true)))
+          .to eq('new_dog' => { 'breed' => 'Collie' })
       end
     end
 
@@ -243,31 +243,31 @@ RSpec.describe Surrealist do
       let(:instance) { Instrument::Guitar.new }
 
       it 'builds schema' do
-        expect(instance.build_schema(root: 'guitar'))
-          .to eq(guitar: { brand_name: 'Fender' })
+        expect(instance.build_schema(root: 'new_guitar'))
+          .to eq(new_guitar: { brand_name: 'Fender' })
       end
 
       it 'surrealizes' do
-        expect(JSON.parse(instance.surrealize(root: 'guitar')))
-          .to eq('guitar' => { 'brand_name' => 'Fender' })
+        expect(JSON.parse(instance.surrealize(root: 'new_guitar')))
+          .to eq('new_guitar' => { 'brand_name' => 'Fender' })
       end
 
       it 'camelizes' do
-        expect(instance.build_schema(root: 'guitar', camelize: true))
-          .to eq(guitar: { brandName: 'Fender' })
+        expect(instance.build_schema(root: 'new_guitar', camelize: true))
+          .to eq(newGuitar: { brandName: 'Fender' })
 
-        expect(JSON.parse(instance.surrealize(root: 'guitar', camelize: true)))
-          .to eq('guitar' => { 'brandName' => 'Fender' })
+        expect(JSON.parse(instance.surrealize(root: 'new_guitar', camelize: true)))
+          .to eq('newGuitar' => { 'brandName' => 'Fender' })
       end
 
-      it 'include_root' do
-        expect(JSON.parse(instance.surrealize(root: 'guitar', include_root: true)))
-          .to eq('guitar' => { 'guitar' => { 'brand_name' => 'Fender' } })
+      it 'overrides include_root' do
+        expect(JSON.parse(instance.surrealize(root: 'new_guitar', include_root: true)))
+          .to eq('new_guitar' => { 'brand_name' => 'Fender' })
       end
 
-      it 'include_namespaces' do
-        expect(JSON.parse(instance.surrealize(root: 'guitar', include_namespaces: true)))
-          .to eq('guitar' => { 'instrument' => { 'guitar' => { 'brand_name' => 'Fender' } } })
+      it 'overrides include_namespaces' do
+        expect(JSON.parse(instance.surrealize(root: 'new_guitar', include_namespaces: true)))
+          .to eq('new_guitar' => { 'brand_name' => 'Fender' })
       end
     end
 
@@ -275,31 +275,31 @@ RSpec.describe Surrealist do
       let(:instance) { Code::Language::Ruby.new }
 
       it 'builds schema' do
-        expect(instance.build_schema(root: 'ruby'))
-          .to eq(ruby: { age: '22 years' })
+        expect(instance.build_schema(root: 'new_ruby'))
+          .to eq(new_ruby: { age: '22 years' })
       end
 
       it 'surrealizes' do
-        expect(JSON.parse(instance.surrealize(root: 'ruby')))
-          .to eq('ruby' => { 'age' => '22 years' })
+        expect(JSON.parse(instance.surrealize(root: 'new_ruby')))
+          .to eq('new_ruby' => { 'age' => '22 years' })
       end
 
       it 'camelizes' do
-        expect(instance.build_schema(root: 'ruby', camelize: true))
-          .to eq(ruby: { age: '22 years' })
+        expect(instance.build_schema(root: 'new_ruby', camelize: true))
+          .to eq(newRuby: { age: '22 years' })
 
-        expect(JSON.parse(instance.surrealize(root: 'ruby', camelize: true)))
-          .to eq('ruby' => { 'age' => '22 years' })
+        expect(JSON.parse(instance.surrealize(root: 'new_ruby', camelize: true)))
+          .to eq('newRuby' => { 'age' => '22 years' })
       end
 
-      it 'include_root' do
-        expect(JSON.parse(instance.surrealize(root: 'ruby', include_root: true)))
-          .to eq('ruby' => { 'ruby' => { 'age' => '22 years' } })
+      it 'overrides include_root' do
+        expect(JSON.parse(instance.surrealize(root: 'new_ruby', include_root: true)))
+          .to eq('new_ruby' => { 'age' => '22 years' })
       end
 
-      it 'include_namespaces' do
-        expect(JSON.parse(instance.surrealize(root: 'ruby', include_namespaces: true)))
-          .to eq('ruby' => { 'code' => { 'language' => { 'ruby' => { 'age' => '22 years' } } } })
+      it 'overrides include_namespaces' do
+        expect(JSON.parse(instance.surrealize(root: 'new_ruby', include_namespaces: true)))
+          .to eq('new_ruby' => { 'age' => '22 years' })
       end
     end
   end

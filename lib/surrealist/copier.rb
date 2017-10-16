@@ -18,13 +18,7 @@ module Surrealist
           Surrealist::ExceptionRaiser.raise_unknown_root!
         end
 
-        copy_before_root = copied_and_possibly_wrapped_hash(hash, klass, carrier, namespaces_condition)
-
-        if carrier.root
-          wrap_schema_into_root(schema: copy_before_root, carrier: carrier, root: carrier.root.to_s)
-        else
-          copy_before_root
-        end
+        copied_and_possibly_wrapped_hash(hash, klass, carrier, namespaces_condition)
       end
 
       private
@@ -38,7 +32,9 @@ module Surrealist
       #
       # @return [Hash] deeply copied hash, possibly wrapped.
       def copied_and_possibly_wrapped_hash(hash, klass, carrier, namespaces_condition)
-        if namespaces_condition
+        if carrier.root
+          wrap_schema_into_root(schema: hash, carrier: carrier, root: carrier.root.to_s)
+        elsif namespaces_condition
           wrap_schema_into_namespace(schema: hash, klass: klass, carrier: carrier)
         elsif carrier.include_root
           actual_class = Surrealist::StringUtils.extract_class(klass)
