@@ -37,16 +37,7 @@ class SeriousCat
   end
 
   def cat_food
-    CatFood.new(amount: 3, brand: 'Whiskas')
-  end
-end
-
-class CatFood
-  attr_reader :amount, :brand
-
-  def initialize(amount:, brand:)
-    @amount = amount
-    @brand  = brand
+    Struct.new(:amount, :brand).new(3, 'Whiskas')
   end
 end
 
