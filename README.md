@@ -352,6 +352,12 @@ You can find motivation behind introducing new API versus monkey-patching [here]
 `#surrealize_collection` works for all data structures that respond to `#each`. All ActiveRecord
 features (like associations, inheritance etc) are supported and covered. Other ORMs should work without
 issues as well, tests are in progress. All optional arguments (`camelize`, `include_root` etc) are also supported.
+
+An additional and unique arguement is `raw` which is evalauted as a Boolean. If this option is truthy then the results will be an array of surrealized hashes (ie. NOT a JSON string).
+```
+Surrealist.surrealize_collection(users, raw: true)
+# => [{ "name": "Nikita", "age": 23 }, { "name": "Alessandro", "age": 24 }]
+```
 Guides on where to use `#surrealize_collection` vs `#surrealize` for all ORMs are coming.
 
 ### Bool and Any

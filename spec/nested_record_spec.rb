@@ -1,5 +1,6 @@
 require_relative '../lib/surrealist'
 require_relative './orms/ar'
+require_relative './carriers/params'
 
 RSpec.describe Surrealist do
   describe 'nested object surrealization' do
@@ -24,6 +25,15 @@ RSpec.describe Surrealist do
       end
     end
 
+    context 'nested collection of objects to surrealize' do
+      let(:subject) { Question.first.build_schema }
+
+      it 'works' do
+        expect(subject.fetch(:answers)).to be_a Array
+        expect(subject.fetch(:answers)[0].fetch(:question)).to be_nil
+      end
+    end
+
     context 'collection of objects to surrealize' do
       context 'has self-referencing assocations' do
         let(:subject) { Surrealist.surrealize_collection(Executive.all) }
@@ -34,12 +44,25 @@ RSpec.describe Surrealist do
         end
       end
 
-      context 'has assocatiaions' do
+      context 'has associations' do
         it 'works' do
-          collection = Employee.all
-          expect(Surrealist.surrealize_collection(collection))
+          expect(Surrealist.surrealize_collection(Employee.all))
             .not_to include('Manager')
         end
+      end
+    end
+
+    it 'works with valid surrealization params' do
+      VALID_PARAMS.each do |i|
+        expect { Employee.first.build_schema(**i) }
+          .to_not raise_error
+      end
+    end
+
+    it 'fails with invalid surrealization params' do
+      INVALID_PARAMS.each do |i|
+        expect { Employee.first.build_schema(**i) }
+          .to raise_error ArgumentError
       end
     end
   end
