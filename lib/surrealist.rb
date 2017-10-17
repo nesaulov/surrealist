@@ -33,6 +33,7 @@ module Surrealist
     # @param [Boolean] camelize optional argument for converting hash to camelBack.
     # @param [Boolean] include_root optional argument for having the root key of the resulting hash
     #   as instance's class name.
+    # @param [String] root optional argument for using a specified root key for the resulting hash
     #
     # @return [Object] the Collection#map with elements being json-formatted string corresponding
     #   to the schema provided in the object's class. Values will be taken from the return values
@@ -44,7 +45,7 @@ module Surrealist
     #   Surrealist.surrealize_collection(User.all)
     #   # => "[{\"name\":\"Nikita\",\"age\":23}, {\"name\":\"Alessandro\",\"age\":24}]"
     #   # For more examples see README
-    def surrealize_collection(collection, camelize: false, include_root: false, include_namespaces: false, namespaces_nesting_level: DEFAULT_NESTING_LEVEL) # rubocop:disable Metrics/LineLength
+    def surrealize_collection(collection, camelize: false, include_root: false, include_namespaces: false, root: nil, namespaces_nesting_level: DEFAULT_NESTING_LEVEL) # rubocop:disable Metrics/LineLength
       unless collection.respond_to?(:each)
         raise Surrealist::ExceptionRaiser.raise_invalid_collection!
       end
@@ -54,6 +55,7 @@ module Surrealist
           camelize: camelize,
           include_root: include_root,
           include_namespaces: include_namespaces,
+          root: root,
           namespaces_nesting_level: namespaces_nesting_level,
         )
       end)

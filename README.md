@@ -29,6 +29,7 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
   * [Include root](#include-root)
   * [Include namespaces](#include-namespaces)
   * [Collection Surrealization](#collection-surrealization)
+  * [Root](#root)
   * [Bool and Any](#bool-and-any)
   * [Type errors](#type-errors)
   * [Undefined methods in schema](#undefined-methods-in-schema)
@@ -353,6 +354,35 @@ You can find motivation behind introducing new API versus monkey-patching [here]
 features (like associations, inheritance etc) are supported and covered. Other ORMs should work without
 issues as well, tests are in progress. All optional arguments (`camelize`, `include_root` etc) are also supported.
 Guides on where to use `#surrealize_collection` vs `#surrealize` for all ORMs are coming.
+
+### Root
+If you want to wrap the resulting JSON into a specified root key, you can pass optional `root` argument
+to `#surrealize` or `#build_schema`. The `root` argument will be stripped of whitespaces.
+``` ruby
+class Cat
+  include Surrealist
+ 
+  json_schema do
+    { weight: String }
+  end
+ 
+  def weight
+    '3 kilos'
+  end
+end
+
+Cat.new.surrealize(root: :kitten)
+# => '{ "kitten": { "weight": "3 kilos" } }'
+Cat.new.surrealize(root: ' kitten ')
+# => '{ "kitten": { "weight": "3 kilos" } }'
+```
+This overrides the `include_root` and `include_namespaces` arguments.
+``` ruby
+Animal::Cat.new.surrealize(include_root: true, root: :kitten)
+# => '{ "kitten": { "weight": "3 kilos" } }'
+Animal::Cat.new.surrealize(include_namespaces: true, root: 'kitten')
+# => '{ "kitten": { "weight": "3 kilos" } }'
+```
 
 ### Bool and Any
 If you have a parameter that is of boolean type, or if you don't care about the type, you
