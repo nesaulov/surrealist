@@ -108,6 +108,37 @@ RSpec.describe Surrealist do
       end
     end
 
+    context 'simple example with extra whitespaces' do
+      let(:instance) { Cat.new }
+
+      it 'builds schema' do
+        expect(instance.build_schema(root: ' kitten ')).to eq(kitten: { cat_weight: '3 kilos' })
+      end
+
+      it 'surrealizes' do
+        expect(JSON.parse(instance.surrealize(root: ' kitten ')))
+          .to eq('kitten' => { 'cat_weight' => '3 kilos' })
+      end
+
+      it 'camelizes' do
+        expect(instance.build_schema(root: ' kitten ', camelize: true))
+          .to eq(kitten: { catWeight: '3 kilos' })
+
+        expect(JSON.parse(instance.surrealize(root: ' kitten ', camelize: true)))
+          .to eq('kitten' => { 'catWeight' => '3 kilos' })
+      end
+
+      it 'overrides include_root' do
+        expect(JSON.parse(instance.surrealize(root: ' kitten ', include_root: true)))
+          .to eq('kitten' => { 'cat_weight' => '3 kilos' })
+      end
+
+      it 'overrides include_namespaces' do
+        expect(JSON.parse(instance.surrealize(root: ' kitten ', include_namespaces: true)))
+          .to eq('kitten' => { 'cat_weight' => '3 kilos' })
+      end
+    end
+
     context 'simple example' do
       let(:instance) { Cat.new }
 

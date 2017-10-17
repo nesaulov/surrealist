@@ -37,6 +37,7 @@ module Surrealist
       check_booleans!
       check_namespaces_nesting!
       check_root!
+      strip_root!
       self
     end
 
@@ -75,6 +76,11 @@ module Surrealist
       unless root.nil? || (root.is_a?(String) && root.present?) || root.is_a?(Symbol)
         Surrealist::ExceptionRaiser.raise_invalid_root!(root)
       end
+    end
+
+    # Strips root of empty whitespaces
+    def strip_root!
+      root.is_a?(String) && @root = root.strip
     end
   end
 end
