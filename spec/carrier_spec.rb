@@ -15,7 +15,7 @@ RSpec.describe Surrealist::Carrier do
     context 'valid arguments' do
       VALID_PARAMS.each do |hash|
         result = described_class.call(hash)
-        %i[camelize include_namespaces include_root namespaces_nesting_level].each do |method|
+        %i[camelize include_namespaces include_root namespaces_nesting_level root].each do |method|
           it "stores #{method} in Carrier and returns self for #{hash}" do
             expect(result).to be_a(Surrealist::Carrier)
             expect(result.send(method)).to eq(hash[method])

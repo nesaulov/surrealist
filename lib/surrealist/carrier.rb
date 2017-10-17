@@ -10,21 +10,23 @@ module Surrealist
     #   as instance's class name.
     # @param [Boolean] include_namespaces optional argument for having root key as a nested hash of
     #   instance's namespaces. Animal::Cat.new.surrealize -> (animal: { cat: { weight: '3 kilos' } })
+    # @param [String] root optional argument for using a specified root key for the resulting hash
     # @param [Integer] namespaces_nesting_level level of namespaces nesting.
     #
     # @raise ArgumentError if types of arguments are wrong.
     #
     # @return [Carrier] self if type checks were passed.
-    def self.call(camelize:, include_root:, include_namespaces:, namespaces_nesting_level:)
-      new(camelize, include_root, include_namespaces, namespaces_nesting_level).sanitize!
+    def self.call(camelize:, include_root:, include_namespaces:, root:, namespaces_nesting_level:)
+      new(camelize, include_root, include_namespaces, root, namespaces_nesting_level).sanitize!
     end
 
-    attr_reader :camelize, :include_root, :include_namespaces, :namespaces_nesting_level
+    attr_reader :camelize, :include_root, :include_namespaces, :root, :namespaces_nesting_level
 
-    def initialize(camelize, include_root, include_namespaces, namespaces_nesting_level)
+    def initialize(camelize, include_root, include_namespaces, root, namespaces_nesting_level)
       @camelize                 = camelize
       @include_root             = include_root
       @include_namespaces       = include_namespaces
+      @root                     = root
       @namespaces_nesting_level = namespaces_nesting_level
     end
 
@@ -34,6 +36,8 @@ module Surrealist
     def sanitize!
       check_booleans!
       check_namespaces_nesting!
+      check_root!
+      strip_root!
       self
     end
 
@@ -64,6 +68,19 @@ module Surrealist
       if namespaces_nesting_level <= 0
         Surrealist::ExceptionRaiser.raise_invalid_nesting!(namespaces_nesting_level)
       end
+    end
+
+    # Checks if root is not nil, a non-empty string, or symbol
+    # @raise ArgumentError
+    def check_root!
+      unless root.nil? || (root.is_a?(String) && root.present?) || root.is_a?(Symbol)
+        Surrealist::ExceptionRaiser.raise_invalid_root!(root)
+      end
+    end
+
+    # Strips root of empty whitespaces
+    def strip_root!
+      root.is_a?(String) && @root = root.strip
     end
   end
 end
