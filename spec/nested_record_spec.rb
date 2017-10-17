@@ -26,7 +26,7 @@ RSpec.describe Surrealist do
     end
 
     context 'nested collection of objects to surrealize' do
-      let(:subject) { Question.first.build_schema }
+      let(:subject) { Answer.first.question.build_schema }
 
       it 'works' do
         expect(subject.fetch(:answers)).to be_a Array
