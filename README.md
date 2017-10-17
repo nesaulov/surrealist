@@ -357,7 +357,7 @@ Guides on where to use `#surrealize_collection` vs `#surrealize` for all ORMs ar
 
 ### Root
 If you want to wrap the resulting JSON into a specified root key, you can pass optional `root` argument
-to `#surrealize` or `#build_schema`.
+to `#surrealize` or `#build_schema`. The `root` argument will be stripped of whitespaces.
 ``` ruby
 class Cat
   include Surrealist
@@ -373,15 +373,15 @@ end
 
 Cat.new.surrealize(root: :kitten)
 # => '{ "kitten": { "weight": "3 kilos" } }'
-Cat.new.surrealize(root: 'kitten')
+Cat.new.surrealize(root: ' kitten ')
 # => '{ "kitten": { "weight": "3 kilos" } }'
 ```
-This works with the `include_root` and `include_namespaces` arguments too.
+This overrides the `include_root` and `include_namespaces` arguments.
 ``` ruby
 Animal::Cat.new.surrealize(include_root: true, root: :kitten)
-# => '{ "kitten": { "cat": { "weight": "3 kilos" } } }'
+# => '{ "kitten": { "weight": "3 kilos" } }'
 Animal::Cat.new.surrealize(include_namespaces: true, root: 'kitten')
-# => '{ "kitten": { "animal": { "cat": { "weight": "3 kilos" } } } }'
+# => '{ "kitten": { "weight": "3 kilos" } }'
 ```
 
 ### Bool and Any
