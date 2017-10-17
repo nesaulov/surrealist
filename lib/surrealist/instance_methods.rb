@@ -11,6 +11,7 @@ module Surrealist
     #   as instance's class name.
     # @param [Boolean] include_namespaces optional argument for having root key as a nested hash of
     #   instance's namespaces. Animal::Cat.new.surrealize -> (animal: { cat: { weight: '3 kilos' } })
+    # @param [String] root optional argument for using a specified root key for the hash
     # @param [Integer] namespaces_nesting_level level of namespaces nesting.
     #
     # @return [String] a json-formatted string corresponding to the schema
@@ -47,23 +48,25 @@ module Surrealist
     #   User.new.surrealize
     #   # => "{\"name\":\"Nikita\",\"age\":23}"
     #   # For more examples see README
-    def surrealize(camelize: false, include_root: false, include_namespaces: false, namespaces_nesting_level: DEFAULT_NESTING_LEVEL) # rubocop:disable Metrics/LineLength
+    def surrealize(camelize: false, include_root: false, include_namespaces: false, root: nil, namespaces_nesting_level: DEFAULT_NESTING_LEVEL) # rubocop:disable Metrics/LineLength
       JSON.dump(
         build_schema(
           camelize: camelize,
           include_root: include_root,
           include_namespaces: include_namespaces,
+          root: root,
           namespaces_nesting_level: namespaces_nesting_level,
         ),
       )
     end
 
     # Invokes +Surrealist+'s class method +build_schema+
-    def build_schema(camelize: false, include_root: false, include_namespaces: false, namespaces_nesting_level: DEFAULT_NESTING_LEVEL) # rubocop:disable Metrics/LineLength
+    def build_schema(camelize: false, include_root: false, include_namespaces: false, root: nil, namespaces_nesting_level: DEFAULT_NESTING_LEVEL) # rubocop:disable Metrics/LineLength
       carrier = Surrealist::Carrier.call(
         camelize: camelize,
         include_namespaces: include_namespaces,
         include_root: include_root,
+        root: root,
         namespaces_nesting_level: namespaces_nesting_level,
       )
 
