@@ -43,6 +43,7 @@ module Surrealist
       #
       # @return [Hash] schema
       def parse_hash(hash:, schema:, instance:, key:)
+        # binding.pry
         if instance.respond_to?(key)
           maybe_take_values_from_instance(instance: instance, method: key, hash: hash, schema: schema)
         else
@@ -60,11 +61,17 @@ module Surrealist
       # @return [Hash] schema
       def maybe_take_values_from_instance(instance:, method:, hash:, schema:)
         object = instance.send(method)
+        # binding.pry
 
         hash.each do |key, value|
           if object.methods.include?(key)
             take_values_from_instance(instance: object, value: value, hash: hash, key: key,
                                       schema: schema, method: method)
+          elsif object.respond_to?(:each)
+            object.each do |item|
+              take_values_from_instance(instance: item, value: value, hash: hash, key: key,
+              schema: schema, method: method)
+            end
           else
             call(schema: hash, instance: object)
           end
