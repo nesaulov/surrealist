@@ -63,7 +63,7 @@ module Surrealist
         end
       end
 
-      raw ? result : JSON.dump(result) # rubocop:disable Style/DoubleNegation
+      raw ? result : JSON.dump(result)
     end
 
     # Builds hash from schema provided in the object's class and type-checks the values.
