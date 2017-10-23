@@ -11,7 +11,7 @@ require 'surrealist/hash_utils'
 require 'surrealist/instance_methods'
 require 'surrealist/schema_definer'
 require 'surrealist/string_utils'
-require 'surrealist/surrealist_helper'
+require 'surrealist/helper'
 require 'surrealist/type_helper'
 require 'json'
 
@@ -49,7 +49,7 @@ module Surrealist
     def surrealize_collection(collection, camelize: false, include_root: false, include_namespaces: false, root: nil, namespaces_nesting_level: DEFAULT_NESTING_LEVEL, raw: false) # rubocop:disable Metrics/LineLength
       raise Surrealist::ExceptionRaiser.raise_invalid_collection! unless collection.respond_to?(:each)
 
-      s_c = collection.map do |record|
+      result = collection.map do |record|
         if Helper.surrealist?(record.class)
           record.build_schema(
             camelize: camelize,
@@ -63,7 +63,7 @@ module Surrealist
         end
       end
 
-      !!raw ? s_c : JSON.dump(s_c) # rubocop:disable Style/DoubleNegation
+      raw ? result : JSON.dump(result) # rubocop:disable Style/DoubleNegation
     end
 
     # Builds hash from schema provided in the object's class and type-checks the values.

@@ -59,7 +59,7 @@ ActiveRecord::Schema.define do
   end
 
   create_table :proms do |table|
-    table.column :name, :string
+    table.column :prom_name, :string
   end
 
   create_table :prom_couples do |table|
@@ -68,7 +68,7 @@ ActiveRecord::Schema.define do
   end
 
   create_table :prom_kings do |table|
-    table.column :name, :string
+    table.column :prom_king_name, :string
     table.integer :prom_couple_id
   end
 
@@ -180,7 +180,7 @@ class PromKing < ActiveRecord::Base
 
   include Surrealist
 
-  json_schema { { name: String, prom: Object } }
+  json_schema { { prom_king_name: String, prom: Object } }
 end
 
 class PromCouple < ActiveRecord::Base
@@ -197,7 +197,7 @@ class Prom < ActiveRecord::Base
 
   include Surrealist
 
-  json_schema { { name: String, prom_couple: PromCouple } }
+  json_schema { { prom_name: String, prom_couple: PromCouple } }
 end
 
 class Question < ActiveRecord::Base
@@ -230,8 +230,8 @@ end
 5.times { Employee.create(name: name_string, manager_id: Manager.all.sample.id) }
 Assistant.create(name: name_string, executive_id: Executive.first.id)
 Assistant.create(name: name_string, executive_id: Executive.second.id)
-Prom.create(name: name_string)
+Prom.create(prom_name: name_string)
 PromCouple.create(prom_id: Prom.first.id, prom_queen: name_string)
-PromKing.create(name: name_string, prom_couple_id: PromCouple.first.id)
+PromKing.create(prom_king_name: name_string, prom_couple_id: PromCouple.first.id)
 5.times { Question.create(name: name_string) }
 10.times { Answer.create(name: name_string, question_id: Question.all.sample.id) }
