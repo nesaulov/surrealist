@@ -70,7 +70,7 @@ module Surrealist
           elsif object.respond_to?(:each)
             object.each do |item|
               take_values_from_instance(instance: item, value: value, hash: hash, key: key,
-              schema: schema, method: method)
+                                        schema: schema, method: method)
             end
           else
             call(schema: hash, instance: object)
