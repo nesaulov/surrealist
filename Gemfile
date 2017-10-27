@@ -9,7 +9,7 @@ group :development, :test do
   gem 'data_mapper'
   gem 'dm-sqlite-adapter'
   gem 'pry'
-  gem 'rom'
+  gem 'rom', '~> 3.0'
   gem 'rom-sql'
   gem 'sequel'
   gem 'sqlite3'

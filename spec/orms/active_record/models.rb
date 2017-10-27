@@ -1,5 +1,4 @@
 require 'active_record'
-require 'pry'
 require_relative '../../../lib/surrealist'
 
 ActiveRecord::Base.establish_connection(
@@ -15,10 +14,13 @@ ActiveRecord::Schema.define do
 
   create_table(:schema_less_ars) { |table| table.column :name, :string }
 
-  create_table(:ar_scopes) { |table| table.column :title, :string }
+  create_table(:ar_scopes) do |table|
+    table.column :title, :string
+    table.column :money, :int
+  end
 
   create_table :books do |table|
-    table.column :name, :string
+    table.column :title, :string
     table.integer :genre_id
     table.integer :author_id
     table.integer :publisher_id
@@ -45,6 +47,7 @@ ActiveRecord::Schema.define do
   end
 end
 
+#
 #
 # Basics
 #
@@ -95,19 +98,16 @@ class ARScope < ActiveRecord::Base
   scope :coll_offset, -> { offset(43) }
   scope :coll_lock, -> { lock(12) }
   scope :coll_readonly, -> { readonly }
-  scope :coll_reorder, -> { reorder(id: :asc) }
+  scope :coll_reorder, -> { reorder(id: :desc) }
   scope :coll_distinct, -> { distinct }
   scope :coll_find_each, -> { find_each { |rec| rec.title.length > 2 } }
-
-  # delegate :find_each, :find_in_batches, :in_batches, to: :all
-  # delegate :select, :group, :order, :except, :reorder, :limit, :offset, :joins, :left_joins,
-  # :left_outer_joins, :or,
-  #          :where, :rewhere, :preload, :eager_load, :includes, :from, :lock, :readonly, :extending,
-  #          :having, :create_with, :distinct, :references, :none, :unscope, :merge, to: :all
-  # delegate :count, :average, :minimum, :maximum, :sum, :calculate, to: :all
-  # delegate :pluck, :ids, to: :all
-  # CLAUSE_METHODS = [:where, :having, :from]
-  # INVALID_METHODS_FOR_DELETE_ALL = [:limit, :distinct, :offset, :group, :having]
+  scope :coll_select, -> { select(:title, :money) }
+  scope :coll_group, -> { group(:title) }
+  scope :coll_order, -> { order(title: :desc) }
+  scope :coll_except, -> { except(id: 65) }
+  scope :coll_extending, -> { extending Surrealist }
+  scope :coll_having, -> { having('sum(money) > 43').group(:money) }
+  scope :coll_references, -> { references(:book) }
 
   # Surrealist.surrealize_collection() will fail with scopes that return an instance.
   scope :rec_find, -> { find(2) }
@@ -133,12 +133,15 @@ class ARScope < ActiveRecord::Base
   scope :rec_last, -> { last }
   scope :rec_last!, -> { last! }
 
-  json_schema { { title: String } }
+  json_schema { { title: String, money: Integer } }
 end
 
-45.times { ARScope.create!(title: ('a'..'z').to_a.sample(8).join) }
+45.times { ARScope.create!(title: ('a'..'z').to_a.sample(8).join, money: rand(5432)) }
 
+#
+#
 # Associations
+#
 
 class Book < ActiveRecord::Base
   has_and_belongs_to_many :authors
@@ -150,7 +153,7 @@ class Book < ActiveRecord::Base
 
   json_schema do
     {
-      name:  String,
+      title:  String,
       genre: {
         name: String,
       },
@@ -194,13 +197,13 @@ end
 %w[Twain Jerome Shakespeare].each_with_index do |name, i|
   Author.create!(name: name, id: i + 1)
 end
-# binding.pry
+
 [
   'The Adventures of Tom Sawyer',
   'Three Men in a Boat',
   'Romeo and Juliet',
-].each_with_index do |name, i|
-  Book.create!(name: name, id: i + 1, genre_id: i + 1, author_id: i + 1)
+].each_with_index do |title, i|
+  Book.create!(title: title, id: i + 1, genre_id: i + 1, author_ids: [i + 1])
 end
 
 [
@@ -214,10 +217,5 @@ end
     'Nobel Prize',
     'Franz Kafka Prize',
     'America Award',
-  ].shuffle.each_with_index { |title, i| Award.create!(title: title, book_id: i + 1) }
+  ].each_with_index { |title, i| Award.create!(title: title, book_id: i + 1) }
 end
-# 3.times { Genre.create(name: ('a'..'z').to_a.sample(8).join) }
-# 3.times { Author.create(name: ('a'..'z').to_a.sample(8).join) }
-# 3.times { Book.create(name: ('a'..'z').to_a.sample(8).join, genre_id: Genre.all.sample.id) }
-# 3.times { Publisher.create(name: ('a'..'z').to_a.sample(8).join, book_id: Book.all.sample.id) }
-# 3.times { Award.create(name: ('a'..'z').to_a.sample(8).join, book_id: Book.all.sample.id) }

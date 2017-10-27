@@ -5,10 +5,17 @@ require_relative 'models'
 require_relative '../../carriers/params'
 
 RSpec.describe 'ActiveRecord integration' do
-  let(:Surrealist) { Surrealist }
-
   describe 'Surrealist.surrealize(ActiveRecord_Relation)' do
     let(:result) { Surrealist.surrealize_collection(collection) }
+
+    context 'basics' do
+      let(:collection) { Book.all }
+
+      it 'works with #all' do
+        expect(JSON.parse(result).length).to eq(3)
+        expect(JSON.parse(result)).to be_a Array
+      end
+    end
 
     context 'inheritance' do
       let(:collection) { TestAR.all }
@@ -55,6 +62,11 @@ RSpec.describe 'ActiveRecord integration' do
           -> { Surrealist.surrealize_collection(ARScope.coll_reorder) },
           -> { Surrealist.surrealize_collection(ARScope.coll_distinct) },
           -> { Surrealist.surrealize_collection(ARScope.coll_find_each) },
+          -> { Surrealist.surrealize_collection(ARScope.coll_select) },
+          -> { Surrealist.surrealize_collection(ARScope.coll_group) },
+          -> { Surrealist.surrealize_collection(ARScope.coll_order) },
+          -> { Surrealist.surrealize_collection(ARScope.coll_except) },
+          -> { Surrealist.surrealize_collection(ARScope.coll_extending) },
         ].each do |lambda|
           it 'works if scope returns collection of records' do
             expect { lambda.call }.not_to raise_error
@@ -96,51 +108,80 @@ RSpec.describe 'ActiveRecord integration' do
     end
 
     context 'associations' do
-      it 'works with `bt` `ho`, `hm`, `habtm`' do
-        #  TODO
+      let(:first_book) do
+        [
+          { title:   'The Adventures of Tom Sawyer', genre: { name: 'Adventures' },
+            awards: { title: 'Nobel Prize' } },
+        ]
       end
 
-      it 'works' do
-        expect(JSON.parse(Surrealist.surrealize_collection(Book.all)).length)
-          .to eq(3)
-        expect(JSON.parse(Surrealist.surrealize_collection(Book.all)))
-          .to respond_to(:each)
+      context 'has one' do
+        let(:collection) { Book.joins(:publisher).limit(1) }
+
+        it 'raises exception on single record reference' do
+          expect { Surrealist.surrealize_collection(Book.first.publisher) }
+            .to raise_error Surrealist::InvalidCollectionError
+        end
+
+        it 'works with query methods that return relations' do
+          expect(result).to eq(first_book.to_json)
+        end
       end
 
-      it 'fails with belongs_to' do
-        expect { Surrealist.surrealize_collection(Book.first.genre) }
-          .to raise_error Surrealist::InvalidCollectionError
+      context 'belongs to' do
+        let(:collection) { Book.joins(:genre).limit(1) }
+
+        it 'raises exception on single record reference' do
+          expect { Surrealist.surrealize_collection(Book.first.genre) }
+            .to raise_error Surrealist::InvalidCollectionError
+        end
+
+        it 'works with query methods that return relations' do
+          expect(result).to eq(first_book.to_json)
+        end
       end
 
-      it 'fails with has_one' do
-        expect { Surrealist.surrealize_collection(Book.first.publisher) }
-          .to raise_error Surrealist::InvalidCollectionError
+      context 'has_many' do
+        let(:collection) { Book.first.awards }
+
+        it 'works' do
+          expect(result).to eq(Array.new(3) { { title: 'Nobel Prize' } }.to_json)
+        end
       end
 
-      it 'works with has_many' do
-        expect(JSON.parse(Surrealist.surrealize_collection(Book.first.awards)))
-          .to respond_to(:each)
-      end
+      context 'has and belongs to many' do
+        let(:collection) { Book.second.authors }
 
-      it 'works with has_and_belongs_to_many' do
-        expect(JSON.parse(Surrealist.surrealize_collection(Book.first.authors)))
-          .to respond_to(:each)
-        expect(JSON.parse(Surrealist.surrealize_collection(Author.first.books)))
-          .to respond_to(:each)
+        it 'works both ways' do
+          expect(Surrealist.surrealize_collection(Book.second.authors))
+            .to eq([{ name: 'Jerome' }].to_json)
+
+          expect(Surrealist.surrealize_collection(Author.first.books))
+            .to eq(
+              [
+                { title: 'The Adventures of Tom Sawyer', genre: { name: 'Adventures' },
+                  awards: { title: 'Nobel Prize' } },
+              ].to_json,
+            )
+        end
       end
     end
 
     context 'includes' do
+      let(:collection) { Book.includes(:authors) }
+
       it 'works' do
-        expect(JSON.parse(Surrealist.surrealize_collection(Book.includes(:authors))))
-          .to respond_to(:each)
+        expect(JSON.parse(result).length).to eq(3)
+        expect(JSON.parse(result)).to be_a Array
       end
     end
 
     context 'joins' do
+      let(:collection) { Book.joins(:genre) }
+
       it 'works' do
-        expect(JSON.parse(Surrealist.surrealize_collection(Book.joins(:genre))))
-          .to respond_to(:each)
+        expect(JSON.parse(result).length).to eq(3)
+        expect(JSON.parse(result)).to be_a Array
       end
     end
 
