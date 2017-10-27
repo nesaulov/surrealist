@@ -17,3 +17,20 @@ class ItemsMapper < ROM::Mapper
   relation :items
   model Item
 end
+
+# context 'rom' do
+#   rom = ROM.container(:memory) do |conf|
+#     conf.register_mapper(ItemsMapper)
+#     conf.relation(:items) do
+#       def all; as(:item_obj).to_a; end
+#     end
+#     conf.commands(:items) do
+#       define(:create)
+#     end
+#   end
+#   rom.command(:items).create.call(name: 'testing rom')
+#   it 'works' do
+#     expect(subject.surrealize_collection(rom.relation(:items).all))
+#       .to eq([{ name: 'testing rom' }].to_json)
+#   end
+# end

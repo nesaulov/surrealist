@@ -15,3 +15,10 @@ end
 DataMapper.finalize.auto_upgrade!
 
 TestDataMapper.create(name: 'testing data mapper')
+
+# context 'data mapper' do
+#   it 'works' do
+#     expect(subject.surrealize_collection(TestDataMapper.all))
+#       .to eq([{ name: 'testing data mapper' }].to_json)
+#   end
+# end
