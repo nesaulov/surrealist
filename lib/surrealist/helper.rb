@@ -8,7 +8,7 @@ module Surrealist
       #
       # @return [Boolean] if Surrealist is included in class.
       def surrealist?(klass)
-        klass.included_modules.include?(Surrealist)
+        klass < Surrealist
       end
     end
   end
