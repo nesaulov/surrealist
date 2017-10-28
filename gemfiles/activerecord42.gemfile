@@ -1,0 +1,17 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+
+group :development, :test do
+  gem 'activerecord', '~> 4.2'
+  gem 'coveralls', require: false
+  gem 'data_mapper'
+  gem 'dm-sqlite-adapter'
+  gem 'rom', '~> 3.0'
+  gem 'rom-sql'
+  gem 'sequel'
+  gem 'sqlite3'
+  gem 'yard', require: false unless ENV['TRAVIS']
+end
+
+gemspec path: '..'
