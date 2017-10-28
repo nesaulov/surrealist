@@ -50,7 +50,7 @@ RSpec.describe 'ActiveRecord integration' do
 
     context 'scopes' do
       context 'query methods' do
-        [
+        scopes = [
           -> { Surrealist.surrealize_collection(ARScope.coll_where) },
           -> { Surrealist.surrealize_collection(ARScope.coll_where_not) },
           -> { Surrealist.surrealize_collection(ARScope.coll_order) },
@@ -66,8 +66,10 @@ RSpec.describe 'ActiveRecord integration' do
           -> { Surrealist.surrealize_collection(ARScope.coll_group) },
           -> { Surrealist.surrealize_collection(ARScope.coll_order) },
           -> { Surrealist.surrealize_collection(ARScope.coll_except) },
-          -> { Surrealist.surrealize_collection(ARScope.coll_extending) },
-        ].each do |lambda|
+        ]
+        scopes.push(-> { Surrealist.surrealize_collection(ARScope.coll_extending) }) unless ruby_22
+
+        scopes.flatten.each do |lambda|
           it 'works if scope returns collection of records' do
             expect { lambda.call }.not_to raise_error
           end
@@ -75,7 +77,7 @@ RSpec.describe 'ActiveRecord integration' do
       end
 
       context 'finder methods' do
-        [
+        scopes = [
           -> { Surrealist.surrealize_collection(ARScope.rec_find_by) },
           -> { Surrealist.surrealize_collection(ARScope.rec_find_by!) },
           -> { Surrealist.surrealize_collection(ARScope.rec_find) },
@@ -92,13 +94,20 @@ RSpec.describe 'ActiveRecord integration' do
           -> { Surrealist.surrealize_collection(ARScope.rec_fifth!) },
           -> { Surrealist.surrealize_collection(ARScope.rec_forty_two) },
           -> { Surrealist.surrealize_collection(ARScope.rec_forty_two!) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_third_to_last) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_third_to_last!) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_second_to_last) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_second_to_last!) },
           -> { Surrealist.surrealize_collection(ARScope.rec_last) },
           -> { Surrealist.surrealize_collection(ARScope.rec_last!) },
-        ].each do |lambda|
+        ]
+
+        unless ruby_22
+          scopes.push([
+            -> { Surrealist.surrealize_collection(ARScope.rec_third_to_last) },
+            -> { Surrealist.surrealize_collection(ARScope.rec_third_to_last!) },
+            -> { Surrealist.surrealize_collection(ARScope.rec_second_to_last) },
+            -> { Surrealist.surrealize_collection(ARScope.rec_second_to_last!) },
+          ])
+        end
+
+        scopes.flatten.each do |lambda|
           it 'fails if scope returns single record' do
             expect { lambda.call }.to raise_error Surrealist::InvalidCollectionError,
                                                   'Can\'t serialize collection - must respond to :each'

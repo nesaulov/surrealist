@@ -126,12 +126,15 @@ class ARScope < ActiveRecord::Base
   scope :rec_fifth!, -> { fifth! }
   scope :rec_forty_two, -> { forty_two }
   scope :rec_forty_two!, -> { forty_two! }
-  scope :rec_third_to_last, -> { third_to_last }
-  scope :rec_third_to_last!, -> { third_to_last! }
-  scope :rec_second_to_last, -> { second_to_last }
-  scope :rec_second_to_last!, -> { second_to_last! }
   scope :rec_last, -> { last }
   scope :rec_last!, -> { last! }
+
+  unless ruby_22 # AR 4.2 doesn't have these methods
+    scope :rec_third_to_last, -> { third_to_last }
+    scope :rec_third_to_last!, -> { third_to_last! }
+    scope :rec_second_to_last, -> { second_to_last }
+    scope :rec_second_to_last!, -> { second_to_last! }
+  end
 
   json_schema { { title: String, money: Integer } }
 end
