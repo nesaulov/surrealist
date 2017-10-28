@@ -1,7 +1,7 @@
 AllCops:
   TargetRubyVersion: 2.2
-  Excludes:
-   - gemfiles/*
+  Exclude:
+    - './gemfiles/*gemfile'
 
 # Layout
 
