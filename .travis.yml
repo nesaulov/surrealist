@@ -3,11 +3,20 @@ sudo: false
 cache: bundler
 before_install: gem install bundler
 script: bundle exec rake
-rvm:
-  - 2.2.0
-  - 2.2.5
-  - 2.3.1
-  - 2.3.5
-  - 2.4.0
-  - 2.4.2
-  - ruby-head
+matrix:
+  fast_finish: true
+  include:
+    - rvm: ruby-head
+      gemfile: Gemfile
+    - rvm: 2.4.2
+      gemfile: Gemfile
+    - rvm: 2.4.0
+      gemfile: Gemfile
+    - rvm: 2.3.5
+      gemfile: Gemfile
+    - rvm: 2.3.1
+      gemfile: Gemfile
+    - rvm: 2.2.5
+      gemfile: Gemfile
+    - rvm: 2.2.0
+      gemfile: gemfiles/activerecord42.gemfile
