@@ -223,12 +223,14 @@ RSpec.describe 'ActiveRecord integration' do
   end
 
   describe 'ActiveRecord instance #surrealize' do
+    let(:no_method_message) { /undefined .*method `surrealize' for/ }
+
     context 'scopes' do
       context 'query methods' do
         collection_scopes.flatten.each do |lambda|
           it 'fails if scope returns collection of records' do
             expect { lambda.call.surrealize }
-              .to raise_error NoMethodError, /undefined method `surrealize' for/
+              .to raise_error NoMethodError, no_method_message
           end
         end
       end
@@ -261,7 +263,7 @@ RSpec.describe 'ActiveRecord integration' do
 
         it 'fails with query methods that return relations' do
           expect { Book.joins(:publisher).limit(1).surrealize }
-            .to raise_error NoMethodError, /undefined method `surrealize' for/
+            .to raise_error NoMethodError, no_method_message
         end
       end
 
@@ -273,24 +275,24 @@ RSpec.describe 'ActiveRecord integration' do
 
         it 'fails with query methods that return relations' do
           expect { Book.joins(:genre).limit(1).surrealize }
-            .to raise_error NoMethodError, /undefined method `surrealize' for/
+            .to raise_error NoMethodError, no_method_message
         end
       end
 
       context 'has_many' do
         it 'fails' do
           expect { Book.first.awards.surrealize }
-            .to raise_error NoMethodError, /undefined method `surrealize' for/
+            .to raise_error NoMethodError, no_method_message
         end
       end
 
       context 'has and belongs to many' do
         it 'fails both ways' do
           expect { Book.second.authors.surrealize }
-            .to raise_error NoMethodError, /undefined method `surrealize' for/
+            .to raise_error NoMethodError, no_method_message
 
           expect { Author.first.books.surrealize }
-            .to raise_error NoMethodError, /undefined method `surrealize' for/
+            .to raise_error NoMethodError, no_method_message
         end
       end
     end
