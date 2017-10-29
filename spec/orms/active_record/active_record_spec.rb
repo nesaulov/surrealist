@@ -1,11 +1,61 @@
 # frozen_string_literal: true
 
-require_relative '../../../lib/surrealist'
 require_relative 'models'
+require_relative '../../../lib/surrealist'
 require_relative '../../carriers/params'
 
 RSpec.describe 'ActiveRecord integration' do
-  describe 'Surrealist.surrealize(ActiveRecord_Relation)' do
+  collection_scopes = [
+    -> { ARScope.coll_where },
+    -> { ARScope.coll_where_not },
+    -> { ARScope.coll_order },
+    -> { ARScope.coll_take },
+    -> { ARScope.coll_limit },
+    -> { ARScope.coll_offset },
+    -> { ARScope.coll_lock },
+    -> { ARScope.coll_readonly },
+    -> { ARScope.coll_reorder },
+    -> { ARScope.coll_distinct },
+    -> { ARScope.coll_find_each },
+    -> { ARScope.coll_select },
+    -> { ARScope.coll_group },
+    -> { ARScope.coll_order },
+    -> { ARScope.coll_except },
+  ]
+
+  record_scopes = [
+    -> { ARScope.rec_find_by },
+    -> { ARScope.rec_find_by! },
+    -> { ARScope.rec_find },
+    -> { ARScope.rec_take! },
+    -> { ARScope.rec_first },
+    -> { ARScope.rec_first! },
+    -> { ARScope.rec_second },
+    -> { ARScope.rec_second! },
+    -> { ARScope.rec_third },
+    -> { ARScope.rec_third! },
+    -> { ARScope.rec_fourth },
+    -> { ARScope.rec_fourth! },
+    -> { ARScope.rec_fifth },
+    -> { ARScope.rec_fifth! },
+    -> { ARScope.rec_forty_two },
+    -> { ARScope.rec_forty_two! },
+    -> { ARScope.rec_last },
+    -> { ARScope.rec_last! },
+  ]
+
+  collection_scopes.push(-> { ARScope.coll_extending }) unless ruby_22
+
+  unless ruby_22
+    record_scopes.push([
+      -> { ARScope.rec_third_to_last },
+      -> { ARScope.rec_third_to_last! },
+      -> { ARScope.rec_second_to_last },
+      -> { ARScope.rec_second_to_last! },
+    ])
+  end
+
+  describe 'Surrealist.surrealize_collection()' do
     let(:result) { Surrealist.surrealize_collection(collection) }
 
     context 'basics' do
@@ -13,7 +63,7 @@ RSpec.describe 'ActiveRecord integration' do
 
       it 'works with #all' do
         expect(JSON.parse(result).length).to eq(3)
-        expect(JSON.parse(result)).to be_a Array
+        expect(JSON.parse(result)).to be_an Array
       end
     end
 
@@ -50,67 +100,20 @@ RSpec.describe 'ActiveRecord integration' do
 
     context 'scopes' do
       context 'query methods' do
-        scopes = [
-          -> { Surrealist.surrealize_collection(ARScope.coll_where) },
-          -> { Surrealist.surrealize_collection(ARScope.coll_where_not) },
-          -> { Surrealist.surrealize_collection(ARScope.coll_order) },
-          -> { Surrealist.surrealize_collection(ARScope.coll_take) },
-          -> { Surrealist.surrealize_collection(ARScope.coll_limit) },
-          -> { Surrealist.surrealize_collection(ARScope.coll_offset) },
-          -> { Surrealist.surrealize_collection(ARScope.coll_lock) },
-          -> { Surrealist.surrealize_collection(ARScope.coll_readonly) },
-          -> { Surrealist.surrealize_collection(ARScope.coll_reorder) },
-          -> { Surrealist.surrealize_collection(ARScope.coll_distinct) },
-          -> { Surrealist.surrealize_collection(ARScope.coll_find_each) },
-          -> { Surrealist.surrealize_collection(ARScope.coll_select) },
-          -> { Surrealist.surrealize_collection(ARScope.coll_group) },
-          -> { Surrealist.surrealize_collection(ARScope.coll_order) },
-          -> { Surrealist.surrealize_collection(ARScope.coll_except) },
-        ]
-        scopes.push(-> { Surrealist.surrealize_collection(ARScope.coll_extending) }) unless ruby_22
-
-        scopes.flatten.each do |lambda|
+        collection_scopes.flatten.each do |lambda|
           it 'works if scope returns collection of records' do
-            expect { lambda.call }.not_to raise_error
+            expect { Surrealist.surrealize_collection(lambda.call) }
+              .not_to raise_error
           end
         end
       end
 
       context 'finder methods' do
-        scopes = [
-          -> { Surrealist.surrealize_collection(ARScope.rec_find_by) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_find_by!) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_find) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_take!) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_first) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_first!) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_second) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_second!) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_third) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_third!) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_fourth) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_fourth!) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_fifth) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_fifth!) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_forty_two) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_forty_two!) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_last) },
-          -> { Surrealist.surrealize_collection(ARScope.rec_last!) },
-        ]
-
-        unless ruby_22
-          scopes.push([
-            -> { Surrealist.surrealize_collection(ARScope.rec_third_to_last) },
-            -> { Surrealist.surrealize_collection(ARScope.rec_third_to_last!) },
-            -> { Surrealist.surrealize_collection(ARScope.rec_second_to_last) },
-            -> { Surrealist.surrealize_collection(ARScope.rec_second_to_last!) },
-          ])
-        end
-
-        scopes.flatten.each do |lambda|
+        record_scopes.flatten.each do |lambda|
           it 'fails if scope returns single record' do
-            expect { lambda.call }.to raise_error Surrealist::InvalidCollectionError,
-                                                  'Can\'t serialize collection - must respond to :each'
+            expect { Surrealist.surrealize_collection(lambda.call) }
+              .to raise_error Surrealist::InvalidCollectionError,
+                              'Can\'t serialize collection - must respond to :each'
           end
         end
       end
@@ -159,8 +162,6 @@ RSpec.describe 'ActiveRecord integration' do
       end
 
       context 'has and belongs to many' do
-        let(:collection) { Book.second.authors }
-
         it 'works both ways' do
           expect(Surrealist.surrealize_collection(Book.second.authors))
             .to eq([{ name: 'Jerome' }].to_json)
@@ -181,7 +182,7 @@ RSpec.describe 'ActiveRecord integration' do
 
       it 'works' do
         expect(JSON.parse(result).length).to eq(3)
-        expect(JSON.parse(result)).to be_a Array
+        expect(JSON.parse(result)).to be_an Array
       end
     end
 
@@ -190,30 +191,108 @@ RSpec.describe 'ActiveRecord integration' do
 
       it 'works' do
         expect(JSON.parse(result).length).to eq(3)
-        expect(JSON.parse(result)).to be_a Array
+        expect(JSON.parse(result)).to be_an Array
       end
     end
 
-    it 'works with valid surrealization params' do
-      VALID_PARAMS.each do |i|
-        expect { Surrealist.surrealize_collection(TestAR.all, **i) }
-          .to_not raise_error
+    context 'parameters' do
+      it 'works with valid surrealization params' do
+        VALID_PARAMS.each do |i|
+          expect { Surrealist.surrealize_collection(TestAR.all, **i) }
+            .to_not raise_error
+          expect(Surrealist.surrealize_collection(TestAR.all, **i))
+            .to be_a String
+        end
+      end
+
+      it 'fails with invalid surrealization params' do
+        INVALID_PARAMS.each do |i|
+          expect { Surrealist.surrealize_collection(TestAR.all, **i) }
+            .to raise_error ArgumentError
+        end
       end
     end
 
-    it 'fails with invalid surrealization params' do
-      INVALID_PARAMS.each do |i|
-        expect { Surrealist.surrealize_collection(TestAR.all, **i) }
-          .to raise_error ArgumentError
+    context 'not a proper collection' do
+      it 'fails' do
+        expect { Surrealist.surrealize_collection(Object) }
+          .to raise_error(Surrealist::InvalidCollectionError,
+                          'Can\'t serialize collection - must respond to :each')
       end
     end
   end
 
-  context 'not proper collection' do
-    it 'fails' do
-      expect { Surrealist.surrealize_collection(Object) }
-        .to raise_error(Surrealist::InvalidCollectionError,
-                        'Can\'t serialize collection - must respond to :each')
+  describe 'ActiveRecord instance #surrealize' do
+    context 'scopes' do
+      context 'query methods' do
+        collection_scopes.flatten.each do |lambda|
+          it 'fails if scope returns collection of records' do
+            expect { lambda.call.surrealize }
+              .to raise_error NoMethodError, /undefined method `surrealize' for/
+          end
+        end
+      end
+
+      context 'finder methods' do
+        record_scopes.flatten.each do |lambda|
+          it 'works if scope returns single record' do
+            expect(lambda.call.surrealize)
+              .to be_a String
+            expect(JSON.parse(lambda.call.surrealize)).to have_key('title')
+            expect(JSON.parse(lambda.call.surrealize)).to have_key('money')
+          end
+        end
+      end
+    end
+
+    context 'associations' do
+      let(:first_book) do
+        [
+          { title:   'The Adventures of Tom Sawyer', genre: { name: 'Adventures' },
+            awards: { title: 'Nobel Prize' } },
+        ]
+      end
+
+      context 'has one' do
+        it 'works for a single record reference' do
+          expect(Book.first.publisher.surrealize)
+            .to eq('{"name":"Cengage Learning"}')
+        end
+
+        it 'fails with query methods that return relations' do
+          expect { Book.joins(:publisher).limit(1).surrealize }
+            .to raise_error NoMethodError, /undefined method `surrealize' for/
+        end
+      end
+
+      context 'belongs to' do
+        it 'works for a single record reference' do
+          expect(Book.first.genre.surrealize)
+            .to eq('{"name":"Adventures"}')
+        end
+
+        it 'fails with query methods that return relations' do
+          expect { Book.joins(:genre).limit(1).surrealize }
+            .to raise_error NoMethodError, /undefined method `surrealize' for/
+        end
+      end
+
+      context 'has_many' do
+        it 'fails' do
+          expect { Book.first.awards.surrealize }
+            .to raise_error NoMethodError, /undefined method `surrealize' for/
+        end
+      end
+
+      context 'has and belongs to many' do
+        it 'fails both ways' do
+          expect { Book.second.authors.surrealize }
+            .to raise_error NoMethodError, /undefined method `surrealize' for/
+
+          expect { Author.first.books.surrealize }
+            .to raise_error NoMethodError, /undefined method `surrealize' for/
+        end
+      end
     end
   end
 end

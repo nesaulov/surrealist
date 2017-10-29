@@ -2,12 +2,6 @@
 
 require_relative '../lib/surrealist'
 
-
-
-
-
-
-
 class Note
   include Surrealist
 
