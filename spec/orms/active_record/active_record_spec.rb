@@ -227,10 +227,12 @@ RSpec.describe 'ActiveRecord integration' do
 
     context 'scopes' do
       context 'query methods' do
+        error = ruby_22 ? NameError : NoMethodError
+
         collection_scopes.flatten.each do |lambda|
           it 'fails if scope returns collection of records' do
             expect { lambda.call.surrealize }
-              .to raise_error NoMethodError, no_method_message
+              .to raise_error error, no_method_message
           end
         end
       end
