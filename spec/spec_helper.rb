@@ -15,4 +15,8 @@ RSpec.configure do |config|
   config.order = 'random'
 end
 
+def ruby_22
+  ::RUBY_VERSION =~ /2.2.0/
+end
+
 srand RSpec.configuration.seed
