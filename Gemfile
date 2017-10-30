@@ -8,8 +8,11 @@ group :development, :test do
   gem 'coveralls', require: false
   gem 'data_mapper'
   gem 'dm-sqlite-adapter'
+  gem 'dry-struct'
+  gem 'dry-types', '~> 0.12'
   gem 'pry'
   gem 'rom', '~> 3.0'
+  gem 'rom-repository'
   gem 'rom-sql'
   gem 'sequel'
   gem 'sqlite3'

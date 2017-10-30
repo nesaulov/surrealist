@@ -18,6 +18,12 @@ require 'json'
 module Surrealist
   # Default namespaces nesting level
   DEFAULT_NESTING_LEVEL = 666
+  # Instance variable name that is set by SchemaDefiner
+  INSTANCE_VARIABLE = '@__surrealist_schema'.freeze
+  # Instance's parent instance variable name that is set by SchemaDefiner
+  PARENT_VARIABLE = '@__surrealist_schema_parent'.freeze
+  # Class variable name that is set by SchemaDefiner
+  CLASS_VARIABLE = '@@__surrealist_schema'.freeze
 
   class << self
     # @param [Class] base class to include/extend +Surrealist+.
@@ -29,7 +35,7 @@ module Surrealist
     # Iterates over a collection of Surrealist Objects and
     # maps surrealize to each record.
     #
-    # @param [Object] Collection of instances of a class that has +Surrealist+ included.
+    # @param [Object] collection of instances of a class that has +Surrealist+ included.
     # @param [Boolean] camelize optional argument for converting hash to camelBack.
     # @param [Boolean] include_root optional argument for having the root key of the resulting hash
     #   as instance's class name.
@@ -101,8 +107,7 @@ module Surrealist
     #   # => { name: 'Nikita', age: 23 }
     #   # For more examples see README
     def build_schema(instance:, carrier:)
-      delegatee = instance.class.instance_variable_get('@__surrealist_schema_parent')
-      schema = (delegatee || instance.class).instance_variable_get('@__surrealist_schema')
+      schema = find_schema(instance)
 
       Surrealist::ExceptionRaiser.raise_unknown_schema!(instance) if schema.nil?
 
@@ -114,6 +119,18 @@ module Surrealist
 
       hash = Builder.call(schema: normalized_schema, instance: instance)
       carrier.camelize ? Surrealist::HashUtils.camelize_hash(hash) : hash
+    end
+
+    private
+
+    def find_schema(instance)
+      delegatee = instance.class.instance_variable_get(PARENT_VARIABLE)
+      maybe_schema = (delegatee || instance.class).instance_variable_get(INSTANCE_VARIABLE)
+      maybe_schema || (instance.class.class_variable_get(CLASS_VARIABLE) if klass_var_defined?(instance))
+    end
+
+    def klass_var_defined?(instance)
+      instance.class.class_variable_defined?(CLASS_VARIABLE)
     end
   end
 end
