@@ -16,6 +16,19 @@ RSpec.describe Surrealist do
                   { name: 'testing active record inherit again' }].to_json)
       end
 
+      it 'works with raw parameter' do
+        expect(subject.surrealize_collection(TestAR.all, raw: true))
+          .to eq([{ name: 'testing active record' },
+                  { name: 'testing active record inherit' },
+                  { name: 'testing active record inherit again' }])
+      end
+
+      # Allows us to support nested/arbitrarily linked objects
+      it 'works with non-Surrealist object' do
+        expect(subject.surrealize_collection([1, 2, 3]))
+          .to eq([1, 2, 3].to_json)
+      end
+
       it 'works with inheritance' do
         expect(subject.surrealize_collection(InheritAR.all))
           .to eq([{ name: 'testing active record inherit' },

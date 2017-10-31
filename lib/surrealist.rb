@@ -11,7 +11,9 @@ require 'surrealist/hash_utils'
 require 'surrealist/instance_methods'
 require 'surrealist/schema_definer'
 require 'surrealist/string_utils'
+require 'surrealist/helper'
 require 'surrealist/type_helper'
+require 'surrealist/value_assigner'
 require 'json'
 
 # Main module that provides the +json_schema+ class method and +surrealize+ instance method.
@@ -45,20 +47,24 @@ module Surrealist
     #   Surrealist.surrealize_collection(User.all)
     #   # => "[{\"name\":\"Nikita\",\"age\":23}, {\"name\":\"Alessandro\",\"age\":24}]"
     #   # For more examples see README
-    def surrealize_collection(collection, camelize: false, include_root: false, include_namespaces: false, root: nil, namespaces_nesting_level: DEFAULT_NESTING_LEVEL) # rubocop:disable Metrics/LineLength
-      unless collection.respond_to?(:each)
-        raise Surrealist::ExceptionRaiser.raise_invalid_collection!
+    def surrealize_collection(collection, camelize: false, include_root: false, include_namespaces: false, root: nil, namespaces_nesting_level: DEFAULT_NESTING_LEVEL, raw: false) # rubocop:disable Metrics/LineLength
+      raise Surrealist::ExceptionRaiser.raise_invalid_collection! unless collection.respond_to?(:each)
+
+      result = collection.map do |record|
+        if Helper.surrealist?(record.class)
+          record.build_schema(
+            camelize: camelize,
+            include_root: include_root,
+            include_namespaces: include_namespaces,
+            root: root,
+            namespaces_nesting_level: namespaces_nesting_level,
+          )
+        else
+          record
+        end
       end
 
-      JSON.dump(collection.map do |record|
-        record.build_schema(
-          camelize: camelize,
-          include_root: include_root,
-          include_namespaces: include_namespaces,
-          root: root,
-          namespaces_nesting_level: namespaces_nesting_level,
-        )
-      end)
+      raw ? result : JSON.dump(result)
     end
 
     # Builds hash from schema provided in the object's class and type-checks the values.
