@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../lib/surrealist'
-
 class Person; include Surrealist; end
 
 RSpec.describe Surrealist::SchemaDefiner do

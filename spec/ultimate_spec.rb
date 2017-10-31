@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../lib/surrealist'
-
 class Human
   include Surrealist
 
@@ -83,6 +81,34 @@ class Kid
   end
 end
 
+class WithWeirdSchema
+  include Surrealist
+
+  json_schema do
+    {
+      one: {
+        two: {
+          three: {
+            something: String,
+            level: {
+              deeper: {},
+              another: String,
+            },
+          },
+        },
+      },
+    }
+  end
+
+  def something
+    'a string'
+  end
+
+  def another
+    'another string'
+  end
+end
+
 RSpec.describe Surrealist do
   context 'ultimate spec' do
     let(:human) { Human.new('John', 'Doe') }
@@ -142,6 +168,15 @@ RSpec.describe Surrealist do
           creditCard: { cardNumber: 1234, cardHolder: 'John Doe' },
           children:   { male: { count: 2 }, female: { count: 1 } }
         })
+    end
+  end
+
+  context 'weird schema' do
+    it 'works' do
+      expect(WithWeirdSchema.new.build_schema)
+        .to eq(one: { two: { three: {
+          something: 'a string', level: { deeper: {}, another: 'another string' }
+        } } })
     end
   end
 end
