@@ -17,13 +17,12 @@ module Surrealist
       def call(schema:, instance:)
         schema.each do |schema_key, schema_value|
           if schema_value.is_a?(Hash)
-            nested_instance = instance.respond_to?(schema_key) ? instance.send(schema_key) : instance
-            Builder.call(schema: schema_value, instance: nested_instance)
+            Builder.call(schema: schema_value,
+                         instance: instance.respond_to?(schema_key) ? instance.send(schema_key) : instance)
           else
-            value = instance.is_a?(Hash) ? instance[schema_key] : instance.send(schema_key)
             assign_value(instance: instance,
                          method: schema_key,
-                         value: value,
+                         value: instance.is_a?(Hash) ? instance[schema_key] : instance.send(schema_key),
                          type: schema_value) { |coerced_value| schema[schema_key] = coerced_value }
           end
         end
