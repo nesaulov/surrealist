@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Surrealist
   # A generic helper.
   class Helper

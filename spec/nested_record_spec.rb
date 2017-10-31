@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../lib/surrealist'
 require_relative './orms/ar'
 require_relative './carriers/params'
