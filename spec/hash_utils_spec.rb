@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../lib/surrealist'
-
 RSpec.describe Surrealist::HashUtils do
   describe '#camelize_hash' do
     subject(:camelized_hash) { described_class.camelize_hash(hash) }

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../lib/surrealist'
-
 RSpec.describe Surrealist::StringUtils do
   describe '#underscore' do
     let(:expectations) do

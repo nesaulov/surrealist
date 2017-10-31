@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../lib/surrealist'
-
 class NullCarrier
   attr_reader :camelize, :include_root, :include_namespaces, :namespaces_nesting_level, :root
 

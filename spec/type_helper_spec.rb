@@ -1,12 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../lib/surrealist'
-require 'dry-types'
-
-module Types
-  include Dry::Types.module
-end
-
 RSpec.describe Surrealist::TypeHelper do
   describe '#valid_type?' do
     context 'nil values' do
