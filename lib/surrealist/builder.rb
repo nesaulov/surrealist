@@ -13,7 +13,6 @@ module Surrealist
       #   does not have a corresponding method on the object.
       #
       # @return [Hash] a hash that will be dumped into JSON.
-      # rubocop:disable Metrics/MethodLength
       def call(schema:, instance:)
         schema.each do |schema_key, schema_value|
           if schema_value.is_a?(Hash)
