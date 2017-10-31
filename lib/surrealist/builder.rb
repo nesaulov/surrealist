@@ -62,12 +62,8 @@ module Surrealist
         object = instance.send(method)
 
         hash.each do |key, value|
-          if object.methods.include?(key)
-            take_values_from_instance(instance: object, value: value, hash: hash, key: key,
-                                      schema: schema, method: method)
-          else
-            call(schema: hash, instance: object)
-          end
+          take_values_from_instance(instance: object, value: value, hash: hash, key: key,
+                                    schema: schema, method: method)
         end
       end
 
