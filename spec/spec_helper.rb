@@ -17,7 +17,10 @@ require 'dry-struct'
 require 'dry-types'
 require 'pry'
 require 'rom'
+require 'rom-repository'
 require 'surrealist'
+
+require_relative 'support/shared_contexts/parameters_contexts'
 
 RSpec.configure do |config|
   config.disable_monkey_patching!

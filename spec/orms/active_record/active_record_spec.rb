@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 require_relative 'models'
-require_relative '../../../lib/surrealist'
-require_relative '../../carriers/params'
 
 RSpec.describe 'ActiveRecord integration' do
   collection_scopes = [
@@ -196,21 +194,10 @@ RSpec.describe 'ActiveRecord integration' do
     end
 
     context 'parameters' do
-      it 'works with valid surrealization params' do
-        VALID_PARAMS.each do |i|
-          expect { Surrealist.surrealize_collection(TestAR.all, **i) }
-            .to_not raise_error
-          expect(Surrealist.surrealize_collection(TestAR.all, **i))
-            .to be_a String
-        end
-      end
+      let(:collection) { TestAR.all }
 
-      it 'fails with invalid surrealization params' do
-        INVALID_PARAMS.each do |i|
-          expect { Surrealist.surrealize_collection(TestAR.all, **i) }
-            .to raise_error ArgumentError
-        end
-      end
+      it_behaves_like 'error is raised for invalid params: collection'
+      it_behaves_like 'error is not raised for valid params: collection'
     end
 
     context 'not a proper collection' do
@@ -240,8 +227,7 @@ RSpec.describe 'ActiveRecord integration' do
       context 'finder methods' do
         record_scopes.flatten.each do |lambda|
           it 'works if scope returns single record' do
-            expect(lambda.call.surrealize)
-              .to be_a String
+            expect(lambda.call.surrealize).to be_a String
             expect(JSON.parse(lambda.call.surrealize)).to have_key('title')
             expect(JSON.parse(lambda.call.surrealize)).to have_key('money')
           end
@@ -249,14 +235,14 @@ RSpec.describe 'ActiveRecord integration' do
       end
     end
 
-    context 'associations' do
-      let(:first_book) do
-        [
-          { title:   'The Adventures of Tom Sawyer', genre: { name: 'Adventures' },
-            awards: { title: 'Nobel Prize' } },
-        ]
-      end
+    context 'parameters' do
+      let(:instance) { Book.first.publisher }
 
+      it_behaves_like 'error is raised for invalid params: instance'
+      it_behaves_like 'error is not raised for valid params: instance'
+    end
+
+    context 'associations' do
       context 'has one' do
         it 'works for a single record reference' do
           expect(Book.first.publisher.surrealize)

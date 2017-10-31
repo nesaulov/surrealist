@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative './carriers/params'
-
 RSpec.describe Surrealist::Carrier do
   describe '#call' do
     context 'invalid arguments' do
