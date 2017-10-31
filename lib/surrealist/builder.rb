@@ -52,7 +52,7 @@ module Surrealist
 
           if value.respond_to?(:build_schema)
             yield assign_nested_record(instance: instance, value: value)
-          elsif value.respond_to?(:each) && value.any? { |v| Helper.surrealist?(v.class) }
+          elsif value.respond_to?(:each) && !value.empty? && value.all? { |v| Helper.surrealist?(v.class) }
             yield assign_nested_collection(instance: instance, value: value)
           else
             yield value
