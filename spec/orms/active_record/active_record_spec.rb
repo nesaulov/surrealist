@@ -44,7 +44,7 @@ RSpec.describe 'ActiveRecord integration' do
 
   collection_scopes.push(-> { ARScope.coll_extending }) unless ruby_22
 
-  unless ruby_22
+  unless ruby_22 # AR 4.2 doesn't have these methods
     record_scopes.push([
       -> { ARScope.rec_third_to_last },
       -> { ARScope.rec_third_to_last! },
@@ -99,7 +99,7 @@ RSpec.describe 'ActiveRecord integration' do
     context 'scopes' do
       context 'query methods' do
         collection_scopes.flatten.each do |lambda|
-          it 'works if scope returns collection of records' do
+          it 'works if scope returns a collection of records' do
             expect { Surrealist.surrealize_collection(lambda.call) }
               .not_to raise_error
           end
@@ -108,7 +108,7 @@ RSpec.describe 'ActiveRecord integration' do
 
       context 'finder methods' do
         record_scopes.flatten.each do |lambda|
-          it 'fails if scope returns single record' do
+          it 'fails if scope returns a single record' do
             expect { Surrealist.surrealize_collection(lambda.call) }
               .to raise_error Surrealist::InvalidCollectionError,
                               'Can\'t serialize collection - must respond to :each'
@@ -217,7 +217,7 @@ RSpec.describe 'ActiveRecord integration' do
         error = ruby_22 ? NameError : NoMethodError
 
         collection_scopes.flatten.each do |lambda|
-          it 'fails if scope returns collection of records' do
+          it 'fails if scope returns a collection of records' do
             expect { lambda.call.surrealize }
               .to raise_error error, no_method_message
           end
@@ -226,7 +226,7 @@ RSpec.describe 'ActiveRecord integration' do
 
       context 'finder methods' do
         record_scopes.flatten.each do |lambda|
-          it 'works if scope returns single record' do
+          it 'works if scope returns a single record' do
             expect(lambda.call.surrealize).to be_a String
             expect(JSON.parse(lambda.call.surrealize)).to have_key('title')
             expect(JSON.parse(lambda.call.surrealize)).to have_key('money')
