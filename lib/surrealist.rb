@@ -13,6 +13,7 @@ require 'surrealist/schema_definer'
 require 'surrealist/string_utils'
 require 'surrealist/helper'
 require 'surrealist/type_helper'
+require 'surrealist/value_assigner'
 require 'json'
 
 # Main module that provides the +json_schema+ class method and +surrealize+ instance method.
