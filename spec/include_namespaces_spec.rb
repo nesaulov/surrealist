@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../lib/surrealist'
-require 'dry-types'
-
 module BusinessSystem
   class Cashout
     class ReportSystem
