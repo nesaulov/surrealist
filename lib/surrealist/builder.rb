@@ -17,17 +17,11 @@ module Surrealist
       def call(schema:, instance:)
         schema.each do |schema_key, schema_value|
           if schema_value.is_a?(Hash)
-            Builder.call(
-              schema: schema_value,
-              instance: instance.respond_to?(schema_key) ? instance.send(schema_key) : instance,
-            )
+            Builder.call(schema: schema_value,
+                         instance: instance.respond_to?(schema_key) ? instance.send(schema_key) : instance)
           else
-            ValueAssigner.assign(
-              instance: instance,
-              method: schema_key,
-              value: instance.is_a?(Hash) ? instance[schema_key] : instance.send(schema_key),
-              type: schema_value,
-            ) { |coerced_value| schema[schema_key] = coerced_value }
+            ValueAssigner.assign(schema: Schema.new(schema_key, schema_value),
+                                 instance: instance) { |coerced_value| schema[schema_key] = coerced_value }
           end
         end
       rescue NoMethodError => e
@@ -35,7 +29,8 @@ module Surrealist
               "#{e.message}. You have probably defined a key " \
               "in the schema that doesn't have a corresponding method."
       end
-      # rubocop:enable Metrics/MethodLength
+
+      Schema = Struct.new(:key, :value)
     end
   end
 end

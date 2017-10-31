@@ -14,26 +14,31 @@ module Surrealist
       # @raise +Surrealist::InvalidTypeError+ if type-check failed at some point.
       #
       # @return [Hash] schema
-      def assign(instance:, method:, value:, type:)
-        if TypeHelper.valid_type?(value: value, type: type)
-          value = TypeHelper.coerce(type: type, value: value)
+      def assign(instance:, schema:)
+        value = raw_value(instance: instance, schema: schema)
 
-          @stack ||= []
+        # array to track and prevent infinite self references in surrealization
+        @stack ||= []
 
-          if value.respond_to?(:build_schema)
-            yield assign_nested_record(instance: instance, value: value)
-          elsif value.respond_to?(:each) && !value.empty? && value.all? { |v| Helper.surrealist?(v.class) }
-            yield assign_nested_collection(instance: instance, value: value)
-          else
-            yield value
-          end
+        if value.respond_to?(:build_schema)
+          yield assign_nested_record(instance: instance, value: value)
+        elsif value.respond_to?(:each) && !value.empty? && value.all? { |v| Helper.surrealist?(v.class) }
+          yield assign_nested_collection(instance: instance, value: value)
         else
-          raise Surrealist::InvalidTypeError,
-                "Wrong type for key `#{method}`. Expected #{type}, got #{value.class}."
+          yield value
         end
       end
 
       private
+
+      def raw_value(instance:, schema:)
+        value = instance.is_a?(Hash) ? instance[schema.key] : instance.send(schema.key)
+        unless TypeHelper.valid_type?(value: value, type: schema.value)
+          raise Surrealist::InvalidTypeError,
+                "Wrong type for key `#{schema.key}`. Expected #{schema.value}, got #{value.class}."
+        end
+        TypeHelper.coerce(type: schema.value, value: value)
+      end
 
       # Assists in recursively generating schema for records while preventing infinite self-referencing
       #
