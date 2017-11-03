@@ -36,7 +36,13 @@ module Surrealist
       #
       # @return [Object] value to be further processed
       def raw_value(instance:, schema:)
-        value = instance.is_a?(Hash) ? instance[schema.key] : instance.send(schema.key)
+        # FIXME: this is minimal thing required to allow many-to-many associations with defined schema,
+        # FIXME: like described in spec/orms/active_record/models.rb:207
+        if defined?(ActiveRecord) && instance.is_a?(ActiveRecord::Relation)
+          value = instance.first.send(schema.key)
+        else
+          value = instance.is_a?(Hash) ? instance[schema.key] : instance.send(schema.key)
+        end
         unless TypeHelper.valid_type?(value: value, type: schema.value)
           raise Surrealist::InvalidTypeError,
                 "Wrong type for key `#{schema.key}`. Expected #{schema.value}, got #{value.class}."
