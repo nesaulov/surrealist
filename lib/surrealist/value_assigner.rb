@@ -7,33 +7,42 @@ module Surrealist
       # Assigns value returned from a method to a corresponding key in the schema hash.
       #
       # @param [Object] instance the instance of the object which methods from the schema are called on.
-      # @param [Symbol] method a key from the schema hash representing a method on the instance.
-      # @param [Object] value a value that has to be type-checked.
-      # @param [Class] type class representing data type.
-      #
-      # @raise +Surrealist::InvalidTypeError+ if type-check failed at some point.
+      # @param [Struct] schema containing a single schema key and value
       #
       # @return [Hash] schema
-      def assign(instance:, method:, value:, type:)
-        if TypeHelper.valid_type?(value: value, type: type)
-          value = TypeHelper.coerce(type: type, value: value)
+      def assign(instance:, schema:)
+        value = raw_value(instance: instance, schema: schema)
 
-          @stack ||= []
+        # array to track and prevent infinite self references in surrealization
+        @stack ||= []
 
-          if value.respond_to?(:build_schema)
-            yield assign_nested_record(instance: instance, value: value)
-          elsif value.respond_to?(:each) && !value.empty? && value.all? { |v| Helper.surrealist?(v.class) }
-            yield assign_nested_collection(instance: instance, value: value)
-          else
-            yield value
-          end
+        if value.respond_to?(:build_schema)
+          yield assign_nested_record(instance: instance, value: value)
+        elsif value.respond_to?(:each) && !value.empty? && value.all? { |v| Helper.surrealist?(v.class) }
+          yield assign_nested_collection(instance: instance, value: value)
         else
-          raise Surrealist::InvalidTypeError,
-                "Wrong type for key `#{method}`. Expected #{type}, got #{value.class}."
+          yield value
         end
       end
 
       private
+
+      # Generates first pass of serializing value, doing type check and coercion
+      #
+      # @param [Object] instance the instance of the object which methods from the schema are called on.
+      # @param [Struct] schema containing a single schema key and value
+      #
+      # @raise +Surrealist::InvalidTypeError+ if type-check failed at some point.
+      #
+      # @return [Object] value to be further processed
+      def raw_value(instance:, schema:)
+        value = instance.is_a?(Hash) ? instance[schema.key] : instance.send(schema.key)
+        unless TypeHelper.valid_type?(value: value, type: schema.value)
+          raise Surrealist::InvalidTypeError,
+                "Wrong type for key `#{schema.key}`. Expected #{schema.value}, got #{value.class}."
+        end
+        TypeHelper.coerce(type: schema.value, value: value)
+      end
 
       # Assists in recursively generating schema for records while preventing infinite self-referencing
       #
