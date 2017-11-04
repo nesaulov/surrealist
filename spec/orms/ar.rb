@@ -5,6 +5,8 @@ ActiveRecord::Base.establish_connection(
   database: ':memory:',
 )
 
+ActiveRecord::Migration.verbose = false
+
 ActiveRecord::Schema.define do
   create_table :test_ars do |table|
     table.column :name, :string
