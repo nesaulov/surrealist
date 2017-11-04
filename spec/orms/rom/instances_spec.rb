@@ -35,7 +35,7 @@ class UserRepo < ROM::Repository[:users]
   commands :create, update: :by_pk, delete: :by_pk
 end
 
-class User < Dry::Struct
+class RomUser < Dry::Struct
   include Surrealist
 
   attribute :name, String
@@ -74,17 +74,17 @@ RSpec.describe 'ROM Integration' do
       end
 
       context 'using ROM::Struct::Model#as(Representative)' do
-        let(:instance) { users.as(User).first }
+        let(:instance) { users.as(RomUser).to_a[1] }
 
-        it { expect(instance.surrealize).to eq('{"email":"jane@struct.rom"}') }
+        it { expect(instance.surrealize).to eq('{"email":"dane@as.rom"}') }
         it_behaves_like 'error is not raised for valid params: instance'
         it_behaves_like 'error is raised for invalid params: instance'
       end
 
       context 'using mapper' do
-        let(:instance) { users.as(:user_obj).to_a.first }
+        let(:instance) { users.as(:user_obj).to_a[2] }
 
-        it { expect(instance.surrealize).to eq('{"email":"jane@struct.rom"}') }
+        it { expect(instance.surrealize).to eq('{"email":"jack@mapper.rom"}') }
         it { expect(users.as(:user_obj).to_a.size).to eq(3) }
         it_behaves_like 'error is not raised for valid params: instance'
         it_behaves_like 'error is raised for invalid params: instance'
