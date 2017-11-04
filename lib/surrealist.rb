@@ -26,6 +26,9 @@ module Surrealist
   PARENT_VARIABLE = '@__surrealist_schema_parent'.freeze
   # Class variable name that is set by SchemaDefiner
   CLASS_VARIABLE = '@@__surrealist_schema'.freeze
+  # An instance of Carrier with default params
+  NULL_CARRIER = Carrier.new(false, false, false,
+                             nil, DEFAULT_NESTING_LEVEL).freeze
 
   class << self
     # @param [Class] base class to include/extend +Surrealist+.

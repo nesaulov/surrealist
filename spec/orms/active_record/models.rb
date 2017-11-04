@@ -205,6 +205,7 @@ class Book < ActiveRecord::Base
       },
       awards: {
         title: String,
+        id: Integer,
       },
     }
   end

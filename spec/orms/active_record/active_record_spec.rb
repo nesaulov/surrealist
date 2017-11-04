@@ -55,13 +55,14 @@ RSpec.describe 'ActiveRecord integration' do
 
   describe 'Surrealist.surrealize_collection()' do
     let(:result) { Surrealist.surrealize_collection(collection) }
+    let(:parsed_result) { JSON.parse(result) }
 
     context 'basics' do
       let(:collection) { Book.all }
 
       it 'works with #all' do
-        expect(JSON.parse(result).length).to eq(3)
-        expect(JSON.parse(result)).to be_an Array
+        expect(parsed_result.length).to eq(3)
+        expect(parsed_result).to be_an Array
       end
     end
 
@@ -120,8 +121,13 @@ RSpec.describe 'ActiveRecord integration' do
     context 'associations' do
       let(:first_book) do
         [
-          { title:   'The Adventures of Tom Sawyer', genre: { name: 'Adventures' },
-            awards: { title: 'Nobel Prize' } },
+          { title:  'The Adventures of Tom Sawyer',
+            genre:  { name: 'Adventures' },
+            awards: [
+              { title: 'Nobel Prize', id: 1 },
+              { title: 'Nobel Prize', id: 4 },
+              { title: 'Nobel Prize', id: 7 },
+            ] },
         ]
       end
 
@@ -165,12 +171,7 @@ RSpec.describe 'ActiveRecord integration' do
             .to eq([{ name: 'Jerome' }].to_json)
 
           expect(Surrealist.surrealize_collection(Author.first.books))
-            .to eq(
-              [
-                { title: 'The Adventures of Tom Sawyer', genre: { name: 'Adventures' },
-                  awards: { title: 'Nobel Prize' } },
-              ].to_json,
-            )
+            .to eq(first_book.to_json)
         end
       end
     end
