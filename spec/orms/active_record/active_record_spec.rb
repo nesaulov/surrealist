@@ -180,8 +180,8 @@ RSpec.describe 'ActiveRecord integration' do
       let(:collection) { Book.includes(:authors) }
 
       it 'works' do
-        expect(JSON.parse(result).length).to eq(3)
-        expect(JSON.parse(result)).to be_an Array
+        expect(parsed_result.length).to eq(3)
+        expect(parsed_result).to be_an Array
       end
     end
 
