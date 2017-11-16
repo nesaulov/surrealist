@@ -90,7 +90,11 @@ Performance/UnfreezeString:
 # Style
 
 Style/MixinUsage:
-  Exlude:
+  Exclude:
+    - spec/**/*rb
+
+Style/DateTime:
+  Exclude:
     - spec/**/*rb
 
 Style/SingleLineMethods:
