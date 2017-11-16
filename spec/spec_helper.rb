@@ -21,6 +21,8 @@ require 'rom-repository'
 require 'surrealist'
 
 require_relative 'support/shared_contexts/parameters_contexts'
+require_relative 'orms/active_record/models'
+require_relative 'orms/sequel/models'
 
 RSpec.configure do |config|
   config.disable_monkey_patching!
