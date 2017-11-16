@@ -13,9 +13,9 @@ RSpec.describe 'Sequel integration' do
 
   describe 'collections' do
     let(:collection) { SequelItem.all }
+    let(:subject) { Surrealist.surrealize_collection(collection) }
 
-    it { expect(Surrealist.surrealize_collection(collection))
-           .to eq([{ name: 'testing sequel' }].to_json) }
+    it { is_expected.to eq([{ name: 'testing sequel' }].to_json) }
 
     it_behaves_like 'error is not raised for valid params: collection'
     it_behaves_like 'error is raised for invalid params: collection'

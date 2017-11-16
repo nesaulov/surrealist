@@ -10,7 +10,6 @@ DB.create_table :sequel_items do
   Float :price
 end
 
-
 class SequelItem < Sequel::Model
   include Surrealist
 
