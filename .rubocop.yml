@@ -89,6 +89,14 @@ Performance/UnfreezeString:
 
 # Style
 
+Style/MixinUsage:
+  Exclude:
+    - spec/**/*rb
+
+Style/DateTime:
+  Exclude:
+    - spec/**/*rb
+
 Style/SingleLineMethods:
   Exclude:
     - spec/**/*rb
