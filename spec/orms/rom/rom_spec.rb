@@ -18,6 +18,22 @@ class UsersMapper < ROM::Mapper
   model UserModel
 end
 
+class SchemalessUser
+  include Surrealist
+
+  attr_reader :id, :name, :email
+
+  def initialize(attributes)
+    @id, @name, @email = attributes.values_at(:id, :name, :email)
+  end
+end
+
+class MapperWithoutSchema < ROM::Mapper
+  register_as :user_wo_schema
+  relation :users
+  model SchemalessUser
+end
+
 container = ROM.container(:sql, ['sqlite::memory']) do |conf|
   conf.default.create_table(:users) do
     primary_key :id
@@ -26,6 +42,7 @@ container = ROM.container(:sql, ['sqlite::memory']) do |conf|
   end
 
   conf.register_mapper(UsersMapper)
+  conf.register_mapper(MapperWithoutSchema)
   conf.commands(:users) do
     define(:create)
   end
@@ -51,12 +68,10 @@ class ROM::Struct::User < ROM::Struct
 end
 
 RSpec.describe 'ROM Integration' do
-  # describe 'instance.surrealize()' do
   let(:user_repo) { UserRepo.new(container) }
   let(:users) { user_repo.users }
   let(:parsed_collection) { JSON.parse(Surrealist.surrealize_collection(collection)) }
 
-  # context 'single record' do
   before(:all) do
     user_repo = UserRepo.new(container)
     [
@@ -184,6 +199,25 @@ RSpec.describe 'ROM Integration' do
         it { expect(parsed_collection).to eq(result) }
         it_behaves_like 'error is not raised for valid params: collection'
         it_behaves_like 'error is raised for invalid params: collection'
+      end
+    end
+  end
+
+  context 'with no schema provided' do
+    let(:instance) { users.as(:user_wo_schema).first }
+    let(:collection) { users.as(:user_wo_schema).to_a }
+
+    describe 'UnknownSchemaError is raised' do
+      specify 'for instance' do
+        expect { instance.surrealize }
+          .to raise_error(Surrealist::UnknownSchemaError,
+                          "Can't serialize SchemalessUser - no schema was provided.")
+      end
+
+      specify 'for collection' do
+        expect { Surrealist.surrealize_collection(collection) }
+          .to raise_error(Surrealist::UnknownSchemaError,
+                          "Can't serialize SchemalessUser - no schema was provided.")
       end
     end
   end
