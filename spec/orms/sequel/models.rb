@@ -16,4 +16,4 @@ class SequelItem < Sequel::Model
   json_schema { { name: String } }
 end
 
-SequelItem.insert(name: 'testing sequel')
+7.times { |i| SequelItem.insert(name: "SequelItem #{i}", price: i * 4) }
