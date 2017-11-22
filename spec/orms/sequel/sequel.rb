@@ -10,3 +10,10 @@ class TestSequel < Sequel::Model
   json_schema { { name: String } }
 end
 TestSequel.insert(name: 'testing sequel')
+
+# context 'sequel' do
+#   it 'works' do
+#     expect(subject.surrealize_collection(TestSequel.all))
+#       .to eq([{ name: 'testing sequel' }].to_json)
+#   end
+# end

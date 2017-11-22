@@ -341,5 +341,11 @@ RSpec.describe Surrealist do
         end
       end
     end
+
+    context 'plain Ruby array' do
+      let(:array) { [1, 3, 'dog'] }
+
+      it { expect(Surrealist.surrealize_collection(array)).to eq('[1,3,"dog"]') }
+    end
   end
 end

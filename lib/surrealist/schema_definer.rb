@@ -15,7 +15,11 @@ module Surrealist
     def self.call(klass, hash)
       raise Surrealist::InvalidSchemaError, 'Schema should be defined as a hash' unless hash.is_a?(Hash)
 
-      klass.instance_variable_set('@__surrealist_schema', hash)
+      if klass.name =~ /ROM::Struct/
+        klass.class_variable_set('@@__surrealist_schema', hash)
+      else
+        klass.instance_variable_set('@__surrealist_schema', hash)
+      end
     end
   end
 end

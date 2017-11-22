@@ -6,7 +6,7 @@ module Surrealist
     class << self
       # Determines if the class uses the Surrealist mixin.
       #
-      # @param [Class] to be checked.
+      # @param [Class] klass a class to be checked.
       #
       # @return [Boolean] if Surrealist is included in class.
       def surrealist?(klass)

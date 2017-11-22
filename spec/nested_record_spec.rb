@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../lib/surrealist'
-require_relative './orms/ar'
-require_relative './carriers/params'
+require_relative './orms/active_record/models'
 
 RSpec.describe Surrealist do
   describe 'nested object surrealization' do
@@ -54,18 +52,11 @@ RSpec.describe Surrealist do
       end
     end
 
-    it 'works with valid surrealization params' do
-      VALID_PARAMS.each do |i|
-        expect { Employee.first.build_schema(**i) }
-          .to_not raise_error
-      end
-    end
+    context 'parameters' do
+      let(:instance) { Employee.first }
 
-    it 'fails with invalid surrealization params' do
-      INVALID_PARAMS.each do |i|
-        expect { Employee.first.build_schema(**i) }
-          .to raise_error ArgumentError
-      end
+      it_behaves_like 'error is raised for invalid params: instance'
+      it_behaves_like 'error is not raised for valid params: instance'
     end
   end
 end

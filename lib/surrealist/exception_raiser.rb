@@ -5,25 +5,25 @@ module Surrealist
   class UnknownSchemaError < RuntimeError; end
 
   # Error class for classes with +json_schema+ defined not as a hash.
-  class InvalidSchemaError < RuntimeError; end
+  class InvalidSchemaError < ArgumentError; end
 
   # Error class for +NoMethodError+.
-  class UndefinedMethodError < RuntimeError; end
+  class UndefinedMethodError < ArgumentError; end
 
   # Error class for failed type-checks.
   class InvalidTypeError < TypeError; end
 
   # Error class for undefined root keys for schema wrapping.
-  class UnknownRootError < RuntimeError; end
+  class UnknownRootError < ArgumentError; end
 
   # Error class for undefined class to delegate schema.
-  class InvalidSchemaDelegation < RuntimeError; end
+  class InvalidSchemaDelegation < ArgumentError; end
 
   # Error class for invalid object given to iteratively apply surrealize.
   class InvalidCollectionError < ArgumentError; end
 
   # Error class for cases where +namespaces_nesting_level+ is set to 0.
-  class InvalidNestingLevel < RuntimeError; end
+  class InvalidNestingLevel < ArgumentError; end
 
   # A class that raises all Surrealist exceptions
   class ExceptionRaiser
@@ -68,12 +68,22 @@ module Surrealist
               "Expected `namespaces_nesting_level` to be a positive integer, got: #{value}"
       end
 
-      # Raises ArgumentError if root is not nil, a non-empty stringk or symbol.
+      # Raises ArgumentError if root is not nil, a non-empty string or symbol.
       #
       # @raise ArgumentError
       def raise_invalid_root!(value)
         raise ArgumentError,
               "Expected `root` to be nil, a non-empty string, or symbol, got: #{value}"
+      end
+
+      # Raises ArgumentError if a key defined in the schema does not have a corresponding
+      # method on the object.
+      #
+      # @raise Surrealist::UndefinedMethodError
+      def raise_invalid_key!(e)
+        raise Surrealist::UndefinedMethodError,
+              "#{e.message}. You have probably defined a key " \
+              "in the schema that doesn't have a corresponding method."
       end
     end
   end
