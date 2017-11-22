@@ -1,3 +1,14 @@
+# 0.3.0
+
+## Added
+* Full integration for ActiveRecord (@nesaulov, @AlessandroMinali) #37
+* Full integration for ROM (@nesaulov, @AlessandroMinali) #37
+* `root` optional argument (@chrisatanasian) #32
+* Nested records surrealization (@AlessandroMinali) #34
+
+## Fixed
+* Dependencies update (@nesaulov) #48
+
 # 0.2.0
 ## Added
 * `delegate_surrealization_to` class method
