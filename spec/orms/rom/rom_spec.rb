@@ -28,10 +28,34 @@ class SchemalessUser
   end
 end
 
+class DelegatedUser < UserModel
+  delegate_surrealization_to UserModel
+
+  def initialize(attributes)
+    super
+    @email = 'delegated@example.com'
+  end
+end
+
+class GrandChildUser < DelegatedUser
+end
+
 class MapperWithoutSchema < ROM::Mapper
   register_as :user_wo_schema
   relation :users
   model SchemalessUser
+end
+
+class MapperDelegatedSchema < ROM::Mapper
+  register_as :user_de_schema
+  relation :users
+  model DelegatedUser
+end
+
+class MappeInheritedDelegatedSchema < ROM::Mapper
+  register_as :user_child_de_schema
+  relation :users
+  model GrandChildUser
 end
 
 container = ROM.container(:sql, ['sqlite::memory']) do |conf|
@@ -43,6 +67,8 @@ container = ROM.container(:sql, ['sqlite::memory']) do |conf|
 
   conf.register_mapper(UsersMapper)
   conf.register_mapper(MapperWithoutSchema)
+  conf.register_mapper(MapperDelegatedSchema)
+  conf.register_mapper(MappeInheritedDelegatedSchema)
   conf.commands(:users) do
     define(:create)
   end
@@ -218,6 +244,66 @@ RSpec.describe 'ROM Integration' do
         expect { Surrealist.surrealize_collection(collection) }
           .to raise_error(Surrealist::UnknownSchemaError,
                           "Can't serialize SchemalessUser - no schema was provided.")
+      end
+    end
+  end
+
+  context 'with delegated schema' do
+    context 'for instance' do
+      let(:instance) { users.as(:user_de_schema).to_a[2] }
+      let(:result) { '{"id":3,"email":"delegated@example.com"}' }
+
+      it { expect(instance.surrealize).to eq(result) }
+      it { expect(users.as(:user_de_schema).to_a.size).to eq(3) }
+      it_behaves_like 'error is not raised for valid params: instance'
+      it_behaves_like 'error is raised for invalid params: instance'
+
+      context '#where().first' do
+        let(:instance) { users.as(:user_de_schema).where(id: 3).first }
+
+        it { expect(instance.surrealize).to eq(result) }
+        it_behaves_like 'error is not raised for valid params: instance'
+        it_behaves_like 'error is raised for invalid params: instance'
+      end
+    end
+
+    context 'for collection' do
+      let(:collection) { users.as(:user_de_schema).to_a }
+      let(:result) do
+        [{ 'id' => 1, 'email' => 'delegated@example.com' },
+         { 'id' => 2, 'email' => 'delegated@example.com' },
+         { 'id' => 3, 'email' => 'delegated@example.com' }]
+      end
+
+      it { expect(parsed_collection).to eq(result) }
+      it_behaves_like 'error is not raised for valid params: collection'
+      it_behaves_like 'error is raised for invalid params: collection'
+
+      context '#where().to_a' do
+        let(:collection) { users.as(:user_de_schema).where { id < 4 }.to_a }
+
+        it { expect(parsed_collection).to eq(result) }
+        it_behaves_like 'error is not raised for valid params: collection'
+        it_behaves_like 'error is raised for invalid params: collection'
+      end
+    end
+  end
+
+  context 'with inheritance of class that has delegated but we don\'t delegate' do
+    let(:instance) { users.as(:user_child_de_schema).first }
+    let(:collection) { users.as(:user_child_de_schema).to_a }
+
+    describe 'UnknownSchemaError is raised' do
+      specify 'for instance' do
+        expect { instance.surrealize }
+          .to raise_error(Surrealist::UnknownSchemaError,
+                          "Can't serialize GrandChildUser - no schema was provided.")
+      end
+
+      specify 'for collection' do
+        expect { Surrealist.surrealize_collection(collection) }
+          .to raise_error(Surrealist::UnknownSchemaError,
+                          "Can't serialize GrandChildUser - no schema was provided.")
       end
     end
   end
