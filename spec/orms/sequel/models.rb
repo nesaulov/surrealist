@@ -1,7 +1,5 @@
 require 'sequel'
 
-Sequel.extension :migration
-
 DB = Sequel.sqlite
 
 DB.create_table :sequel_items do
