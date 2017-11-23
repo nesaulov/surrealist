@@ -451,7 +451,8 @@ type check will be passed. If you want to be strict about `nil`s consider using 
 
 ## Roadmap
 Here is a list of features that are not implemented yet (contributions are welcome):
-* [Collection serialization](https://github.com/nesaulov/surrealist/issues/12)
+* [Benchmarks](https://github.com/nesaulov/surrealist/issues/40)
+* [Sequel integration](https://github.com/nesaulov/surrealist/issues/45)
 
 ## Contributing
 Bug reports and pull requests are welcome on GitHub at https://github.com/nesaulov/surrealist.

@@ -26,8 +26,6 @@ module Surrealist
   PARENT_VARIABLE = '@__surrealist_schema_parent'.freeze
   # Class variable name that is set by SchemaDefiner
   CLASS_VARIABLE = '@@__surrealist_schema'.freeze
-  # Struct to carry schema along
-  Schema = Struct.new(:key, :value).freeze
 
   class << self
     # @param [Class] base class to include/extend +Surrealist+.
