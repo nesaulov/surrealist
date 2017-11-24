@@ -3,14 +3,14 @@
 module Surrealist
   # A helper class for strings transformations.
   module StringUtils
-    DASH                    = '-'.freeze
-    UNDERSCORE              = '_'.freeze
-    EMPTY_STRING            = ''.freeze
-    DASH_REGEXP1            = /([A-Z]+)([A-Z][a-z])/o
-    DASH_REGEXP2            = /([a-z\d])([A-Z])/o
-    UNDERSCORE_REGEXP       = /(?:^|_)([^_\s]+)/o
-    NAMESPACES_SEPARATOR    = '::'.freeze
-    UNDERSCORE_SUBSTITUTION = '\1_\2'.freeze
+    DASH                  = '-'.freeze
+    UNDERSCORE            = '_'.freeze
+    EMPTY_STRING          = ''.freeze
+    DASH_REGEXP1          = /([A-Z]+)([A-Z][a-z])/o
+    DASH_REGEXP2          = /([a-z\d])([A-Z])/o
+    UNDERSCORE_REGEXP     = /(?:^|_)([^_\s]+)/o
+    NAMESPACES_SEPARATOR  = '::'.freeze
+    UNDERSCORE_SUBSTITUTE = '\1_\2'.freeze
 
     class << self
       # Converts a string to snake_case.
@@ -20,8 +20,8 @@ module Surrealist
       # @return [String] new underscored string.
       def underscore(string)
         string.gsub(NAMESPACES_SEPARATOR, UNDERSCORE)
-          .gsub(DASH_REGEXP1, UNDERSCORE_SUBSTITUTION)
-          .gsub(DASH_REGEXP2, UNDERSCORE_SUBSTITUTION)
+          .gsub(DASH_REGEXP1, UNDERSCORE_SUBSTITUTE)
+          .gsub(DASH_REGEXP2, UNDERSCORE_SUBSTITUTE)
           .tr(DASH, UNDERSCORE)
           .downcase
       end
