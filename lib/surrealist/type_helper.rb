@@ -2,7 +2,7 @@
 
 module Surrealist
   # Service class for type checking
-  class TypeHelper
+  module TypeHelper
     # Dry-types class matcher
     DRY_TYPE_CLASS = 'Dry::Types'.freeze
 
@@ -18,7 +18,7 @@ module Surrealist
         return true if type == Any
 
         if type == Bool
-          [true, false].include?(value)
+          Surrealist::Carrier::BOOLEANS.include?(value)
         elsif dry_type?(type)
           type.try(value).success?
         else

@@ -3,6 +3,10 @@
 module Surrealist
   # A data structure to carry arguments across methods.
   class Carrier
+    BOOLEANS = [true, false].freeze
+
+    attr_reader :camelize, :include_root, :include_namespaces, :root, :namespaces_nesting_level
+
     # Public wrapper for Carrier.
     #
     # @param [Boolean] camelize optional argument for converting hash to camelBack.
@@ -19,8 +23,6 @@ module Surrealist
     def self.call(camelize:, include_root:, include_namespaces:, root:, namespaces_nesting_level:)
       new(camelize, include_root, include_namespaces, root, namespaces_nesting_level).sanitize!
     end
-
-    attr_reader :camelize, :include_root, :include_namespaces, :root, :namespaces_nesting_level
 
     def initialize(camelize, include_root, include_namespaces, root, namespaces_nesting_level)
       @camelize                 = camelize
@@ -47,7 +49,7 @@ module Surrealist
     # @raise ArgumentError
     def check_booleans!
       booleans_hash.each do |key, value|
-        unless [true, false].include?(value)
+        unless BOOLEANS.include?(value)
           raise ArgumentError, "Expected `#{key}` to be either true or false, got #{value}"
         end
       end
@@ -73,7 +75,7 @@ module Surrealist
     # Checks if root is not nil, a non-empty string, or symbol
     # @raise ArgumentError
     def check_root!
-      unless root.nil? || (root.is_a?(String) && root.present?) || root.is_a?(Symbol)
+      unless root.nil? || (root.is_a?(String) && !root.strip.empty?) || root.is_a?(Symbol)
         Surrealist::ExceptionRaiser.raise_invalid_root!(root)
       end
     end

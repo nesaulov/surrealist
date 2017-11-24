@@ -2,18 +2,27 @@
 
 module Surrealist
   # A helper class for strings transformations.
-  class StringUtils
+  module StringUtils
+    DASH                    = '-'.freeze
+    UNDERSCORE              = '_'.freeze
+    EMPTY_STRING            = ''.freeze
+    DASH_REGEXP1            = /([A-Z]+)([A-Z][a-z])/o
+    DASH_REGEXP2            = /([a-z\d])([A-Z])/o
+    UNDERSCORE_REGEXP       = /(?:^|_)([^_\s]+)/o
+    NAMESPACES_SEPARATOR    = '::'.freeze
+    UNDERSCORE_SUBSTITUTION = '\1_\2'.freeze
+
     class << self
       # Converts a string to snake_case.
       #
       # @param [String] string a string to be underscored.
       #
-      # @return [String] underscored string.
+      # @return [String] new underscored string.
       def underscore(string)
-        string.gsub('::', '_')
-          .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
-          .gsub(/([a-z\d])([A-Z])/, '\1_\2')
-          .tr('-', '_')
+        string.gsub(NAMESPACES_SEPARATOR, UNDERSCORE)
+          .gsub(DASH_REGEXP1, UNDERSCORE_SUBSTITUTION)
+          .gsub(DASH_REGEXP2, UNDERSCORE_SUBSTITUTION)
+          .tr(DASH, UNDERSCORE)
           .downcase
       end
 
@@ -25,12 +34,11 @@ module Surrealist
       # @return [String] camelized string.
       def camelize(snake_string, first_upper = true)
         if first_upper
-          snake_string.to_s
-            .gsub(/(?:^|_)([^_\s]+)/) { Regexp.last_match[1].capitalize }
+          snake_string.to_s.gsub(UNDERSCORE_REGEXP) { Regexp.last_match[1].capitalize }
         else
-          parts = snake_string.split('_', 2)
+          parts = snake_string.split(UNDERSCORE, 2)
           parts[0] << camelize(parts[1]) if parts.size > 1
-          parts[0] || ''
+          parts[0] || EMPTY_STRING
         end
       end
 
@@ -43,7 +51,7 @@ module Surrealist
       #
       # @return [String] extracted class
       def extract_class(string)
-        uncapitalize(string.split('::').last)
+        uncapitalize(string.split(NAMESPACES_SEPARATOR).last)
       end
 
       # Extracts n amount of classes from a namespaces and returns a nested hash.
@@ -62,8 +70,8 @@ module Surrealist
       # @return [Hash] a nested hash.
       def break_namespaces(klass, camelize:, nesting_level:)
         Surrealist::ExceptionRaiser.raise_invalid_nesting!(nesting_level) unless nesting_level > 0
-        arr = klass.split('::')
-        arr.last(nesting_level).reverse.inject({}) do |a, n|
+
+        klass.split(NAMESPACES_SEPARATOR).last(nesting_level).reverse.inject({}) do |a, n|
           camelize ? Hash[camelize(uncapitalize(n), false).to_sym => a] : Hash[underscore(n).to_sym => a]
         end
       end
