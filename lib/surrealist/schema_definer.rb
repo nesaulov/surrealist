@@ -2,7 +2,9 @@
 
 module Surrealist
   # A class that defines a method on the object that stores the schema.
-  class SchemaDefiner
+  module SchemaDefiner
+    ROM_REGEXP = /ROM::Struct/o
+    SCHEMA_TYPE_ERROR = 'Schema should be defined as a hash'.freeze
     # Defines an instance variable on the object that stores the schema.
     #
     # @param [Object] klass class of the object that needs to be surrealized.
@@ -13,12 +15,12 @@ module Surrealist
     #
     # @raise +Surrealist::InvalidSchemaError+ if schema was defined not through a hash.
     def self.call(klass, hash)
-      raise Surrealist::InvalidSchemaError, 'Schema should be defined as a hash' unless hash.is_a?(Hash)
+      raise Surrealist::InvalidSchemaError, SCHEMA_TYPE_ERROR unless hash.is_a?(Hash)
 
-      if klass.name =~ /ROM::Struct/
-        klass.class_variable_set('@@__surrealist_schema', hash)
+      if klass.name =~ ROM_REGEXP
+        klass.class_variable_set(Surrealist::CLASS_VARIABLE, hash)
       else
-        klass.instance_variable_set('@__surrealist_schema', hash)
+        klass.instance_variable_set(Surrealist::INSTANCE_VARIABLE, hash)
       end
     end
   end
