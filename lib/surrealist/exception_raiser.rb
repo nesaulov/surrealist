@@ -26,14 +26,18 @@ module Surrealist
   class InvalidNestingLevel < ArgumentError; end
 
   # A class that raises all Surrealist exceptions
-  class ExceptionRaiser
+  module ExceptionRaiser
+    CLASS_NAME_NOT_PASSED           = "Can't wrap schema in root key - class name was not passed".freeze
+    MUST_RESPOND_TO_EACH            = "Can't serialize collection - must respond to :each".freeze
+    CLASS_DOESNT_INCLUDE_SURREALIST = 'Class does not include Surrealist'.freeze
+
     class << self
       # Raises Surrealist::InvalidSchemaDelegation if destination of delegation does not
       # include Surrealist.
       #
       # @raise Surrealist::InvalidSchemaDelegation
       def raise_invalid_schema_delegation!
-        raise Surrealist::InvalidSchemaDelegation, 'Class does not include Surrealist'
+        raise Surrealist::InvalidSchemaDelegation, CLASS_DOESNT_INCLUDE_SURREALIST
       end
 
       # Raises Surrealist::UnknownSchemaError
@@ -50,14 +54,14 @@ module Surrealist
       #
       # @raise Surrealist::UnknownRootError
       def raise_unknown_root!
-        raise Surrealist::UnknownRootError, "Can't wrap schema in root key - class name was not passed"
+        raise Surrealist::UnknownRootError, CLASS_NAME_NOT_PASSED
       end
 
       # Raises Surrealist::InvalidCollectionError
       #
       # @raise Surrealist::InvalidCollectionError
       def raise_invalid_collection!
-        raise Surrealist::InvalidCollectionError, "Can't serialize collection - must respond to :each"
+        raise Surrealist::InvalidCollectionError, MUST_RESPOND_TO_EACH
       end
 
       # Raises ArgumentError if namespaces_nesting_level is not an integer.

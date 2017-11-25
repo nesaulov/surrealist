@@ -2,7 +2,9 @@
 
 module Surrealist
   # A helper class for deep copying and wrapping hashes.
-  class Copier
+  module Copier
+    EMPTY_HASH = {}.freeze
+
     class << self
       # Deeply copies the schema hash and wraps it if there is a need to.
       #
@@ -107,7 +109,7 @@ module Surrealist
       # @return [Hash] resulting hash.
       def inject_schema(hash, sub_hash)
         hash.each do |k, v|
-          v == {} ? hash[k] = sub_hash : inject_schema(v, sub_hash)
+          v == EMPTY_HASH ? hash[k] = sub_hash : inject_schema(v, sub_hash)
         end
       end
     end

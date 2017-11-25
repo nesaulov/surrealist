@@ -2,7 +2,7 @@
 
 module Surrealist
   # A helper class for hashes transformations.
-  class HashUtils
+  module HashUtils
     class << self
       # Converts hash's keys to camelBack keys.
       #

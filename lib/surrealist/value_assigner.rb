@@ -2,7 +2,7 @@
 
 module Surrealist
   # A class that determines the correct value to return for serialization. May descend recursively.
-  class ValueAssigner
+  module ValueAssigner
     class << self
       # Assigns value returned from a method to a corresponding key in the schema hash.
       #
