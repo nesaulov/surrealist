@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Surrealist
+  # A class that defines a method on then object that stores aliases map
   class AliasesDefiner
     ALIASES_TYPE_ERROR = 'Aliases should be defined as a hash'.freeze
 

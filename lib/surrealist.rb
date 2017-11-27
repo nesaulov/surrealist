@@ -127,7 +127,10 @@ module Surrealist
         carrier: carrier,
       )
 
-      hash = Builder.new(carrier: carrier, schema: normalized_schema, aliases: aliases, instance: instance).call
+      hash = Builder.new(carrier: carrier,
+                         schema: normalized_schema,
+                         aliases: aliases,
+                         instance: instance).call
       carrier.camelize ? Surrealist::HashUtils.camelize_hash(hash) : hash
     end
 
