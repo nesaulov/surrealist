@@ -55,6 +55,32 @@ module Surrealist
       SchemaDefiner.call(self, yield)
     end
 
+    # A DSL method to create aliases for json schema. Must reference a valid
+    # class that includes Surrealist
+    #
+    # @param [Hash] aliases
+    #
+    # @example DSL usage example
+    #   class Person
+    #     include Surrealist
+    #
+    #     json_aliases avatar: :image
+    #
+    #     json_shema do
+    #       { avatar: String }
+    #     end
+    #
+    #     def image
+    #       'http://image-host.com/image.jpg'
+    #     end
+    #   end
+    #
+    #   Person.new.surrealize
+    #   # => "{\"avatar\": \"http://image-host.com/image.jpg\"}"
+    def json_aliases(aliases)
+      AliasesDefiner.call(self, aliases)
+    end
+
     # A DSL method to delegate schema in a declarative style. Must reference a valid
     # class that includes Surrealist
     #

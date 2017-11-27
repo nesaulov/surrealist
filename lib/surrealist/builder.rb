@@ -8,10 +8,12 @@ module Surrealist
 
     # @param [Carrier] carrier instance of Surrealist::Carrier
     # @param [Hash] schema the schema defined in the object's class.
+    # @param [Hash] aliases the aliases map defined in the object's class.
     # @param [Object] instance the instance of the object which methods from the schema are called on.
-    def initialize(carrier:, schema:, instance:)
-      @carrier = carrier
-      @schema = schema
+    def initialize(carrier:, schema:, aliases: {}, instance:)
+      @carrier  = carrier
+      @schema   = schema
+      @aliases  = aliases
       @instance = instance
     end
 
@@ -29,7 +31,7 @@ module Surrealist
         if schema_value.is_a?(Hash)
           check_for_ar(schema, instance, schema_key, schema_value)
         else
-          ValueAssigner.assign(schema: Schema.new(schema_key, schema_value),
+          ValueAssigner.assign(schema:   Schema.new(find_right_key(schema_key), schema_value),
                                instance: instance) { |coerced_value| schema[schema_key] = coerced_value }
         end
       end
@@ -87,6 +89,15 @@ module Surrealist
           instance: i,
         )
       end
+    end
+
+    # Find right key for json value considering aliases
+    #
+    # @param [String] key Key defined in json_schema method
+    #
+    # @return [String] right schema key
+    def find_right_key(key)
+      @aliases.fetch(key, key)
     end
   end
 end

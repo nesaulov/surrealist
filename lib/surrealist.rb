@@ -10,6 +10,7 @@ require 'surrealist/exception_raiser'
 require 'surrealist/hash_utils'
 require 'surrealist/instance_methods'
 require 'surrealist/schema_definer'
+require 'surrealist/aliases_definer'
 require 'surrealist/string_utils'
 require 'surrealist/helper'
 require 'surrealist/type_helper'
@@ -26,6 +27,8 @@ module Surrealist
   PARENT_VARIABLE = '@__surrealist_schema_parent'.freeze
   # Class variable name that is set by SchemaDefiner
   CLASS_VARIABLE = '@@__surrealist_schema'.freeze
+  # Class variable name that stores aliases hash
+  ALIASES_INSTANCE_VARIABLE = '@__surrealist_aliases'.freeze
 
   class << self
     # @param [Class] base class to include/extend +Surrealist+.
@@ -114,6 +117,7 @@ module Surrealist
     #   # For more examples see README
     def build_schema(instance:, carrier:)
       schema = find_schema(instance)
+      aliases = find_aliases(instance)
 
       Surrealist::ExceptionRaiser.raise_unknown_schema!(instance) if schema.nil?
 
@@ -123,7 +127,7 @@ module Surrealist
         carrier: carrier,
       )
 
-      hash = Builder.new(carrier: carrier, schema: normalized_schema, instance: instance).call
+      hash = Builder.new(carrier: carrier, schema: normalized_schema, aliases: aliases, instance: instance).call
       carrier.camelize ? Surrealist::HashUtils.camelize_hash(hash) : hash
     end
 
@@ -133,6 +137,10 @@ module Surrealist
       delegatee = instance.class.instance_variable_get(PARENT_VARIABLE)
       maybe_schema = (delegatee || instance.class).instance_variable_get(INSTANCE_VARIABLE)
       maybe_schema || (instance.class.class_variable_get(CLASS_VARIABLE) if klass_var_defined?(instance))
+    end
+
+    def find_aliases(instance)
+      instance.class.instance_variable_get(ALIASES_INSTANCE_VARIABLE) || {}
     end
 
     def klass_var_defined?(instance)
