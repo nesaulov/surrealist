@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Surrealist
+  # A helper module that finds aliases and schemes in classes
   module VarsFinder
     # Instance variable name that is set by SchemaDefiner
     SCHEMA_INSTANCE_VARIABLE = '@__surrealist_schema'.freeze
@@ -13,7 +16,8 @@ module Surrealist
       def find_schema(instance)
         delegatee = instance.class.instance_variable_get(SCHEMA_PARENT_VARIABLE)
         maybe_schema = (delegatee || instance.class).instance_variable_get(SCHEMA_INSTANCE_VARIABLE)
-        maybe_schema || (instance.class.class_variable_get(SCHEMA_CLASS_VARIABLE) if klass_var_defined?(instance))
+        maybe_schema ||
+          (instance.class.class_variable_get(SCHEMA_CLASS_VARIABLE) if klass_var_defined?(instance))
       end
 
       def find_aliases(instance)
@@ -27,5 +31,4 @@ module Surrealist
       end
     end
   end
-
 end

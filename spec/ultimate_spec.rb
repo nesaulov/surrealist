@@ -3,7 +3,9 @@
 class Human
   include Surrealist
 
-  attr_reader :name, :last_name
+  attr_reader :first_name, :last_name
+
+  json_aliases name: :first_name
 
   json_schema do
     {
@@ -25,11 +27,14 @@ class Human
           count: Integer,
         },
       },
+      pet: {
+        name: String,
+      },
     }
   end
 
-  def initialize(name, last_name)
-    @name = name
+  def initialize(first_name, last_name)
+    @first_name = first_name
     @last_name = last_name
   end
 
@@ -38,7 +43,7 @@ class Human
   end
 
   def full_name
-    "#{name} #{last_name}"
+    "#{first_name} #{last_name}"
   end
 
   def credit_card
@@ -48,9 +53,14 @@ class Human
   def children
     Kid.find(person: 'John')
   end
+
+  def pet
+    Pet.new('Toby')
+  end
 end
 
 Properties = Struct.new(:gender, :age)
+Pet = Struct.new(:name)
 
 class CreditCard
   attr_reader :card_number, :card_holder
@@ -122,6 +132,8 @@ RSpec.describe Surrealist do
         }, 'children' => {
           'male' => { 'count' => 2 },
           'female' => { 'count' => 1 },
+        }, 'pet' => {
+          'name' => 'Toby',
         })
     end
 
@@ -129,7 +141,7 @@ RSpec.describe Surrealist do
       expect(human.build_schema)
         .to eq(name: 'John', last_name: 'Doe', properties: { gender: 'male', age: 42 },
                credit_card: { card_number: 1234, card_holder: 'John Doe' },
-               children: { male: { count: 2 }, female: { count: 1 } })
+               children: { male: { count: 2 }, female: { count: 1 } }, pet: { name: 'Toby' })
     end
 
     it 'camelizes' do
@@ -141,12 +153,14 @@ RSpec.describe Surrealist do
         }, 'children' => {
           'male' => { 'count' => 2 },
           'female' => { 'count' => 1 },
+        }, 'pet' => {
+          'name' => 'Toby',
         })
 
       expect(human.build_schema(camelize: true))
         .to eq(name: 'John', lastName: 'Doe', properties: { gender: 'male', age: 42 },
                creditCard: { cardNumber: 1234, cardHolder: 'John Doe' },
-               children: { male: { count: 2 }, female: { count: 1 } })
+               children: { male: { count: 2 }, female: { count: 1 } }, pet: { name: 'Toby' })
     end
 
     it 'includes root' do
@@ -159,6 +173,8 @@ RSpec.describe Surrealist do
           }, 'children'   => {
             'male'   => { 'count' => 2 },
             'female' => { 'count' => 1 },
+          }, 'pet' => {
+            'name' => 'Toby',
           }
         })
 
@@ -166,7 +182,8 @@ RSpec.describe Surrealist do
         .to eq(human: {
           name: 'John', lastName: 'Doe', properties: { gender: 'male', age: 42 },
           creditCard: { cardNumber: 1234, cardHolder: 'John Doe' },
-          children:   { male: { count: 2 }, female: { count: 1 } }
+          children:   { male: { count: 2 }, female: { count: 1 } },
+          pet: { name: 'Toby' }
         })
     end
   end

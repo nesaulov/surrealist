@@ -1,14 +1,18 @@
 class User
   include Surrealist
 
-  json_aliases avatar: :image
+  json_aliases avatar: :image, name: :login
 
   json_schema do
-    { avatar: String }
+    { avatar: String, name: String }
   end
 
   def image
     'http://some-image.host/avatar/neo.jpg'
+  end
+
+  def login
+    'neo'
   end
 end
 
@@ -42,29 +46,47 @@ end
 
 RSpec.describe Surrealist do
   describe '#json_aliases' do
-    subject(:json) { JSON.parse(instance.surrealize) }
+    describe 'instance' do
+      subject(:json) { JSON.parse(instance.surrealize) }
 
-    context 'with existing method' do
-      let(:instance) { User.new }
+      context 'with existing method' do
+        let(:instance) { User.new }
 
-      it 'uses alias method' do
-        expect(json).to eq('avatar' => 'http://some-image.host/avatar/neo.jpg')
+        it 'uses alias method' do
+          expect(json).to eq('avatar' => 'http://some-image.host/avatar/neo.jpg', 'name' => 'neo')
+        end
+      end
+
+      context 'with wrong method name' do
+        let(:instance) { WrongUser.new }
+
+        it 'raises exception' do
+          expect { json }.to raise_error Surrealist::UndefinedMethodError
+        end
+      end
+
+      context 'with useless alias' do
+        let(:instance) { UndecidedUser.new }
+
+        it 'ignores aliases' do
+          expect(json).to eq('image' => 'http://some-image.host/avatar/neo.jpg')
+        end
+      end
+
+      context 'with any params' do
+        let(:instance) { User.new }
+
+        it_behaves_like 'error is raised for invalid params: instance'
+        it_behaves_like 'error is not raised for valid params: instance'
       end
     end
 
-    context 'with wrong method name' do
-      let(:instance) { WrongUser.new }
+    describe 'collections' do
+      context 'with any params' do
+        let(:collection) { Array.new(3).map { User.new } }
 
-      it 'raises exception' do
-        expect { json }.to raise_error Surrealist::UndefinedMethodError
-      end
-    end
-
-    context 'with useless alias' do
-      let(:instance) { UndecidedUser.new }
-
-      it 'ignores aliases' do
-        expect(json).to eq('image' => 'http://some-image.host/avatar/neo.jpg')
+        it_behaves_like 'error is raised for invalid params: collection'
+        it_behaves_like 'error is not raised for valid params: collection'
       end
     end
   end

@@ -26,12 +26,12 @@ module Surrealist
     #   does not have a corresponding method on the object.
     #
     # @return [Hash] a hash that will be dumped into JSON.
-    def call(schema: @schema, instance: @instance)
+    def call(schema: @schema, aliases: @aliases, instance: @instance)
       schema.each do |schema_key, schema_value|
         if schema_value.is_a?(Hash)
           check_for_ar(schema, instance, schema_key, schema_value)
         else
-          ValueAssigner.assign(schema:   Schema.new(find_right_key(schema_key), schema_value),
+          ValueAssigner.assign(schema:   Schema.new(find_right_key(aliases, schema_key), schema_value),
                                instance: instance) { |coerced_value| schema[schema_key] = coerced_value }
         end
       end
@@ -55,8 +55,10 @@ module Surrealist
       if ar_collection?(instance, key)
         construct_collection(schema, instance, key, value)
       else
-        call(schema:   value,
-             instance: instance.respond_to?(key) ? instance.send(key) : instance)
+        nested_instance = instance.respond_to?(key) ? instance.send(key) : instance
+        call(schema: value,
+             aliases: Surrealist::VarsFinder.find_aliases(nested_instance),
+             instance: nested_instance)
       end
     end
 
@@ -96,8 +98,8 @@ module Surrealist
     # @param [String] key Key defined in json_schema method
     #
     # @return [String] right schema key
-    def find_right_key(key)
-      @aliases.fetch(key, key)
+    def find_right_key(aliases, key)
+      aliases.fetch(key, key)
     end
   end
 end
