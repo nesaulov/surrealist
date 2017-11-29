@@ -33,6 +33,7 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
   * [Bool and Any](#bool-and-any)
   * [Type errors](#type-errors)
   * [Undefined methods in schema](#undefined-methods-in-schema)
+  * [Aliases](#aliases)
   * [Other notes](#other-notes)
 * [Roadmap](#roadmap)  
 * [Contributing](#contributing)
@@ -443,6 +444,32 @@ end
 Car.new.surrealize
 # => Surrealist::UndefinedMethodError: undefined method `weight' for #<Car:0x007f9bc1dc7fa8>. You have probably defined a key in the schema that doesn't have a corresponding method.
 ```
+
+### Aliases
+Now you can define aliases for your schema.
+See example below:
+```ruby
+class Car
+  include Surrealist
+  
+  json_aliases name: :brand
+  
+  json_schema do
+    { name: String }
+  end
+  
+  def brand
+    'BMW'
+  end
+end
+
+Car.new.surrealize
+# => { "name": "BMW" }
+```
+
+**IMPORTANT** Aliases will be worked only for root object, not nested.
+If you want to use aliases for nested object you should define aliases
+for nested objects or collection item respectively.
 
 ### Other notes
 * nil values are allowed by default, so if you have, say, `age: String`, but the actual value is nil,
