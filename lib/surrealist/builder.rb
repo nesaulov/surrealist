@@ -10,7 +10,7 @@ module Surrealist
     # @param [Hash] schema the schema defined in the object's class.
     # @param [Hash] aliases the aliases map defined in the object's class.
     # @param [Object] instance the instance of the object which methods from the schema are called on.
-    def initialize(carrier:, schema:, aliases: {}, instance:)
+    def initialize(carrier:, schema:, aliases:, instance:)
       @carrier  = carrier
       @schema   = schema
       @aliases  = aliases

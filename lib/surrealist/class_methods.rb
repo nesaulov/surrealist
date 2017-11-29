@@ -115,7 +115,7 @@ module Surrealist
 
       Surrealist::ExceptionRaiser.raise_invalid_schema_delegation! unless Helper.surrealist?(klass)
 
-      instance_variable_set(Surrealist::PARENT_VARIABLE, klass)
+      instance_variable_set(Surrealist::VarsFinder::SCHEMA_PARENT_VARIABLE, klass)
     end
   end
 end

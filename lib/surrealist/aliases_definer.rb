@@ -15,7 +15,7 @@ module Surrealist
     def self.call(klass, aliases)
       raise Surrealist::InvalidAliasesError, ALIASES_TYPE_ERROR unless aliases.is_a?(Hash)
 
-      klass.instance_variable_set(Surrealist::ALIASES_INSTANCE_VARIABLE, aliases)
+      klass.instance_variable_set(Surrealist::VarsFinder::ALIASES_INSTANCE_VARIABLE, aliases)
     end
   end
 end
