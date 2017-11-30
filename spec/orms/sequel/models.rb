@@ -10,8 +10,8 @@ end
 
 DB.create_table :albums do
   primary_key :id
-  Integer :artist_id
-  String :title
+  foreign_key :artist_id, :artists, null: false
+  String :title, unique: true
   Integer :year
 end
 
@@ -31,7 +31,7 @@ class Album < Sequel::Model
   json_schema { { title: String, year: Integer } }
 end
 
-7.times { |i| Artist.insert(name: "Artist #{i}", age: i * 4) }
+7.times { |i| Artist.insert(name: "Artist #{i}", age: (18 + i * 4)) }
 
 Artist.each_with_index do |artist, i|
   artist.add_album(title: "Album #{i}", year: (1950 + i * 5))

@@ -151,19 +151,57 @@ RSpec.describe 'Sequel integration' do
         it_behaves_like 'error is raised for invalid params: instance'
       end
 
-      context 'where()' do
+      context '#where' do
         let(:instance) { Album.where(id: 1).first.artist }
 
         it { expect(instance.surrealize).to eq(serialized_instance) }
+      end
+
+      context '#association_join' do
+        let(:query) { Album.association_join(:artist).where { year < 1956 } }
+
+        context 'instance' do
+          let(:subject) { instance.surrealize }
+          let(:instance)               { query.first }
+          let(:serialized_instance)    { { title: 'Album 0', year: 1950 }.to_json }
+
+          it { is_expected.to eq(serialized_instance) }
+        end
+
+        context 'collection' do
+          let(:subject) { Surrealist.surrealize_collection(collection) }
+          let(:collection) { query.all }
+          let(:result) { [{ title: 'Album 0', year: 1950 }, { title: 'Album 1', year: 1955 }].to_json }
+
+          it { is_expected.to eq(result) }
+        end
       end
     end
 
     describe 'one to many' do
       let(:subject) { Surrealist.surrealize_collection(collection) }
-      let(:collection) { Artist.first.albums }
-      let(:serialized_collection) { [title: 'Album 0', year: 1950].to_json }
+      let(:collection) { Artist.with_pk(2).albums }
+      let(:serialized_collection) { [title: 'Album 1', year: 1955].to_json }
 
       it { is_expected.to eq(serialized_collection) }
+
+      context '#first' do
+        let(:subject) { collection.first.surrealize }
+
+        it { is_expected.to eq({ title: 'Album 1', year: 1955 }.to_json) }
+      end
+
+      context '#where' do
+        let(:collection) { Artist.where { year < 1970 }.albums }
+
+        # it { is_expected.to eq(serialized_collection) } ??
+      end
+
+      context '#association_join' do
+        let(:query) { Artist.association_join(:albums).where { age >= 16 } }
+
+        # it { binding.pry }
+      end
     end
   end
 end
