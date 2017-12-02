@@ -17,7 +17,7 @@ RSpec.describe 'Sequel integration' do
     end
 
     describe '#first({ condition })' do
-      let(:instance) { Artist.first(age: 4) }
+      let(:instance) { Artist.first(age: 22) }
 
       it { is_expected.to eq({ name: 'Artist 1' }.to_json) }
     end
@@ -29,7 +29,7 @@ RSpec.describe 'Sequel integration' do
     end
 
     describe '#[{ condition }]' do
-      let(:instance) { Artist[{ age: 12 }] }
+      let(:instance) { Artist[{ age: 30 }] }
 
       it { is_expected.to eq({ name: 'Artist 3' }.to_json) }
     end
@@ -41,7 +41,7 @@ RSpec.describe 'Sequel integration' do
     end
 
     describe '#last({ condition })' do
-      let(:instance) { Artist.last(age: 20) }
+      let(:instance) { Artist.last(age: 38) }
 
       it { is_expected.to eq({ name: 'Artist 5' }.to_json) }
     end
@@ -96,7 +96,7 @@ RSpec.describe 'Sequel integration' do
     end
 
     describe '#where{}' do
-      let(:collection) { Artist.where { age < 3 } }
+      let(:collection) { Artist.where { age < 19 } }
       let(:serialized_collection) { [name: 'Artist 0'].to_json }
 
       it { is_expected.to eq(serialized_collection) }
@@ -104,19 +104,19 @@ RSpec.describe 'Sequel integration' do
       it_behaves_like 'error is raised for invalid params: collection'
 
       context 'with #select' do
-        let(:collection) { Artist.select(:id, :name).where { age < 3 } }
+        let(:collection) { Artist.select(:id, :name).where { age < 19 } }
 
         it { is_expected.to eq(serialized_collection) }
       end
 
       context 'with #all' do
-        let(:collection) { Artist.where { age < 3 }.all }
+        let(:collection) { Artist.where { age < 19 }.all }
 
         it { is_expected.to eq(serialized_collection) }
       end
 
       context 'with #select and necessary field not selected' do
-        let(:collection) { Artist.select(:id, :age).where { age < 3 } }
+        let(:collection) { Artist.select(:id, :age).where { age < 19 } }
         let(:serialized_collection) { [name: nil].to_json }
 
         it('substitutes `null` as value') { is_expected.to eq(serialized_collection) }
@@ -162,10 +162,10 @@ RSpec.describe 'Sequel integration' do
 
         context 'instance' do
           let(:subject) { instance.surrealize }
-          let(:instance)               { query.first }
-          let(:serialized_instance)    { { title: 'Album 0', year: 1950 }.to_json }
+          let(:instance) { query.first }
+          let(:result) { { title: 'Album 0', year: 1950 }.to_json }
 
-          it { is_expected.to eq(serialized_instance) }
+          it { is_expected.to eq(result) }
         end
 
         context 'collection' do
@@ -192,15 +192,21 @@ RSpec.describe 'Sequel integration' do
       end
 
       context '#where' do
-        let(:collection) { Artist.where { year < 1970 }.albums }
+        let(:instance) { Artist.where(age: 22).albums }
 
-        # it { is_expected.to eq(serialized_collection) } ??
+        it { is_expected.to eq(serialized_collection) }
       end
 
       context '#association_join' do
-        let(:query) { Artist.association_join(:albums).where { age >= 16 } }
+        let(:query) { Artist.association_join(:albums).where { age >= 35 } }
 
-        # it { binding.pry }
+        context 'instance' do
+          let(:subject) { instance.surrealize }
+          let(:instance) { query.first }
+          let(:result) { { name: 'Artist 5' }.to_json }
+
+          it { is_expected.to eq(result) }
+        end
       end
     end
   end
