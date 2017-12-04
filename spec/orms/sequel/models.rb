@@ -22,10 +22,22 @@ DB.create_table :labels do
   String :label_name
 end
 
+DB.create_table :songs do
+  primary_key :id
+  String :length
+  String :title
+end
+
+DB.create_table :artists_songs do
+  foreign_key :artist_id, :artists, null: false
+  foreign_key :song_id, :songs, null: false
+end
+
 class Artist < Sequel::Model
   include Surrealist
 
   one_to_many :albums
+  many_to_many :songs
 
   json_schema { { name: String } }
 end
@@ -47,12 +59,23 @@ class Label < Sequel::Model
   json_schema { { label_name: String } }
 end
 
+class Song < Sequel::Model
+  include Surrealist
+
+  many_to_many :artists
+
+  json_schema { { title: String } }
+end
+
 7.times { |i| Artist.insert(name: "Artist #{i}", age: (18 + i * 4)) }
 
 Artist.each_with_index do |artist, i|
   artist.add_album(title: "Album #{i}", year: (1950 + i * 5))
+  2.times { |t| artist.add_song(title: "Song #{i}#{t}", length: (120 + i * 5)) }
 end
 
 Album.each_with_index do |album, i|
   Label.new(label_name: "Label #{i}", album_id: album.id).save
 end
+
+Song.each { |song| song.add_artist(Artist.last) }

@@ -256,5 +256,41 @@ RSpec.describe 'Sequel integration' do
         end
       end
     end
+
+    describe 'many to many' do
+      let(:subject) { Surrealist.surrealize_collection(collection) }
+
+      context 'Artist -> Songs' do
+        let(:collection) { Artist.first.songs }
+        let(:result) { [{ title: 'Song 00' }, { title: 'Song 01' }].to_json }
+
+        it { is_expected.to eq(result) }
+        it_behaves_like 'error is not raised for valid params: collection'
+        it_behaves_like 'error is raised for invalid params: collection'
+
+        context '.where' do
+          let(:collection) { Artist.where(songs: Song.last(2)) }
+          let(:result) { [name: 'Artist 6'].to_json }
+
+          it { is_expected.to eq(result) }
+        end
+      end
+
+      context 'Song -> Artists' do
+        let(:collection) { Song.first.artists }
+        let(:result) { [{ name: 'Artist 0' }, { name: 'Artist 6' }].to_json }
+
+        it { is_expected.to eq(result) }
+        it_behaves_like 'error is not raised for valid params: collection'
+        it_behaves_like 'error is raised for invalid params: collection'
+
+        context '.where' do
+          let(:collection) { Song.where(artists: Artist.first(1)) }
+          let(:result) { [{ title: 'Song 00' }, { title: 'Song 01' }].to_json }
+
+          it { is_expected.to eq(result) }
+        end
+      end
+    end
   end
 end
