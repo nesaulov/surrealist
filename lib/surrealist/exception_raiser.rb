@@ -7,6 +7,9 @@ module Surrealist
   # Error class for classes with +json_schema+ defined not as a hash.
   class InvalidSchemaError < ArgumentError; end
 
+  # Error class for classes with +json_aliases+ defined not as a hash.
+  class InvalidAliasesError < ArgumentError; end
+
   # Error class for +NoMethodError+.
   class UndefinedMethodError < ArgumentError; end
 

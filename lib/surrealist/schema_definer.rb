@@ -18,9 +18,9 @@ module Surrealist
       raise Surrealist::InvalidSchemaError, SCHEMA_TYPE_ERROR unless hash.is_a?(Hash)
 
       if klass.name =~ ROM_REGEXP
-        klass.class_variable_set(Surrealist::CLASS_VARIABLE, hash)
+        klass.class_variable_set(Surrealist::VarsFinder::SCHEMA_CLASS_VARIABLE, hash)
       else
-        klass.instance_variable_set(Surrealist::INSTANCE_VARIABLE, hash)
+        klass.instance_variable_set(Surrealist::VarsFinder::SCHEMA_INSTANCE_VARIABLE, hash)
       end
     end
   end
