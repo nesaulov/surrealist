@@ -89,7 +89,8 @@ module Surrealist
 
       Surrealist::ExceptionRaiser.raise_invalid_schema_delegation! unless Helper.surrealist?(klass)
 
-      instance_variable_set(Surrealist::PARENT_VARIABLE, klass)
+      hash = Surrealist::VarsFinder.find_schema(klass)
+      Surrealist::VarsFinder.set_schema(self, hash)
     end
   end
 end
