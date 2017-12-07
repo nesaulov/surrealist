@@ -14,18 +14,13 @@ require 'surrealist/string_utils'
 require 'surrealist/helper'
 require 'surrealist/type_helper'
 require 'surrealist/value_assigner'
+require 'surrealist/vars_finder'
 require 'json'
 
 # Main module that provides the +json_schema+ class method and +surrealize+ instance method.
 module Surrealist
   # Default namespaces nesting level
   DEFAULT_NESTING_LEVEL = 666
-  # Instance variable name that is set by SchemaDefiner
-  INSTANCE_VARIABLE = '@__surrealist_schema'.freeze
-  # Instance's parent instance variable name that is set by SchemaDefiner
-  PARENT_VARIABLE = '@__surrealist_schema_parent'.freeze
-  # Class variable name that is set by SchemaDefiner
-  CLASS_VARIABLE = '@@__surrealist_schema'.freeze
 
   class << self
     # @param [Class] base class to include/extend +Surrealist+.
@@ -113,7 +108,7 @@ module Surrealist
     #   # => { name: 'Nikita', age: 23 }
     #   # For more examples see README
     def build_schema(instance:, carrier:)
-      schema = find_schema(instance)
+      schema = Surrealist::VarsFinder.find_schema(instance.class)
 
       Surrealist::ExceptionRaiser.raise_unknown_schema!(instance) if schema.nil?
 
@@ -125,18 +120,6 @@ module Surrealist
 
       hash = Builder.new(carrier: carrier, schema: normalized_schema, instance: instance).call
       carrier.camelize ? Surrealist::HashUtils.camelize_hash(hash) : hash
-    end
-
-    private
-
-    def find_schema(instance)
-      delegatee = instance.class.instance_variable_get(PARENT_VARIABLE)
-      maybe_schema = (delegatee || instance.class).instance_variable_get(INSTANCE_VARIABLE)
-      maybe_schema || (instance.class.class_variable_get(CLASS_VARIABLE) if klass_var_defined?(instance))
-    end
-
-    def klass_var_defined?(instance)
-      instance.class.class_variable_defined?(CLASS_VARIABLE)
     end
   end
 end
