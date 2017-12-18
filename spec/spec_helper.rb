@@ -30,7 +30,7 @@ RSpec.configure do |config|
 end
 
 def ruby_22
-  ::RUBY_VERSION =~ /2.2.0/
+  ::RUBY_VERSION =~ /2.2/
 end
 
 module Types
