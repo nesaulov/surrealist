@@ -18,7 +18,7 @@ require 'dry-types'
 require 'pry'
 require 'rom'
 require 'rom-repository'
-require 'surrealist'
+require_relative '../lib/surrealist'
 
 require_relative 'support/shared_contexts/parameters_contexts'
 require_relative 'orms/active_record/models'
