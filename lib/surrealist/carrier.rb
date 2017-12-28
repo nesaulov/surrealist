@@ -24,7 +24,7 @@ module Surrealist
       new(args).sanitize!
     end
 
-    def initialize(args)
+    def initialize(**args)
       @camelize                 = args.delete(:camelize) || false
       @include_root             = args.delete(:include_root) || false
       @include_namespaces       = args.delete(:include_namespaces) || false
