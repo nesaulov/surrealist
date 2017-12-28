@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'json'
 require 'surrealist/any'
 require 'surrealist/bool'
 require 'surrealist/builder'
@@ -8,14 +9,14 @@ require 'surrealist/class_methods'
 require 'surrealist/copier'
 require 'surrealist/exception_raiser'
 require 'surrealist/hash_utils'
+require 'surrealist/helper'
 require 'surrealist/instance_methods'
 require 'surrealist/schema_definer'
+require 'surrealist/serializer'
 require 'surrealist/string_utils'
-require 'surrealist/helper'
 require 'surrealist/type_helper'
 require 'surrealist/value_assigner'
 require 'surrealist/vars_finder'
-require 'json'
 
 # Main module that provides the +json_schema+ class method and +surrealize+ instance method.
 module Surrealist

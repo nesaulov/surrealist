@@ -49,6 +49,17 @@ module Surrealist
     #   # => "{\"name\":\"Nikita\",\"age\":23}"
     #   # For more examples see README
     def surrealize(camelize: false, include_root: false, include_namespaces: false, root: nil, namespaces_nesting_level: DEFAULT_NESTING_LEVEL) # rubocop:disable Metrics/LineLength
+      if self.class.instance_variable_get('@__wrap_surrealist')
+        serializer = self.class.instance_variable_get('@__surrealist_serializer')
+        return serializer.new(self).surrealize(
+          root:                     root,
+          camelize:                 camelize,
+          include_root:             include_root,
+          include_namespaces:       include_namespaces,
+          namespaces_nesting_level: namespaces_nesting_level,
+        )
+      end
+
       JSON.dump(
         build_schema(
           camelize: camelize,

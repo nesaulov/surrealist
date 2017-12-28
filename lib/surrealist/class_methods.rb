@@ -92,5 +92,15 @@ module Surrealist
       hash = Surrealist::VarsFinder.find_schema(klass)
       Surrealist::VarsFinder.set_schema(self, hash)
     end
+
+    def surrealize_with(klass)
+      # delegate_surrealization_to klass
+      if klass < Surrealist::Serializer
+        instance_variable_set('@__surrealist_serializer', klass)
+        instance_variable_set('@__wrap_surrealist', true)
+      else
+        raise ArgumentError, "#{klass} should be inherited from Surrealist::Serializer"
+      end
+    end
   end
 end
