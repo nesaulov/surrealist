@@ -35,6 +35,6 @@ RSpec.describe Surrealist::Serializer do
   describe '.surrealize_with' do
     let(:cat) { Koshka.new('kitty').surrealize }
 
-    it { expect(cat).to eq({ name: 'kitty', size: 3 }.to_json) }
+    it { expect(cat).to eq({ name: 'kitty', size: 5 }.to_json) }
   end
 end
