@@ -20,16 +20,16 @@ module Surrealist
     # @raise ArgumentError if types of arguments are wrong.
     #
     # @return [Carrier] self if type checks were passed.
-    def self.call(camelize:, include_root:, include_namespaces:, root:, namespaces_nesting_level:)
-      new(camelize, include_root, include_namespaces, root, namespaces_nesting_level).sanitize!
+    def self.call(**args)
+      new(args).sanitize!
     end
 
-    def initialize(camelize, include_root, include_namespaces, root, namespaces_nesting_level)
-      @camelize                 = camelize
-      @include_root             = include_root
-      @include_namespaces       = include_namespaces
-      @root                     = root
-      @namespaces_nesting_level = namespaces_nesting_level
+    def initialize(**args)
+      @camelize                 = args.delete(:camelize) || false
+      @include_root             = args.delete(:include_root) || false
+      @include_namespaces       = args.delete(:include_namespaces) || false
+      @root                     = args.delete(:root) || nil
+      @namespaces_nesting_level = args.delete(:namespaces_nesting_level) || DEFAULT_NESTING_LEVEL
     end
 
     # Performs type checks
