@@ -94,7 +94,6 @@ module Surrealist
     end
 
     def surrealize_with(klass)
-      # delegate_surrealization_to klass
       if klass < Surrealist::Serializer
         instance_variable_set('@__surrealist_serializer', klass)
         instance_variable_set('@__wrap_surrealist', true)

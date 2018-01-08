@@ -8,8 +8,17 @@ module Surrealist
     attr_reader :object
 
     def initialize(object)
-      # binding.pry
       @object = object
+    end
+
+    def surrealize(**args)
+      if object.respond_to?(:each)
+        # binding.pry
+        Surrealist.surrealize_collection(object, args)
+      else
+        # binding.pry
+        # object.surrealize(args)
+      end
     end
 
     private

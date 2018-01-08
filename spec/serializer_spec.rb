@@ -2,39 +2,52 @@
 
 require 'surrealist'
 
-class KoshkaSerializer < Surrealist::Serializer
+class DogeSerializer < Surrealist::Serializer
   json_schema do
-    { name: String, size: Integer }
+    { name: String, name_length: Integer }
   end
 
-  def size
+  def name_length
     name.length
   end
 end
 
-class Koshka
+class Doge
   include Surrealist
+  attr_reader :name
 
-  surrealize_with KoshkaSerializer
+  surrealize_with DogeSerializer
 
   def initialize(name)
     @name = name
   end
-
-  attr_reader :name
 end
 
 RSpec.describe Surrealist::Serializer do
-  describe 'method missing?' do
-    let(:cat) { Koshka.new('cat') }
-    subject(:kek) { KoshkaSerializer.new(cat).surrealize }
+  describe 'Explicit surrealization through `Serializer.new`' do
+    describe 'instance' do
+      let(:instance) { Doge.new('John') }
+      subject(:json) { DogeSerializer.new(instance).surrealize }
 
-    it { is_expected.to eq({ name: 'cat', size: 3 }.to_json) }
+      it { is_expected.to eq({ name: 'John', name_length: 4 }.to_json) }
+      # it_behaves_like 'error is raised for invalid params: instance'
+      # it_behaves_like 'error is not raised for valid params: instance'
+    end
+
+    describe 'collection' do
+      let(:collection) { [Doge.new('John'), Doge.new('Josh')] }
+      subject(:json) { DogeSerializer.new(collection).surrealize }
+
+      it 'works' do
+        expect(json)
+          .to eq([{ name: 'John', name_lengh: 4 }, { name: 'Josh', name_lenght: 4 }].to_json)
+      end
+    end
   end
 
-  describe '.surrealize_with' do
-    let(:cat) { Koshka.new('kitty').surrealize }
+  describe 'Implicit surrealization using .surrealize_with' do
+    let(:cat) { Doge.new('George').surrealize }
 
-    it { expect(cat).to eq({ name: 'kitty', size: 5 }.to_json) }
+    it { expect(cat).to eq({ name: 'George', name_length: 6 }.to_json) }
   end
 end
