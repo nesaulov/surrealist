@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
+require_relative '../lib/surrealist'
 require 'bundler/setup'
-require 'surrealist'
 require 'pry'
 
 Pry.start
