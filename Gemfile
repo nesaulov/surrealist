@@ -6,8 +6,6 @@ gemspec
 group :development, :test do
   gem 'activerecord'
   gem 'coveralls', require: false
-  gem 'data_mapper'
-  gem 'dm-sqlite-adapter'
   gem 'dry-struct'
   gem 'dry-types'
   gem 'rom', '~> 4.0'
