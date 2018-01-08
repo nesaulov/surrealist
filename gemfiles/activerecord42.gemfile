@@ -5,8 +5,6 @@ source 'https://rubygems.org'
 group :development, :test do
   gem 'activerecord', '~> 4.2'
   gem 'coveralls', require: false
-  gem 'data_mapper'
-  gem 'dm-sqlite-adapter'
   gem 'dry-struct'
   gem 'dry-types'
   gem 'rom', '~> 3.0'
