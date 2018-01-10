@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 class DogeSerializer < Surrealist::Serializer
-  json_schema do
-    { name: String, name_length: Integer }
-  end
+  json_schema { { name: String, name_length: Integer } }
 
   private def name_length
     name.length
