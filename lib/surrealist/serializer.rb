@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module Surrealist
+  # Abstract class to be inherited from
   class Serializer
     extend Surrealist::ClassMethods
-    include Surrealist::InstanceMethods
 
     attr_reader :object
 
@@ -13,22 +13,24 @@ module Surrealist
 
     def surrealize(**args)
       if object.respond_to?(:each)
-        # binding.pry
         Surrealist.surrealize_collection(object, args)
       else
-        # binding.pry
-        # object.surrealize(args)
+        Surrealist.surrealize(instance: self, **args)
       end
+    end
+
+    def build_schema(**args)
+      Surrealist.build_schema(instance: self, **args)
     end
 
     private
 
     def method_missing(method, *args, &block)
-      object.send(method, *args, &block)
+      object.public_send(method, *args, &block) || super
     end
 
     def respond_to_missing?(method, include_private = false)
-      super
+      object.respond_to?(method) || super
     end
   end
 end
