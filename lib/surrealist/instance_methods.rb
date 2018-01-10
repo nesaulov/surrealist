@@ -59,9 +59,7 @@ module Surrealist
 
     # Invokes +Surrealist+'s class method +build_schema+
     def build_schema(**args)
-      carrier = Surrealist::Carrier.call(args)
-
-      Surrealist.build_schema(instance: self, carrier: carrier)
+      Surrealist.build_schema(instance: self, **args)
     end
   end
 end
