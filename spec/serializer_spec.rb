@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'surrealist'
-
 class DogeSerializer < Surrealist::Serializer
   json_schema do
     { name: String, name_length: Integer }

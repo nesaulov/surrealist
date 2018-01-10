@@ -93,6 +93,11 @@ module Surrealist
       Surrealist::VarsFinder.set_schema(self, hash)
     end
 
+    # A DSL method for defining a class that holds serialization logic.
+    #
+    # @param [Class] klass a class that should inherit form Surrealist::Serializer
+    #
+    # @raise ArgumentError if Surrealist::Serializer is not found in the ancestors chain
     def surrealize_with(klass)
       if klass < Surrealist::Serializer
         instance_variable_set('@__surrealist_serializer', klass)
