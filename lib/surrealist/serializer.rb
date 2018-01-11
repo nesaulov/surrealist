@@ -31,16 +31,18 @@ module Surrealist
   class Serializer
     extend Surrealist::ClassMethods
 
-    attr_reader :object
-
-    def initialize(object)
+    # NOTE: #context will work only when using serializer explicitly,
+    #   e.g `CatSerializer.new(Cat.new(3), food: CatFood.new)`
+    #   And then food will be available inside serializer via `context[:food]`
+    def initialize(object, **context)
       @object = object
+      @context = context
     end
 
     # Checks whether object is a collection or an instance and serializes it
     def surrealize(**args)
       if object.respond_to?(:each)
-        Surrealist.surrealize_collection(object, args)
+        Surrealist.surrealize_collection(object, args.merge(context: context))
       else
         Surrealist.surrealize(instance: self, **args)
       end
@@ -53,9 +55,11 @@ module Surrealist
 
     private
 
+    attr_reader :object, :context
+
     # Methods not found inside serializer will be invoked on the object
     def method_missing(method, *args, &block)
-      object.public_send(method, *args, &block) || super
+      object.public_send(method, *args, &block)
     end
 
     # Methods not found inside serializer will be invoked on the object
