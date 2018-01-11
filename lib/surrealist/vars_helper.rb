@@ -1,6 +1,6 @@
 module Surrealist
   # Module for finding and setting hash into vars
-  module VarsFinder
+  module VarsHelper
     # Instance variable name that is set by SchemaDefiner
     INSTANCE_VARIABLE = '@__surrealist_schema'.freeze
     # Instance's parent instance variable name that is set by SchemaDefiner
@@ -9,6 +9,8 @@ module Surrealist
     CLASS_VARIABLE = '@@__surrealist_schema'.freeze
     # Regexp to resolve ROM structure
     ROM_REGEXP = /ROM::Struct/o
+    # Instance variable that keeps serializer class
+    SERIALIZER_CLASS = '@__surrealist_serializer'.freeze
 
     class << self
       # Find the schema
@@ -34,6 +36,23 @@ module Surrealist
         else
           klass.instance_variable_set(INSTANCE_VARIABLE, hash)
         end
+      end
+
+      # Checks if there is a serializer defined for a given class and returns it
+      #
+      # @param [Class] klass a class to check
+      #
+      # @return [Class | nil]
+      def find_serializer(klass)
+        klass.instance_variable_get(SERIALIZER_CLASS)
+      end
+
+      # Sets a serializer for class
+      #
+      # @param [Class] self_class class of object that points to serializer
+      # @param [Class] serializer_class class of serializer
+      def set_serializer(self_class, serializer_class)
+        self_class.instance_variable_set(SERIALIZER_CLASS, serializer_class)
       end
 
       private

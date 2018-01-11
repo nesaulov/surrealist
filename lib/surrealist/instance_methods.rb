@@ -49,8 +49,7 @@ module Surrealist
     #   # => "{\"name\":\"Nikita\",\"age\":23}"
     #   # For more examples see README
     def surrealize(**args)
-      if self.class.instance_variable_get('@__wrap_surrealist')
-        serializer = self.class.instance_variable_get('@__surrealist_serializer')
+      if (serializer = Surrealist::VarsHelper.find_serializer(self.class))
         return serializer.new(self).surrealize(args)
       end
 

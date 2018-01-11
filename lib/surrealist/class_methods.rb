@@ -89,8 +89,8 @@ module Surrealist
 
       Surrealist::ExceptionRaiser.raise_invalid_schema_delegation! unless Helper.surrealist?(klass)
 
-      hash = Surrealist::VarsFinder.find_schema(klass)
-      Surrealist::VarsFinder.set_schema(self, hash)
+      hash = Surrealist::VarsHelper.find_schema(klass)
+      Surrealist::VarsHelper.set_schema(self, hash)
     end
 
     # A DSL method for defining a class that holds serialization logic.
@@ -100,8 +100,7 @@ module Surrealist
     # @raise ArgumentError if Surrealist::Serializer is not found in the ancestors chain
     def surrealize_with(klass)
       if klass < Surrealist::Serializer
-        instance_variable_set('@__surrealist_serializer', klass)
-        instance_variable_set('@__wrap_surrealist', true)
+        Surrealist::VarsHelper.set_serializer(self, klass)
       else
         raise ArgumentError, "#{klass} should be inherited from Surrealist::Serializer"
       end

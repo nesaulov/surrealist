@@ -16,7 +16,7 @@ module Surrealist
     def self.call(klass, hash)
       raise Surrealist::InvalidSchemaError, SCHEMA_TYPE_ERROR unless hash.is_a?(Hash)
 
-      Surrealist::VarsFinder.set_schema(klass, hash)
+      Surrealist::VarsHelper.set_schema(klass, hash)
     end
   end
 end

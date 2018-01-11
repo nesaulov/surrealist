@@ -16,7 +16,7 @@ require_relative 'surrealist/serializer'
 require_relative 'surrealist/string_utils'
 require_relative 'surrealist/type_helper'
 require_relative 'surrealist/value_assigner'
-require_relative 'surrealist/vars_finder'
+require_relative 'surrealist/vars_helper'
 
 # Main module that provides the +json_schema+ class method and +surrealize+ instance method.
 module Surrealist
@@ -122,7 +122,7 @@ module Surrealist
     #   # For more examples see README
     def build_schema(instance:, **args)
       carrier = Surrealist::Carrier.call(args)
-      schema = Surrealist::VarsFinder.find_schema(instance.class)
+      schema = Surrealist::VarsHelper.find_schema(instance.class)
 
       Surrealist::ExceptionRaiser.raise_unknown_schema!(instance) if schema.nil?
 
@@ -148,9 +148,8 @@ module Surrealist
     #   provided in the object's class. Values will be taken from the return values
     #   of appropriate methods from the object.
     def __build_schema(object, **args)
-      if object.class.instance_variable_get('@__wrap_surrealist')
-        serializer = object.class.instance_variable_get('@__surrealist_serializer')
-        serializer.new(object).build_schema(args)
+      if (serializer = Surrealist::VarsHelper.find_serializer(object.class))
+        serializer.new(object, args[:context].to_h).build_schema(args)
       else
         build_schema(instance: object, **args)
       end
