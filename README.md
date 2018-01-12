@@ -32,6 +32,7 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
   * [Root](#root)
   * [Bool and Any](#bool-and-any)
   * [Type errors](#type-errors)
+  * [Defining custom serializers](#defining-custom-serializers)
   * [Undefined methods in schema](#undefined-methods-in-schema)
   * [Other notes](#other-notes)
 * [Roadmap](#roadmap)  
@@ -427,6 +428,73 @@ CreditCard.new.surrealize
 # => Surrealist::InvalidTypeError: Wrong type for key `number`. Expected Integer, got String.
 ```
 
+### Defining custom serializers
+If you need to keep serialization logic separately from the model, you can define a class that
+will inherit from `Surrealist::Serializer`. To point to that class from the model use a class method
+`.surrealize_with`. Example usage:
+``` ruby
+class CatSerializer < Surrealist::Serializer
+  json_schema { { age: Integer, age_group: String } }
+ 
+  def age_group
+    age <= 5 ? 'kitten' : 'cat'
+  end
+end
+ 
+class Cat
+  include Surrealist
+  attr_reader :age
+ 
+  surrealize_with CatSerializer
+ 
+  def initialize(age)
+    @age = age
+  end
+end
+ 
+Cat.new(12).surrealize # Implicit usage through .surrealize_with
+# => '{ "age": 12, "age_group": "cat" }'
+ 
+CatSerializer.new(Cat.new(3)).surrealize # explicit usage of CatSerializer
+# => '{ "age": 3, "age_group": "kitten" }'
+```
+The constructor of `Surrealist::Serializer` takes two arguments: serializable model (or collection) and 
+a context hash. So if there is an object that is not coupled to serializable model
+but it is still necessary for constructing JSON, you can pass it to constructor as a hash. It will 
+be available in the serializer in the `context` hash. 
+``` ruby
+class IncomeSerializer < Surrealist::Serializer
+  json_schema { { amount: Integer } }
+  
+  def amount
+    current_user.guest? ? 100000000 : object.amount
+  end
+  
+  def current_user
+    context[:current_user]
+  end
+end
+ 
+class Income
+  include Surrealist
+  surrealize_with IncomeSerializer
+   
+  attr_reader :amount
+   
+  def initialize(amount)
+    @amount = amount
+  end  
+end
+ 
+income = Income.new(200)
+IncomeSerializer.new(income, current_user: GuestUser.new).surrealize
+# => '{ "amount": 100000000 }'
+ 
+IncomeSerializer.new(income, current_user: User.find(3)).surrealize
+# => '{ "amount": 200 }'
+```
+
+
 ### Undefined methods in schema
 `Surrealist::UndefinedMethodError` is thrown if a key defined in the schema does not have
 a corresponding method defined in the object.
@@ -452,7 +520,6 @@ type check will be passed. If you want to be strict about `nil`s consider using 
 ## Roadmap
 Here is a list of features that are not implemented yet (contributions are welcome):
 * [Benchmarks](https://github.com/nesaulov/surrealist/issues/40)
-* [Sequel integration](https://github.com/nesaulov/surrealist/issues/45)
 
 ## Contributing
 Bug reports and pull requests are welcome on GitHub at https://github.com/nesaulov/surrealist.
