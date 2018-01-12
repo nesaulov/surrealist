@@ -53,8 +53,6 @@ class WrongSerializer
   json_schema { { name: String } }
 end
 
-
-
 RSpec.describe Surrealist::Serializer do
   describe 'Explicit surrealization through `Serializer.new`' do
     describe 'instance' do
