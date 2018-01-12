@@ -48,6 +48,13 @@ class Pancake
   end
 end
 
+class WrongSerializer
+  include Surrealist
+  json_schema { { name: String } }
+end
+
+
+
 RSpec.describe Surrealist::Serializer do
   describe 'Explicit surrealization through `Serializer.new`' do
     describe 'instance' do
@@ -108,6 +115,20 @@ RSpec.describe Surrealist::Serializer do
       subject(:json) { Surrealist.surrealize_collection(collection) }
 
       it { is_expected.to eq expectation }
+    end
+  end
+
+  describe 'Wrong class specified in .surrealize_with' do
+    [WrongSerializer, Integer, ActiveRecord].each do |klass|
+      it 'raises error' do
+        expect do
+          Class.new do
+            include Surrealist
+
+            surrealize_with klass
+          end
+        end.to raise_error(ArgumentError, "#{klass} should be inherited from Surrealist::Serializer")
+      end
     end
   end
 end
