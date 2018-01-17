@@ -141,3 +141,6 @@ Style/TrailingCommaInArguments:
 
 Style/TrailingCommaInLiteral:
   EnforcedStyleForMultiline: comma
+
+Style/MethodMissing:
+  Enabled: false

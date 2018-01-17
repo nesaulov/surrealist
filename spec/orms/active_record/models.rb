@@ -89,6 +89,11 @@ ActiveRecord::Schema.define do
     table.column :name, :string
     table.integer :question_id
   end
+
+  create_table :trees do |table|
+    table.column :name, :string
+    table.column :height, :int
+  end
 end
 
 def name_string
@@ -349,9 +354,19 @@ class Answer < ActiveRecord::Base
   json_schema { { name: String, question: Question } }
 end
 
-# def name_string
-#   ('a'..'z').to_a.sample(8).join
-# end
+# Using a separate class
+
+TreeSerializer = Class.new(Surrealist::Serializer) do
+  json_schema { { name: String, height: Integer, color: String } }
+
+  def color; 'green'; end
+end
+
+class Tree < ActiveRecord::Base
+  include Surrealist
+
+  surrealize_with TreeSerializer
+end
 
 2.times { Executive.create(name: name_string) }
 3.times { Manager.create(name: name_string) }
@@ -363,3 +378,6 @@ PromCouple.create(prom_id: Prom.first.id, prom_queen: name_string)
 PromKing.create(prom_king_name: name_string, prom_couple_id: PromCouple.first.id)
 5.times { Question.create(name: name_string) }
 10.times { Answer.create(name: name_string, question_id: Question.all.sample.id) }
+
+Tree.create!(name: 'Oak', height: 200)
+Tree.create!(name: 'Pine', height: 140)

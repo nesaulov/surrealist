@@ -1,21 +1,22 @@
 # frozen_string_literal: true
 
-require 'surrealist/any'
-require 'surrealist/bool'
-require 'surrealist/builder'
-require 'surrealist/carrier'
-require 'surrealist/class_methods'
-require 'surrealist/copier'
-require 'surrealist/exception_raiser'
-require 'surrealist/hash_utils'
-require 'surrealist/instance_methods'
-require 'surrealist/schema_definer'
-require 'surrealist/string_utils'
-require 'surrealist/helper'
-require 'surrealist/type_helper'
-require 'surrealist/value_assigner'
-require 'surrealist/vars_finder'
 require 'json'
+require_relative 'surrealist/any'
+require_relative 'surrealist/bool'
+require_relative 'surrealist/builder'
+require_relative 'surrealist/carrier'
+require_relative 'surrealist/class_methods'
+require_relative 'surrealist/copier'
+require_relative 'surrealist/exception_raiser'
+require_relative 'surrealist/hash_utils'
+require_relative 'surrealist/helper'
+require_relative 'surrealist/instance_methods'
+require_relative 'surrealist/schema_definer'
+require_relative 'surrealist/serializer'
+require_relative 'surrealist/string_utils'
+require_relative 'surrealist/type_helper'
+require_relative 'surrealist/value_assigner'
+require_relative 'surrealist/vars_helper'
 
 # Main module that provides the +json_schema+ class method and +surrealize+ instance method.
 module Surrealist
@@ -30,15 +31,19 @@ module Surrealist
     end
 
     # Iterates over a collection of Surrealist Objects and
-    # maps surrealize to each record.
+    # maps surrealize to each object.
     #
     # @param [Object] collection of instances of a class that has +Surrealist+ included.
-    # @param [Boolean] camelize optional argument for converting hash to camelBack.
-    # @param [Boolean] include_root optional argument for having the root key of the resulting hash
+    # @param [Boolean] [optional] camelize optional argument for converting hash to camelBack.
+    # @param [Boolean] [optional] include_root optional argument for having the root key of the resulting hash
     #   as instance's class name.
-    # @param [String] root optional argument for using a specified root key for the resulting hash
+    # @param [Boolean] [optional] include_namespaces optional argument for having root key as a nested hash of
+    #   instance's namespaces. Animal::Cat.new.surrealize -> (animal: { cat: { weight: '3 kilos' } })
+    # @param [String] [optional] root optional argument for using a specified root key for the hash.
+    # @param [Integer] [optional] namespaces_nesting_level level of namespaces nesting.
+    # @param [Boolean] [optional] raw optional argument for specifying the expected output format.
     #
-    # @return [Object] the Collection#map with elements being json-formatted string corresponding
+    # @return [JSON | Hash] the Collection#map with elements being json-formatted string corresponding
     #   to the schema provided in the object's class. Values will be taken from the return values
     #   of appropriate methods from the object.
     #
@@ -48,30 +53,38 @@ module Surrealist
     #   Surrealist.surrealize_collection(User.all)
     #   # => "[{\"name\":\"Nikita\",\"age\":23}, {\"name\":\"Alessandro\",\"age\":24}]"
     #   # For more examples see README
-    def surrealize_collection(collection, camelize: false, include_root: false, include_namespaces: false, root: nil, namespaces_nesting_level: DEFAULT_NESTING_LEVEL, raw: false) # rubocop:disable Metrics/LineLength
+    def surrealize_collection(collection, **args)
       raise Surrealist::ExceptionRaiser.raise_invalid_collection! unless collection.respond_to?(:each)
 
-      result = collection.map do |record|
-        if Helper.surrealist?(record.class)
-          record.build_schema(
-            camelize: camelize,
-            include_root: include_root,
-            include_namespaces: include_namespaces,
-            root: root,
-            namespaces_nesting_level: namespaces_nesting_level,
-          )
-        else
-          record
-        end
+      result = collection.map do |object|
+        Helper.surrealist?(object.class) ? __build_schema(object, args) : object
       end
 
-      raw ? result : JSON.dump(result)
+      args[:raw] ? result : JSON.dump(result)
+    end
+
+    # Dumps the object's methods corresponding to the schema
+    # provided in the object's class and type-checks the values.
+    #
+    # @param [Boolean] [optional] camelize optional argument for converting hash to camelBack.
+    # @param [Boolean] [optional] include_root optional argument for having the root key of the resulting hash
+    #   as instance's class name.
+    # @param [Boolean] [optional] include_namespaces optional argument for having root key as a nested hash of
+    #   instance's namespaces. Animal::Cat.new.surrealize -> (animal: { cat: { weight: '3 kilos' } })
+    # @param [String] [optional] root optional argument for using a specified root key for the hash
+    # @param [Integer] [optional] namespaces_nesting_level level of namespaces nesting.
+    #
+    # @return [String] a json-formatted string corresponding to the schema
+    #   provided in the object's class. Values will be taken from the return values
+    #   of appropriate methods from the object.
+    def surrealize(instance:, **args)
+      JSON.dump(build_schema(instance: instance, **args))
     end
 
     # Builds hash from schema provided in the object's class and type-checks the values.
     #
     # @param [Object] instance of a class that has +Surrealist+ included.
-    # @param [Object] carrier instance of Carrier class that carries arguments passed to +surrealize+
+    # @param [Hash] args optional arguments
     #
     # @return [Hash] a hash corresponding to the schema
     #   provided in the object's class. Values will be taken from the return values
@@ -107,8 +120,9 @@ module Surrealist
     #   User.new.build_schema
     #   # => { name: 'Nikita', age: 23 }
     #   # For more examples see README
-    def build_schema(instance:, carrier:)
-      schema = Surrealist::VarsFinder.find_schema(instance.class)
+    def build_schema(instance:, **args)
+      carrier = Surrealist::Carrier.call(args)
+      schema = Surrealist::VarsHelper.find_schema(instance.class)
 
       Surrealist::ExceptionRaiser.raise_unknown_schema!(instance) if schema.nil?
 
@@ -120,6 +134,25 @@ module Surrealist
 
       hash = Builder.new(carrier: carrier, schema: normalized_schema, instance: instance).call
       carrier.camelize ? Surrealist::HashUtils.camelize_hash(hash) : hash
+    end
+
+    private
+
+    # Checks if there is a serializer (< Surrealist::Serializer) defined for the object and delegates
+    # surrealization to it.
+    #
+    # @param [Object] object serializable object
+    # @param [Hash] args optional arguments passed to +surrealize_collection+
+    #
+    # @return [Hash] a hash corresponding to the schema
+    #   provided in the object's class. Values will be taken from the return values
+    #   of appropriate methods from the object.
+    def __build_schema(object, **args)
+      if (serializer = Surrealist::VarsHelper.find_serializer(object.class))
+        serializer.new(object, args[:context].to_h).build_schema(args)
+      else
+        build_schema(instance: object, **args)
+      end
     end
   end
 end

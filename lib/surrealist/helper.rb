@@ -9,7 +9,7 @@ module Surrealist
     #
     # @return [Boolean] if Surrealist is included in class.
     def self.surrealist?(klass)
-      klass < Surrealist
+      klass < Surrealist || klass < Surrealist::Serializer
     end
   end
 end

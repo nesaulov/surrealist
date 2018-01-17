@@ -208,6 +208,16 @@ RSpec.describe 'ActiveRecord integration' do
                           'Can\'t serialize collection - must respond to :each')
       end
     end
+
+    describe 'with serializer defined in a separate class' do
+      subject(:json) { Surrealist.surrealize_collection(Tree.all) }
+      let(:expectation) do
+        [{ name: 'Oak', height: 200, color: 'green' },
+         { name: 'Pine', height: 140, color: 'green' }].to_json
+      end
+
+      it { is_expected.to eq(expectation) }
+    end
   end
 
   describe 'ActiveRecord instance #surrealize' do
@@ -284,6 +294,13 @@ RSpec.describe 'ActiveRecord integration' do
             .to raise_error NoMethodError, no_method_message
         end
       end
+    end
+
+    describe 'with serializer defined in a separate class' do
+      subject(:json) { Tree.find_by(name: 'Oak').surrealize }
+      let(:expectation) { { name: 'Oak', height: 200, color: 'green' }.to_json }
+
+      it { is_expected.to eq(expectation) }
     end
   end
 end
