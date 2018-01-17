@@ -1,8 +1,20 @@
+# 0.4.0
+
+## Added
+* Introduce an abstract serializer class (@nesaulov) #61
+* Full integration for Sequel (@nesaulov) #47
+* Integration for ROM 4.x (@nesaulov) #56
+* Ruby 2.5 support (@nesaulov) #57
+
+## Miscellaneous
+* Memory & performance optimizations (@nesaulov) #51
+* Refactorings (@nulldef) #55
+
 # 0.3.0
 
 ## Added
 * Full integration for ActiveRecord (@nesaulov, @AlessandroMinali) #37
-* Full integration for ROM (@nesaulov, @AlessandroMinali) #37
+* Full integration for ROM <= 3 (@nesaulov, @AlessandroMinali) #37
 * `root` optional argument (@chrisatanasian) #32
 * Nested records surrealization (@AlessandroMinali) #34
 
