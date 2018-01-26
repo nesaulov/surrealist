@@ -3,6 +3,11 @@ AllCops:
   Exclude:
     - './gemfiles/*gemfile'
 
+Documentation:
+  Exclude:
+    - benchmarks/*rb
+    - spec/**/*rb
+
 # Layout
 
 Layout/AlignParameters:
@@ -51,6 +56,7 @@ Lint/RescueType:
 Metrics/BlockLength:
   Exclude:
     - spec/**/*rb
+    - benchmarks
 
 Metrics/CyclomaticComplexity:
   Enabled: false
