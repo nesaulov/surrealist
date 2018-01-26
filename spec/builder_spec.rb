@@ -25,7 +25,7 @@ class Table
 end
 
 RSpec.describe Surrealist::Builder do
-  subject(:result) { described_class.new(schema: schema, instance: instance, carrier: carrier).call }
+  subject(:result) { described_class.new(carrier, schema, instance).call }
 
   let(:instance) { Table.new }
   let(:carrier) { nil }

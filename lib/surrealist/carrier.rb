@@ -43,6 +43,10 @@ module Surrealist
       self
     end
 
+    def no_args_provided?
+      @no_args ||= no_args
+    end
+
     private
 
     # Checks all boolean arguments
@@ -63,11 +67,7 @@ module Surrealist
     # Checks if +namespaces_nesting_level+ is a positive integer
     # @raise ArgumentError
     def check_namespaces_nesting!
-      unless namespaces_nesting_level.is_a?(Integer)
-        Surrealist::ExceptionRaiser.raise_invalid_nesting!(namespaces_nesting_level)
-      end
-
-      if namespaces_nesting_level <= 0
+      if !namespaces_nesting_level.is_a?(Integer) || namespaces_nesting_level <= 0
         Surrealist::ExceptionRaiser.raise_invalid_nesting!(namespaces_nesting_level)
       end
     end
@@ -83,6 +83,11 @@ module Surrealist
     # Strips root of empty whitespaces
     def strip_root!
       root.is_a?(String) && @root = root.strip
+    end
+
+    def no_args
+      !camelize && !include_root && !include_namespaces && root.nil? &&
+        namespaces_nesting_level == DEFAULT_NESTING_LEVEL
     end
   end
 end

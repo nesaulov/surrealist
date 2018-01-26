@@ -68,7 +68,7 @@ module Surrealist
       # @raise Surrealist::InvalidNestingLevel if nesting level is specified as 0.
       #
       # @return [Hash] a nested hash.
-      def break_namespaces(klass, camelize:, nesting_level:)
+      def break_namespaces(klass, camelize, nesting_level)
         Surrealist::ExceptionRaiser.raise_invalid_nesting!(nesting_level) unless nesting_level > 0
 
         klass.split(NAMESPACES_SEPARATOR).last(nesting_level).reverse.inject({}) do |a, n|

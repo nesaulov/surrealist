@@ -10,16 +10,16 @@ module Surrealist
       # @param [Struct] schema containing a single schema key and value
       #
       # @return [Hash] schema
-      def assign(instance:, schema:)
-        value = raw_value(instance: instance, schema: schema)
+      def assign(schema, instance)
+        value = raw_value(instance, schema)
 
         # array to track and prevent infinite self references in surrealization
         @stack ||= []
 
         if value.respond_to?(:build_schema)
-          yield assign_nested_record(instance: instance, value: value)
+          yield assign_nested_record(instance, value)
         elsif value.respond_to?(:each) && !value.empty? && value.all? { |v| Helper.surrealist?(v.class) }
-          yield assign_nested_collection(instance: instance, value: value)
+          yield assign_nested_collection(instance, value)
         else
           yield value
         end
@@ -33,9 +33,9 @@ module Surrealist
       # @param [Struct] schema containing a single schema key and value
       #
       # @return [Object] value to be further processed
-      def raw_value(instance:, schema:)
+      def raw_value(instance, schema)
         value = instance.is_a?(Hash) ? instance[schema.key] : instance.send(schema.key)
-        coerce_value(value, schema: schema)
+        coerce_value(value, schema)
       end
 
       # Coerces value if type check is passed
@@ -46,12 +46,12 @@ module Surrealist
       # @raise +Surrealist::InvalidTypeError+ if type-check failed at some point.
       #
       # @return [Object] value to be further processed
-      def coerce_value(value, schema:)
-        unless TypeHelper.valid_type?(value: value, type: schema.value)
+      def coerce_value(value, schema)
+        unless TypeHelper.valid_type?(value, schema.value)
           raise Surrealist::InvalidTypeError,
                 "Wrong type for key `#{schema.key}`. Expected #{schema.value}, got #{value.class}."
         end
-        TypeHelper.coerce(type: schema.value, value: value)
+        TypeHelper.coerce(value, schema.value)
       end
 
       # Assists in recursively generating schema for records while preventing infinite self-referencing
@@ -60,7 +60,7 @@ module Surrealist
       # @param [Object] value a value that has to be type-checked.
       #
       # @return [Array] of schemas
-      def assign_nested_collection(instance:, value:)
+      def assign_nested_collection(instance, value)
         return if @stack.include?(value.first.class)
         @stack << instance.class << value.first.class
         result = Surrealist.surrealize_collection(value, raw: true)
@@ -74,7 +74,7 @@ module Surrealist
       # @param [Object] value a value that has to be type-checked.
       #
       # @return [Hash] schema
-      def assign_nested_record(instance:, value:)
+      def assign_nested_record(instance, value)
         return if @stack.include?(value.class)
         @stack << instance.class
         result = value.build_schema

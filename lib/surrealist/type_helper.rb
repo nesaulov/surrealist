@@ -14,7 +14,7 @@ module Surrealist
       # @param [Class] type class representing data type.
       #
       # @return [boolean]
-      def valid_type?(value:, type:)
+      def valid_type?(value, type)
         return true if type == Any
 
         if type == Bool
@@ -32,7 +32,7 @@ module Surrealist
       # @param [Class] type class representing data type
       #
       # @return [any] coerced value
-      def coerce(value:, type:)
+      def coerce(value, type)
         return value unless dry_type?(type)
         return value if type.try(value).input == value
 
