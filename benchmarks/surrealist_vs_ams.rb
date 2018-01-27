@@ -78,9 +78,7 @@ Benchmark.ips do |x|
   x.compare!
 end
 
-
 # With AMS logger turned off
-#
 puts "\n------- Turning off AMS logger -------\n"
 ActiveModelSerializers.logger.level = Logger::Severity::UNKNOWN
 
@@ -120,6 +118,7 @@ Benchmark.ips do |x|
   x.compare!
 end
 
+# rubocop:disable Metrics/LineLength
 
 # -- Instance --
 # Comparison:
