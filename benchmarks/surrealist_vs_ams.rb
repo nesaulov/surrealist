@@ -39,84 +39,59 @@ N = 3000
 
 N.times { User.create!(name: random_name, email: "#{random_name}@test.com") }
 
-user = User.find(rand(1..N))
-users = User.all
+def benchmark_instance(ams_arg = '')
+  user = User.find(rand(1..N))
 
-Benchmark.ips do |x|
-  x.config(time: 5, warmup: 2)
+  Benchmark.ips do |x|
+    x.config(time: 5, warmup: 2)
 
-  x.report('AMS: instance') do
-    ActiveModelSerializers::SerializableResource.new(user).to_json
+    x.report("AMS#{ams_arg}: instance") do
+      ActiveModelSerializers::SerializableResource.new(user).to_json
+    end
+
+    x.report('Surrealist: instance through .surrealize') do
+      user.surrealize
+    end
+
+    x.report('Surrealist: instance through Surrealist::Serializer') do
+      UserSurrealistSerializer.new(user).surrealize
+    end
+
+    x.compare!
   end
-
-  x.report('Surrealist: instance through .surrealize') do
-    user.surrealize
-  end
-
-  x.report('Surrealist: instance through Surrealist::Serializer') do
-    UserSurrealistSerializer.new(user).surrealize
-  end
-
-  x.compare!
 end
 
-Benchmark.ips do |x|
-  x.config(time: 5, warmup: 2)
+def benchmark_collection(ams_arg = '')
+  users = User.all
 
-  x.report('AMS: collection') do
-    ActiveModelSerializers::SerializableResource.new(users).to_json
+  Benchmark.ips do |x|
+    x.config(time: 5, warmup: 2)
+
+    x.report("AMS#{ams_arg}: collection") do
+      ActiveModelSerializers::SerializableResource.new(users).to_json
+    end
+
+    x.report('Surrealist: collection through Surrealist.surrealize_collection()') do
+      Surrealist.surrealize_collection(users)
+    end
+
+    x.report('Surrealist: collection through Surrealist::Serializer') do
+      UserSurrealistSerializer.new(users).surrealize
+    end
+
+    x.compare!
   end
-
-  x.report('Surrealist: collection through Surrealist.surrealize_collection()') do
-    Surrealist.surrealize_collection(users)
-  end
-
-  x.report('Surrealist: collection through Surrealist::Serializer') do
-    UserSurrealistSerializer.new(users).surrealize
-  end
-
-  x.compare!
 end
+
+benchmark_instance
+benchmark_collection
 
 # With AMS logger turned off
 puts "\n------- Turning off AMS logger -------\n"
 ActiveModelSerializers.logger.level = Logger::Severity::UNKNOWN
 
-Benchmark.ips do |x|
-  x.config(time: 5, warmup: 2)
-
-  x.report('AMS (without logging): instance') do
-    ActiveModelSerializers::SerializableResource.new(user).to_json
-  end
-
-  x.report('Surrealist: instance through .surrealize') do
-    user.surrealize
-  end
-
-  x.report('Surrealist: instance through Surrealist::Serializer') do
-    UserSurrealistSerializer.new(user).surrealize
-  end
-
-  x.compare!
-end
-
-Benchmark.ips do |x|
-  x.config(time: 5, warmup: 2)
-
-  x.report('AMS (without logging): collection') do
-    ActiveModelSerializers::SerializableResource.new(users).to_json
-  end
-
-  x.report('Surrealist: collection through Surrealist.surrealize_collection()') do
-    Surrealist.surrealize_collection(users)
-  end
-
-  x.report('Surrealist: collection through Surrealist::Serializer') do
-    UserSurrealistSerializer.new(users).surrealize
-  end
-
-  x.compare!
-end
+benchmark_instance('(without logging)')
+benchmark_collection('(without logging)')
 
 # -- Instance --
 # Comparison:
