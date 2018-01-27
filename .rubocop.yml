@@ -65,6 +65,7 @@ Metrics/MethodLength:
   Max: 15
 
 Metrics/LineLength:
+  Exclude: [benchmarks/*rb]
   Max: 110
 
 Metrics/PerceivedComplexity:

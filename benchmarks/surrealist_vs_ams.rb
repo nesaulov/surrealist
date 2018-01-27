@@ -118,8 +118,6 @@ Benchmark.ips do |x|
   x.compare!
 end
 
-# rubocop:disable Metrics/LineLength
-
 # -- Instance --
 # Comparison:
 # Surrealist: instance through .surrealize:    18486.8 i/s
