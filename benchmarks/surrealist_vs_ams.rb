@@ -15,10 +15,24 @@ ActiveRecord::Schema.define do
     table.column :name, :string
     table.column :email, :string
   end
+
+  create_table :authors do |table|
+    table.column :name, :string
+    table.column :last_name, :string
+    table.column :age, :int
+  end
+
+  create_table :books do |table|
+    table.column :title, :string
+    table.column :year, :string
+    table.belongs_to :author
+  end
 end
 
+ActiveModelSerializers.config.adapter = :json
+
 def random_name
-  ('a'..'z').to_a.shuffle.join('').first(10)
+  ('a'..'z').to_a.shuffle.join('').first(10).capitalize
 end
 
 class User < ActiveRecord::Base
@@ -35,9 +49,54 @@ class UserSurrealistSerializer < Surrealist::Serializer
   json_schema { { name: String, email: String } }
 end
 
-N = 3000
+### Associations ###
 
+class AuthorSurrealistSerializer < Surrealist::Serializer
+  json_schema do
+    { name: String, last_name: String, full_name: String, age: Integer, books: Object }
+  end
+
+  def full_name
+    "#{object.name} #{object.last_name}"
+  end
+end
+
+class BookSurrealistSerializer < Surrealist::Serializer
+  json_schema { { title: String, year: String } }
+end
+
+class Author < ActiveRecord::Base
+  include Surrealist
+  surrealize_with AuthorSurrealistSerializer
+
+  has_many :books
+end
+
+class Book < ActiveRecord::Base
+  include Surrealist
+  surrealize_with BookSurrealistSerializer
+
+  belongs_to :author
+end
+
+class AuthorSerializer < ActiveModel::Serializer
+  attributes :name, :last_name, :age
+
+  attribute :full_name do
+    "#{object.name} #{object.last_name}"
+  end
+
+  has_many :books
+end
+
+class BookSerializer < ActiveModel::Serializer
+  attributes :title, :year
+end
+
+N = 3000
 N.times { User.create!(name: random_name, email: "#{random_name}@test.com") }
+(N / 2).times { Author.create!(name: random_name, last_name: random_name, age: rand(80)) }
+N.times { Book.create!(title: random_name, year: "19#{rand(10..99)}", author_id: rand(1..N)) }
 
 def benchmark_instance(ams_arg = '')
   user = User.find(rand(1..N))
@@ -83,6 +142,51 @@ def benchmark_collection(ams_arg = '')
   end
 end
 
+def benchmark_associations_instance
+  instance = Author.find(rand((1..(N / 2))))
+
+  Benchmark.ips do |x|
+    x.config(time: 5, warmup: 2)
+
+    x.report('AMS (associations): instance') do
+      ActiveModelSerializers::SerializableResource.new(instance).to_json
+    end
+
+    x.report('Surrealist (associations): instance through .surrealize') do
+      instance.surrealize
+    end
+
+    x.report('Surrealist (associations): instance through Surrealist::Serializer') do
+      AuthorSurrealistSerializer.new(instance).surrealize
+    end
+
+    x.compare!
+  end
+end
+
+def benchmark_associations_collection
+  collection = Author.all
+
+  Benchmark.ips do |x|
+    x.config(time: 5, warmup: 2)
+
+    x.report('AMS (associations): collection') do
+      ActiveModelSerializers::SerializableResource.new(collection).to_json
+    end
+
+    x.report('Surrealist (associations): collection through Surrealist.surrealize_collection()') do
+      Surrealist.surrealize_collection(collection)
+    end
+
+    x.report('Surrealist (associations): collection through Surrealist::Serializer') do
+      AuthorSurrealistSerializer.new(collection).surrealize
+    end
+
+    x.compare!
+  end
+end
+
+# Default configuration
 benchmark_instance
 benchmark_collection
 
@@ -93,28 +197,47 @@ ActiveModelSerializers.logger.level = Logger::Severity::UNKNOWN
 benchmark_instance('(without logging)')
 benchmark_collection('(without logging)')
 
+# Associations
+benchmark_associations_instance
+benchmark_associations_collection
+
+# ruby 2.5.0p0 (2017-12-25 revision 61468) [x86_64-darwin16]
 # -- Instance --
 # Comparison:
-# Surrealist: instance through .surrealize:    18486.8 i/s
-# Surrealist: instance through Surrealist::Serializer:    15289.3 i/s - same-ish: difference falls within error
-# AMS: instance:     2402.3 i/s - 7.70x  slower
-
+#   Surrealist: instance through .surrealize:    22068.7 i/s
+#   Surrealist: instance through Surrealist::Serializer:    18691.4 i/s - same-ish: difference falls within error
+#   AMS: instance:     2847.9 i/s - 7.75x  slower
+#
 # -- Collection --
 # Comparison:
-# Surrealist: collection through Surrealist.surrealize_collection():        7.2 i/s
-# Surrealist: collection through Surrealist::Serializer:        6.7 i/s - same-ish: difference falls within error
-# AMS: collection:        5.9 i/s - same-ish: difference falls within error
-
-# --- Without AMS logging ---
+#   Surrealist: collection through Surrealist.surrealize_collection():        8.3 i/s
+#   Surrealist: collection through Surrealist::Serializer:        7.5 i/s - same-ish: difference falls within error
+#   AMS: collection:        5.9 i/s - 1.41x  slower
+#
+# --- Without AMS logging (which is turned on by default) ---
 #
 # -- Instance --
 # Comparison:
-# Surrealist: instance through .surrealize:    19634.9 i/s
-# Surrealist: instance through Surrealist::Serializer:    18273.5 i/s - same-ish: difference falls within error
-# AMS (without logging): instance:     6570.4 i/s - 2.99x  slower
-
+#   Surrealist: instance through .surrealize:    21317.8 i/s
+#   Surrealist: instance through Surrealist::Serializer:    18273.7 i/s - same-ish: difference falls within error
+#   AMS(without logging): instance:     4108.7 i/s - 4.96x  slower
+#
 # -- Collection --
 # Comparison:
-# Surrealist: collection through Surrealist.surrealize_collection():        7.2 i/s
-# Surrealist: collection through Surrealist::Serializer:        7.0 i/s - same-ish: difference falls within error
-# AMS (without logging): collection:        5.6 i/s - same-ish: difference falls within error
+#   Surrealist: collection through Surrealist.surrealize_collection():        8.5 i/s
+#   Surrealist: collection through Surrealist::Serializer:        7.4 i/s - same-ish: difference falls within error
+#   AMS(without logging): collection:        6.2 i/s - 1.37x  slower
+#
+# --- Associations ---
+#
+# -- Instance --
+# Comparison:
+#   Surrealist (associations): instance through .surrealize:     3093.0 i/s
+#   Surrealist (associations): instance through Surrealist::Serializer:     3064.6 i/s - same-ish: difference falls within error
+#   AMS (associations): instance:     1580.8 i/s - 2.04x  slower
+#
+# -- Collection --
+# Comparison:
+#   Surrealist (associations): collection through Surrealist.surrealize_collection():        2.0 i/s
+#   Surrealist (associations): collection through Surrealist::Serializer:        2.0 i/s - 1.02x  slower
+#   AMS (associations): collection:        1.3 i/s - 1.46x  slower
