@@ -424,7 +424,7 @@ Methods that return collections:
 
 For detailed usage example (covering ROM 3.x and ROM 4.x) please see `spec/orms/rom/`.
 Under the hood ROM uses Sequel, and Sequel returns instances only on `.first`, `.last`, `.[]` and `.with_pk!`.
-And collections are returned for all other methods.
+Collections are returned for all other methods.
 ``` ruby
 container = ROM.container(:sql, ['sqlite::memory']) do |conf|
   conf.default.create_table(:users) do
@@ -446,6 +446,7 @@ class ROM::Struct::User < ROM::Struct
  
   json_schema { { name: String } }
 end 
+ 
 users.to_a.first # => #<ROM::Struct::User id=1 name="Jane Struct" email="jane@struct.rom">
 users.to_a.first.surrealize # => "{\"name\":\"Jane Struct\"}"
  
@@ -465,15 +466,14 @@ class RomUser < Dry::Struct
 end
  
 # ROM 3.x
-users.as(RomUser).to_a[1].surrealize # => "{\"email\":\"dane@as.rom\"}"
-Surrealist.surrealize_collection(users.as(RomUser).to_a)
-# => "[{\"email\":\"jane@struct.rom\"},{\"email\":\"dane@as.rom\"},{\"email\":\"jack@mapper.rom\"}]"
-   
-# ROM 4.x
-users.map_to(RomUser).to_a[1].surrealize # => "{\"email\":\"dane@as.rom\"}"
-Surrealist.surrealize_collection(users.map_to(RomUser).to_a)
-# => "[{\"email\":\"jane@struct.rom\"},{\"email\":\"dane@as.rom\"},{\"email\":\"jack@mapper.rom\"}]"
+rom_users = users.as(RomUser).to_a
  
+# ROM 4.x
+rom_users = users.map_to(RomUser).to_a
+ 
+rom_users[1].surrealize # => "{\"email\":\"dane@as.rom\"}"
+Surrealist.surrealize_collection(rom_users) # => "[{\"email\":\"jane@struct.rom\"},{\"email\":\"dane@as.rom\"},{\"email\":\"jack@mapper.rom\"}]"
+   
 # using Mappers
 class UserModel
   include Surrealist
@@ -506,7 +506,7 @@ Surrealist.surrealize_collection(mapped.where { id < 4 }.to_a) # => "[{\"email\"
 ``` 
 
 #### Sequel
-Basically, Sequel returns instances only on `.first`, `.last`, `.[]` and `.with_pk!`. And collections are returned for all other methods.
+Basically, Sequel returns instances only on `.first`, `.last`, `.[]` and `.with_pk!`. Collections are returned for all other methods.
 Most of them are covered in `spec/orms/sequel` specs, please refer to them for code examples.
 Associations serialization works the same way as it does with ActiveRecord.
 
