@@ -22,15 +22,20 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
   * [Simple example](#simple-example)
   * [Nested structures](#nested-structures)
   * [Nested objects](#nested-objects)
+  * [Collection Surrealization](#collection-surrealization)
+  * [Defining custom serializers](#defining-custom-serializers)
   * [Delegating Surrealization](#delegating-surrealization)
   * [Usage with Dry::Types](#usage-with-drytypes)
-  * [Defining custom serializers](#defining-custom-serializers)
   * [Build schema](#build-schema)
-  * [Camelization](#camelization)
-  * [Include root](#include-root)
-  * [Include namespaces](#include-namespaces)
-  * [Collection Surrealization](#collection-surrealization)
-  * [Root](#root)
+  * [Working with ORMs](#working-with-orms)
+    * [ActiveRecord](#activerecord)
+    * [ROM](#rom)
+    * [Sequel](#sequel)
+  * [Optional arguments](#optional-arguments)
+    * [Camelization](#camelization)
+    * [Include root](#include-root)
+    * [Root](#root)
+    * [Include namespaces](#include-namespaces)
   * [Bool and Any](#bool-and-any)
   * [Type errors](#type-errors)
   * [Undefined methods in schema](#undefined-methods-in-schema)
@@ -59,7 +64,7 @@ Or install it yourself as:
 
 ## Usage
 Schema should be defined with a block that contains a hash. Every key of the schema should be
-either a name of a method of the surrealizable object (or it's parents/mixins),
+either a name of a method of the surrealizable object (or it's ancestors/mixins),
 or - in case you want to build json structure independently from object's structure - a symbol.
 Every value of the hash should be a constant that represents a Ruby class,
 that will be used for type-checks.
@@ -150,6 +155,36 @@ User.new.surrealize
 # => '{ "name": "John Doe", "credit_card": { "number": 1234, "cvv": 322 } }'
 
 ```
+
+### Collection Surrealization
+Since 0.2.0 Surrealist has API for collection serialization. Example for ActiveRecord:
+``` ruby
+class User < ActiveRecord::Base
+  include Surrealist
+ 
+  json_schema do
+    { name: String, age: Integer }
+  end
+end
+ 
+users = User.all
+# => [#<User:0x007fa1485de878 id: 1, name: "Nikita", age: 23>, #<User:0x007fa1485de5f8 id: 2, name: "Alessandro", age: 24>]
+ 
+Surrealist.surrealize_collection(users)
+# => '[{ "name": "Nikita", "age": 23 }, { "name": "Alessandro", "age": 24 }]'
+```
+You can find motivation behind introducing new API versus monkey-patching [here](https://alessandrominali.github.io/monkey_patching_real_example).  
+`#surrealize_collection` works for all data structures that respond to `#each`. All ActiveRecord
+features (like associations, inheritance etc) are supported and covered. Further reading: [working with ORMs](#working-with-orms).
+All optional arguments (`camelize`, `include_root` etc) are also supported.
+
+An additional and unique argument for `#surrealize_collection` is `raw` which is evaluated as a Boolean.
+If this option is 'truthy' then the results will be an array of surrealized hashes (i.e. NOT a JSON string).
+```
+Surrealist.surrealize_collection(users, raw: true)
+# => [{ "name": "Nikita", "age": 23 }, { "name": "Alessandro", "age": 24 }]
+```
+Guides on where to use `#surrealize_collection` vs `#surrealize` for all ORMs are coming.
 
 ### Delegating surrealization
 You can share the `json_schema` between classes:
@@ -324,7 +359,160 @@ Car.new.build_schema
 # => { age: 7, brand: "Toyota", doors: nil, horsepower: 140, fuel_system: "Direct injection", previous_owner: "John Doe" }
 ```
 
-### Camelization
+### Working with ORMs
+
+There are two kinds of return values of ORM methods: some return collections of objects, while others return instances.
+For the first ones one should use `instance#surrealize`, whereas for the second ones `Surrealist.surrealize_collection(collection)`
+Please keep in mind that if your serialization logic is [kept in a separate class](#defining-custom-serializers) which is inherited from
+`Surrealist::Serializer`, than usage boils down to `YourSerializer.new(instance || collection).surrealize`.
+
+#### ActiveRecord
+All associations work as expected: `.has_many`, `.has_and_belongs_to_many` return collections,
+`.has_one`, `.belongs_to` return instances.
+
+Methods that return instances:
+``` ruby
+.find
+.find_by
+.find_by!
+.take!
+.first 
+.first!
+.second 
+.second!
+.third 
+.third!
+.fourth 
+.fourth!
+.fifth 
+.fifth!
+.forty_two 
+.forty_two!
+.last 
+.last!
+.third_to_last 
+.third_to_last!
+.second_to_last 
+.second_to_last!
+```
+Methods that return collections:
+``` ruby
+.all
+.where  
+.where_not 
+.order  
+.take  
+.limit  
+.offset  
+.lock  
+.readonly 
+.reorder  
+.distinct 
+.find_each 
+.select  
+.group  
+.order  
+.except  
+.extending 
+.having  
+.references
+.includes
+.joins
+```
+
+#### ROM
+
+For detailed usage example (covering ROM 3.x and ROM 4.x) please see `spec/orms/rom/`.
+Under the hood ROM uses Sequel, and Sequel returns instances only on `.first`, `.last`, `.[]` and `.with_pk!`.
+And collections are returned for all other methods.
+``` ruby
+container = ROM.container(:sql, ['sqlite::memory']) do |conf|
+  conf.default.create_table(:users) do
+    primary_key :id
+    column :name, String, null: false
+    column :email, String, null: false
+  end
+  # ...
+end
+ 
+users = UserRepo.new(container).users
+# => #<ROM::Relation[Users] name=ROM::Relation::Name(users) dataset=#<Sequel::SQLite::Dataset: "SELECT `users`.`id`, `users`.`name`, `users`.`email` FROM `users` ORDER BY `users`.`id`">>
+```
+Basically, there are several ways to fetch/represent data in ROM:
+``` ruby
+# With json_schema defined in ROM::Struct::User
+class ROM::Struct::User < ROM::Struct
+  include Surrealist
+ 
+  json_schema { { name: String } }
+end 
+users.to_a.first # => #<ROM::Struct::User id=1 name="Jane Struct" email="jane@struct.rom">
+users.to_a.first.surrealize # => "{\"name\":\"Jane Struct\"}"
+ 
+users.where(id: 1).first # => #<ROM::Struct::User id=1 name="Jane Struct" email="jane@struct.rom">
+users.where(id: 1).first.surrealize # => "{\"name\":\"Jane Struct\"}"
+ 
+Surrealist.surrealize_collection(users.to_a) # => "[{\"name\":\"Jane Struct\"},{\"name\":\"Dane As\"},{\"name\":\"Jack Mapper\"}]"
+ 
+# using ROM::Struct::Model#as(Representative) with json_schema defined in representative
+class RomUser < Dry::Struct
+  include Surrealist
+ 
+  attribute :name, String
+  attribute :email, String
+ 
+  json_schema { { email: String } }
+end
+ 
+# ROM 3.x
+users.as(RomUser).to_a[1].surrealize # => "{\"email\":\"dane@as.rom\"}"
+Surrealist.surrealize_collection(users.as(RomUser).to_a)
+# => "[{\"email\":\"jane@struct.rom\"},{\"email\":\"dane@as.rom\"},{\"email\":\"jack@mapper.rom\"}]"
+   
+# ROM 4.x
+users.map_to(RomUser).to_a[1].surrealize # => "{\"email\":\"dane@as.rom\"}"
+Surrealist.surrealize_collection(users.map_to(RomUser).to_a)
+# => "[{\"email\":\"jane@struct.rom\"},{\"email\":\"dane@as.rom\"},{\"email\":\"jack@mapper.rom\"}]"
+ 
+# using Mappers
+class UserModel
+  include Surrealist
+ 
+  json_schema { { id: Integer, email: String } }
+ 
+  attr_reader :id, :name, :email
+ 
+  def initialize(attributes)
+    @id, @name, @email = attributes.values_at(:id, :name, :email)
+  end
+end
+ 
+class UsersMapper < ROM::Mapper
+  register_as :user_obj
+  relation :users
+  model UserModel
+end
+  
+# ROM 3.x
+mapped = users.as(:user_obj)
+# ROM 4.x
+mapped = users.map_with(:user_obj)
+  
+mapped.to_a[2] # => #<UserModel:0x00007f8ec19fb3c8 @email="jack@mapper.rom", @id=3, @name="Jack Mapper">
+mapped.where(id: 3).first # => #<UserModel:0x00007f8ec19fb3c8 @email="jack@mapper.rom", @id=3, @name="Jack Mapper">
+mapped.to_a[2].surrealize # => "{\"id\":3,\"email\":\"jack@mapper.rom\"}"
+Surrealist.surrealize_collection(mapped.to_a) # => "[{\"email\":\"jane@struct.rom\"},{\"email\":\"dane@as.rom\"},{\"email\":\"jack@mapper.rom\"}]"  
+Surrealist.surrealize_collection(mapped.where { id < 4 }.to_a) # => "[{\"email\":\"jane@struct.rom\"},{\"email\":\"dane@as.rom\"},{\"email\":\"jack@mapper.rom\"}]" 
+``` 
+
+#### Sequel
+Basically, Sequel returns instances only on `.first`, `.last`, `.[]` and `.with_pk!`. And collections are returned for all other methods.
+Most of them are covered in `spec/orms/sequel` specs, please refer to them for code examples.
+Associations serialization works the same way as it does with ActiveRecord.
+
+### Optional arguments
+
+#### Camelization
 If you need to have keys in camelBack, you can pass optional `camelize` argument
 to `#surrealize or #build_schema`. From the previous example:
 
@@ -333,7 +521,7 @@ Car.new.surrealize(camelize: true)
 # => '{ "age": 7, "brand": "Toyota", "doors": null, "horsepower": 140, "fuelSystem": "Direct injection", "previousOwner": "John Doe" }'
 ```
 
-### Include root
+#### Include root
 If you want to wrap the resulting JSON into a root key, you can pass optional `include_root` argument
 to `#surrealize` or `#build_schema`. The root key in this case will be taken from the class name of the
 surrealizable object.
@@ -373,62 +561,7 @@ Animal::Dog.new.surrealize(include_root: true)
 # => '{ "dog": { "breed": "Collie" } }'
 ```
 
-### Include namespaces
-You can build wrap schema into a nested hash from namespaces of the object's class.
-``` ruby
-class BusinessSystem::Cashout::ReportSystem::Withdraws
-  include Surrealist
- 
-  json_schema do
-    { withdraws_amount: Integer }
-  end
- 
-  def withdraws_amount
-    34
-  end
-end
- 
-withdraws = BusinessSystem::Cashout::ReportSystem::Withdraws.new
- 
-withdraws.surrealize(include_namespaces: true)
-# => '{ "business_system": { "cashout": { "report_system": { "withdraws": { "withdraws_amount": 34 } } } } }' 
-```
-By default all namespaces will be taken. If you want you can explicitly specify the level of nesting:
-``` ruby
-withdraws.surrealize(include_namespaces: true, namespaces_nesting_level: 2)
-# => '{ "report_system": { "withdraws": { "withdraws_amount": 34 } } }'
-```
-
-### Collection Surrealization
-Since 0.2.0 Surrealist has API for collection serialization. Example for ActiveRecord:
-``` ruby
-class User < ActiveRecord::Base
-  include Surrealist
- 
-  json_schema do
-    { name: String, age: Integer }
-  end
-end
- 
-users = User.all
-# => [#<User:0x007fa1485de878 id: 1, name: "Nikita", age: 23>, #<User:0x007fa1485de5f8 id: 2, name: "Alessandro", age: 24>]
- 
-Surrealist.surrealize_collection(users)
-# => '[{ "name": "Nikita", "age": 23 }, { "name": "Alessandro", "age": 24 }]'
-```
-You can find motivation behind introducing new API versus monkey-patching [here](https://alessandrominali.github.io/monkey_patching_real_example).  
-`#surrealize_collection` works for all data structures that respond to `#each`. All ActiveRecord
-features (like associations, inheritance etc) are supported and covered. Other ORMs should work without
-issues as well, tests are in progress. All optional arguments (`camelize`, `include_root` etc) are also supported.
-
-An additional and unique arguement for `#surrealize_collection` is `raw` which is evalauted as a Boolean. If this option is 'truthy' then the results will be an array of surrealized hashes (ie. NOT a JSON string).
-```
-Surrealist.surrealize_collection(users, raw: true)
-# => [{ "name": "Nikita", "age": 23 }, { "name": "Alessandro", "age": 24 }]
-```
-Guides on where to use `#surrealize_collection` vs `#surrealize` for all ORMs are coming.
-
-### Root
+#### Root
 If you want to wrap the resulting JSON into a specified root key, you can pass optional `root` argument
 to `#surrealize` or `#build_schema`. The `root` argument will be stripped of whitespaces.
 ``` ruby
@@ -455,6 +588,32 @@ Animal::Cat.new.surrealize(include_root: true, root: :kitten)
 # => '{ "kitten": { "weight": "3 kilos" } }'
 Animal::Cat.new.surrealize(include_namespaces: true, root: 'kitten')
 # => '{ "kitten": { "weight": "3 kilos" } }'
+```
+
+#### Include namespaces
+You can build wrap schema into a nested hash from namespaces of the object's class.
+``` ruby
+class BusinessSystem::Cashout::ReportSystem::Withdraws
+  include Surrealist
+ 
+  json_schema do
+    { withdraws_amount: Integer }
+  end
+ 
+  def withdraws_amount
+    34
+  end
+end
+ 
+withdraws = BusinessSystem::Cashout::ReportSystem::Withdraws.new
+ 
+withdraws.surrealize(include_namespaces: true)
+# => '{ "business_system": { "cashout": { "report_system": { "withdraws": { "withdraws_amount": 34 } } } } }' 
+```
+By default all namespaces will be taken. If you want you can explicitly specify the level of nesting:
+``` ruby
+withdraws.surrealize(include_namespaces: true, namespaces_nesting_level: 2)
+# => '{ "report_system": { "withdraws": { "withdraws_amount": 34 } } }'
 ```
 
 ### Bool and Any
