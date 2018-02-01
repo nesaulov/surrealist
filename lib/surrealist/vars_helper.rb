@@ -47,7 +47,7 @@ module Surrealist
       #
       # @return [Class | nil]
       def find_serializer(klass, tag: nil)
-        tag = tag || DEFAULT_TAG
+        tag ||= DEFAULT_TAG
         klass.instance_variable_get(SERIALIZER_CLASS).try(:[], tag.to_sym)
       end
 
@@ -57,7 +57,7 @@ module Surrealist
       # @param [Class] serializer_class class of serializer
       # @param [Symbol] tag a tag associated with serializer
       def add_serializer(self_class, serializer_class, tag: nil)
-        tag = tag || DEFAULT_TAG
+        tag ||= DEFAULT_TAG
         hash = self_class.instance_variable_get(SERIALIZER_CLASS) || {}
         hash[tag.to_sym] = serializer_class
         self_class.instance_variable_set(SERIALIZER_CLASS, hash)

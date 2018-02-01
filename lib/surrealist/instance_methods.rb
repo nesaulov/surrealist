@@ -50,9 +50,7 @@ module Surrealist
     #   # For more examples see README
     def surrealize(**args)
       serializer = Surrealist::VarsHelper.find_serializer(self.class, tag: args[:tag])
-      if serializer
-        return serializer.new(self).surrealize(args)
-      end
+      return serializer.new(self).surrealize(args) if serializer
 
       JSON.dump(build_schema(args))
     end
