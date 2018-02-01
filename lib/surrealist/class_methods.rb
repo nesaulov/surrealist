@@ -98,9 +98,9 @@ module Surrealist
     # @param [Class] klass a class that should inherit form Surrealist::Serializer
     #
     # @raise ArgumentError if Surrealist::Serializer is not found in the ancestors chain
-    def surrealize_with(klass)
+    def surrealize_with(klass, tag: :default)
       if klass < Surrealist::Serializer
-        Surrealist::VarsHelper.set_serializer(self, klass)
+        Surrealist::VarsHelper.add_serializer(self, klass, tag: tag)
       else
         raise ArgumentError, "#{klass} should be inherited from Surrealist::Serializer"
       end
