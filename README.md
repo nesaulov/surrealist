@@ -317,7 +317,7 @@ IncomeSerializer.new(income, current_user: User.find(3)).surrealize
 
 ### Multiple serializers
 
-Now you can define several custom serializers for one object and use it in different cases. Just mark it with tag:
+Now you can define several custom serializers for one object and use it in different cases. Just mark it with a tag:
 
 ```ruby
 class PostSerializer < Surrealist::Serializer

@@ -10,7 +10,7 @@ module Surrealist
     # Regexp to resolve ROM structure
     ROM_REGEXP = /ROM::Struct/o
     # Instance variable that keeps serializer classes
-    SERIALIZER_CLASS = '@__surrealist_serializers'.freeze
+    SERIALIZER_CLASSES = '@__surrealist_serializers'.freeze
     # Tag for default behaviour in multiple serializers
     DEFAULT_TAG = :default
 
@@ -48,7 +48,7 @@ module Surrealist
       # @return [Class | nil]
       def find_serializer(klass, tag: nil)
         tag ||= DEFAULT_TAG
-        klass.instance_variable_get(SERIALIZER_CLASS).try(:[], tag.to_sym)
+        klass.instance_variable_get(SERIALIZER_CLASSES).try(:[], tag.to_sym)
       end
 
       # Sets a serializer for class
@@ -58,9 +58,9 @@ module Surrealist
       # @param [Symbol] tag a tag associated with serializer
       def add_serializer(self_class, serializer_class, tag: nil)
         tag ||= DEFAULT_TAG
-        hash = self_class.instance_variable_get(SERIALIZER_CLASS) || {}
+        hash = self_class.instance_variable_get(SERIALIZER_CLASSES) || {}
         hash[tag.to_sym] = serializer_class
-        self_class.instance_variable_set(SERIALIZER_CLASS, hash)
+        self_class.instance_variable_set(SERIALIZER_CLASSES, hash)
       end
 
       private
