@@ -76,10 +76,9 @@ RSpec.describe 'Multiple serializers' do
         ]
       end
 
-      it do
-        json = Surrealist.surrealize_collection(collection, tag: :short)
-        expect(json).to eq(expectation.to_json)
-      end
+      let(:json) { Surrealist.surrealize_collection(collection, tag: :short) }
+
+      it { expect(json).to eq(expectation.to_json) }
     end
   end
 end
