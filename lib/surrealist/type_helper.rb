@@ -4,7 +4,7 @@ module Surrealist
   # Service class for type checking
   module TypeHelper
     # Dry-types class matcher
-    DRY_TYPE_CLASS = 'Dry::Types'.freeze
+    DRY_TYPE_CLASS = /Dry::Types/
 
     class << self
       # Checks if value returned from a method is an instance of type class specified
@@ -19,7 +19,7 @@ module Surrealist
 
         if type == Bool
           Surrealist::Carrier::BOOLEANS.include?(value)
-        elsif dry_type?(type)
+        elsif defined?(Dry::Types) && dry_type?(type)
           type.try(value).success?
         else
           value.nil? || value.is_a?(type)
@@ -50,7 +50,7 @@ module Surrealist
         if type.respond_to?(:primitive) || type.class.name.nil?
           true
         else
-          type.class.name.match(DRY_TYPE_CLASS)
+          type.class.name =~ DRY_TYPE_CLASS
         end
       end
     end

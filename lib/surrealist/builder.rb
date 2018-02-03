@@ -81,7 +81,7 @@ module Surrealist
     def construct_collection(schema, instance, key, value)
       schema[key] = []
       instance.send(key).each do |inst|
-        schema[key] << call(Copier.deep_copy(value, carrier), inst)
+        schema[key].push(call(Copier.deep_copy(value, carrier), inst))
       end
     end
   end

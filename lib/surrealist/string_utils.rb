@@ -37,7 +37,7 @@ module Surrealist
           snake_string.to_s.gsub(UNDERSCORE_REGEXP) { Regexp.last_match[1].capitalize }
         else
           parts = snake_string.split(UNDERSCORE, 2)
-          parts[0] << camelize(parts[1]) if parts.size > 1
+          parts[0].concat(camelize(parts[1])) if parts.size > 1
           parts[0] || EMPTY_STRING
         end
       end
@@ -84,9 +84,8 @@ module Surrealist
       #
       # @return [String] new string with lower cased first character.
       def uncapitalize(string)
-        str = string.dup
-        str[0] = str[0].downcase
-        str
+        string[0] = string[0].downcase
+        string
       end
     end
   end

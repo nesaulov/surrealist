@@ -62,7 +62,7 @@ module Surrealist
       # @return [Array] of schemas
       def assign_nested_collection(instance, value)
         return if @stack.include?(value.first.class)
-        @stack << instance.class << value.first.class
+        @stack.push(instance.class).push(value.first.class)
         result = Surrealist.surrealize_collection(value, raw: true)
         @stack.delete(instance.class)
         result
@@ -76,7 +76,7 @@ module Surrealist
       # @return [Hash] schema
       def assign_nested_record(instance, value)
         return if @stack.include?(value.class)
-        @stack << instance.class
+        @stack.push(instance.class)
         result = value.build_schema
         @stack.delete(instance.class)
         result
