@@ -48,7 +48,9 @@ module Surrealist
       # @return [Class | nil]
       def find_serializer(klass, tag: nil)
         tag ||= DEFAULT_TAG
-        klass.instance_variable_get(SERIALIZER_CLASSES).try(:[], tag.to_sym)
+        hash = klass.instance_variable_get(SERIALIZER_CLASSES)
+        return if hash.nil?
+        hash.fetch(tag.to_sym, nil)
       end
 
       # Sets a serializer for class
