@@ -677,7 +677,9 @@ type check will be passed. If you want to be strict about `nil`s consider using 
 
 ## Roadmap
 Here is a list of features that are not implemented yet (contributions are welcome):
-* [Benchmarks](https://github.com/nesaulov/surrealist/issues/40)
+* Having a config that would keep serialization parameters (like camelize, for example)
+* [DSL for serializer contexts](https://github.com/nesaulov/surrealist/issues/67) 
+
 
 ## Contributing
 Bug reports and pull requests are welcome on GitHub at https://github.com/nesaulov/surrealist.
