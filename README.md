@@ -5,7 +5,7 @@
 [![Gem Version](https://badge.fury.io/rb/surrealist.svg)](https://rubygems.org/gems/surrealist)
 
 ![Surrealist](surrealist-icon.png)
- 
+
 A gem that provides DSL for serialization of plain old Ruby objects to JSON in a declarative style
 by defining a `json_schema`. It also provides a trivial type checking in the runtime before serialization.
 [Yard documentation](http://www.rubydoc.info/github/nesaulov/surrealist/master)
@@ -25,6 +25,7 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
   * [Delegating Surrealization](#delegating-surrealization)
   * [Usage with Dry::Types](#usage-with-drytypes)
   * [Defining custom serializers](#defining-custom-serializers)
+  * [Multiple serializers](#multiple-serializers)
   * [Build schema](#build-schema)
   * [Camelization](#camelization)
   * [Include root](#include-root)
@@ -35,7 +36,7 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
   * [Type errors](#type-errors)
   * [Undefined methods in schema](#undefined-methods-in-schema)
   * [Other notes](#other-notes)
-* [Roadmap](#roadmap)  
+* [Roadmap](#roadmap)
 * [Contributing](#contributing)
 * [Credits](#credits)
 * [License](#license)
@@ -71,15 +72,15 @@ that will be used for type-checks.
 ``` ruby
 class Person
   include Surrealist
- 
+
   json_schema do
     { name: String, age: Integer }
   end
- 
+
   def name
     'John Doe'
   end
- 
+
   def age
     42
   end
@@ -98,7 +99,7 @@ Person.new.surrealize
 ``` ruby
 class Person
   include Surrealist
- 
+
   json_schema do
     {
       foo: String,
@@ -113,7 +114,7 @@ class Person
   end
   # ... method definitions
 end
- 
+
 Person.find_by(email: 'example@email.com').surrealize
 # => '{ "foo": "Some string", "name": "John Doe", "nested": { "at": { "any": 42, "level": true } } }'
 ```
@@ -125,7 +126,7 @@ define a method that calls nested object:
 ``` ruby
 class User
   include Surrealist
-  
+
   json_schema do
     {
       name: String,
@@ -135,11 +136,11 @@ class User
       },
     }
   end
- 
+
   def name
     'John Doe'
   end
- 
+
   def credit_card
     # Assuming that instance of a CreditCard has methods #number and #cvv defined
     CreditCard.find_by(holder: name)
@@ -156,11 +157,11 @@ You can share the `json_schema` between classes:
 ``` ruby
 class Host
   include Surrealist
- 
+
   json_schema do
     { name: String }
   end
- 
+
   def name
     'Host'
   end
@@ -168,7 +169,7 @@ end
 
 class Guest
   delegate_surrealization_to Host
- 
+
   def name
     'Guest'
   end
@@ -186,7 +187,7 @@ in this case you have to `include Surrealist` in class that delegates schema as 
 class Potato
   include Surrealist
   delegate_surrealization_to Host
- 
+
   def name
     'Potato'
   end
@@ -209,7 +210,7 @@ require 'dry-types'
 
 class Car
   include Surrealist
- 
+
   json_schema do
     {
       age:            Types::Coercible::Int,
@@ -220,25 +221,25 @@ class Car
       previous_owner: Types::String,
     }
   end
- 
+
   def age;
     '7'
   end
- 
+
   def previous_owner;
     'John Doe'
   end
- 
+
   def horsepower;
     140
   end
- 
+
   def brand;
     'Toyota'
   end
- 
+
   def doors; end
- 
+
   def fuel_system;
     'Direct injection'
   end
@@ -255,63 +256,92 @@ will inherit from `Surrealist::Serializer`. To point to that class from the mode
 ``` ruby
 class CatSerializer < Surrealist::Serializer
   json_schema { { age: Integer, age_group: String } }
- 
+
   def age_group
     age <= 5 ? 'kitten' : 'cat'
   end
 end
- 
+
 class Cat
   include Surrealist
   attr_reader :age
- 
+
   surrealize_with CatSerializer
- 
+
   def initialize(age)
     @age = age
   end
 end
- 
+
 Cat.new(12).surrealize # Implicit usage through .surrealize_with
 # => '{ "age": 12, "age_group": "cat" }'
- 
+
 CatSerializer.new(Cat.new(3)).surrealize # explicit usage of CatSerializer
 # => '{ "age": 3, "age_group": "kitten" }'
 ```
-The constructor of `Surrealist::Serializer` takes two arguments: serializable model (or collection) and 
+The constructor of `Surrealist::Serializer` takes two arguments: serializable model (or collection) and
 a context hash. So if there is an object that is not coupled to serializable model
-but it is still necessary for constructing JSON, you can pass it to constructor as a hash. It will 
-be available in the serializer in the `context` hash. 
+but it is still necessary for constructing JSON, you can pass it to constructor as a hash. It will
+be available in the serializer in the `context` hash.
 ``` ruby
 class IncomeSerializer < Surrealist::Serializer
   json_schema { { amount: Integer } }
-  
+
   def amount
     current_user.guest? ? 100000000 : object.amount
   end
-  
+
   def current_user
     context[:current_user]
   end
 end
- 
+
 class Income
   include Surrealist
   surrealize_with IncomeSerializer
-   
+
   attr_reader :amount
-   
+
   def initialize(amount)
     @amount = amount
-  end  
+  end
 end
- 
+
 income = Income.new(200)
 IncomeSerializer.new(income, current_user: GuestUser.new).surrealize
 # => '{ "amount": 100000000 }'
- 
+
 IncomeSerializer.new(income, current_user: User.find(3)).surrealize
 # => '{ "amount": 200 }'
+```
+
+### Multiple serializers
+
+Now you can define several custom serializers for one object and use it in different cases. Just mark it with a tag:
+
+```ruby
+class PostSerializer < Surrealist::Serializer
+  json_schema { { id: Integer, title: String, author: { name: String } } }
+end
+
+class PreviewSerializer < Surrealist::Serializer
+  json_schema { { id: Integer, title: String } }
+end
+
+class Post
+  include Surrealist
+
+  surrealize_with PostSerializer
+  surrealize_with PreviewSerializer, tag: :short
+
+  attr_reader :id, :title, :author
+end
+
+author = Struct.new(:name).new("John")
+income = Post.new(1, "Ruby is awesome", author)
+income.surrealize # => '{ "id": 1, "title": "Ruby is awesome", author: { name: "John" } }'
+
+income.surrealize(tag: :preview) # => '{ "id": 1, "title": "Ruby is awesome" }'
 ```
 
 ### Build schema
@@ -340,16 +370,16 @@ surrealizable object.
 ``` ruby
 class Cat
   include Surrealist
- 
+
   json_schema do
     { weight: String }
   end
- 
+
   def weight
     '3 kilos'
   end
 end
- 
+
 Cat.new.surrealize(include_root: true)
 # => '{ "cat": { "weight": "3 kilos" } }'
 ```
@@ -358,11 +388,11 @@ With nested classes the last namespace will be taken as root key:
 class Animal
   class Dog
     include Surrealist
- 
+
     json_schema do
       { breed: String }
     end
- 
+
     def breed
       'Collie'
     end
@@ -378,20 +408,20 @@ You can build wrap schema into a nested hash from namespaces of the object's cla
 ``` ruby
 class BusinessSystem::Cashout::ReportSystem::Withdraws
   include Surrealist
- 
+
   json_schema do
     { withdraws_amount: Integer }
   end
- 
+
   def withdraws_amount
     34
   end
 end
- 
+
 withdraws = BusinessSystem::Cashout::ReportSystem::Withdraws.new
- 
+
 withdraws.surrealize(include_namespaces: true)
-# => '{ "business_system": { "cashout": { "report_system": { "withdraws": { "withdraws_amount": 34 } } } } }' 
+# => '{ "business_system": { "cashout": { "report_system": { "withdraws": { "withdraws_amount": 34 } } } } }'
 ```
 By default all namespaces will be taken. If you want you can explicitly specify the level of nesting:
 ``` ruby
@@ -404,19 +434,19 @@ Since 0.2.0 Surrealist has API for collection serialization. Example for ActiveR
 ``` ruby
 class User < ActiveRecord::Base
   include Surrealist
- 
+
   json_schema do
     { name: String, age: Integer }
   end
 end
- 
+
 users = User.all
 # => [#<User:0x007fa1485de878 id: 1, name: "Nikita", age: 23>, #<User:0x007fa1485de5f8 id: 2, name: "Alessandro", age: 24>]
- 
+
 Surrealist.surrealize_collection(users)
 # => '[{ "name": "Nikita", "age": 23 }, { "name": "Alessandro", "age": 24 }]'
 ```
-You can find motivation behind introducing new API versus monkey-patching [here](https://alessandrominali.github.io/monkey_patching_real_example).  
+You can find motivation behind introducing new API versus monkey-patching [here](https://alessandrominali.github.io/monkey_patching_real_example).
 `#surrealize_collection` works for all data structures that respond to `#each`. All ActiveRecord
 features (like associations, inheritance etc) are supported and covered. Other ORMs should work without
 issues as well, tests are in progress. All optional arguments (`camelize`, `include_root` etc) are also supported.
@@ -434,11 +464,11 @@ to `#surrealize` or `#build_schema`. The `root` argument will be stripped of whi
 ``` ruby
 class Cat
   include Surrealist
- 
+
   json_schema do
     { weight: String }
   end
- 
+
   def weight
     '3 kilos'
   end
@@ -464,7 +494,7 @@ can use `Bool` and `Any` respectively.
 ``` ruby
 class User
   include Surrealist
- 
+
   json_schema do
     {
       age: Any,
@@ -480,13 +510,13 @@ end
 ``` ruby
 class CreditCard
   include Surrealist
- 
+
   json_schema do
     { number: Integer }
   end
- 
+
   def number
-    'string'  
+    'string'
   end
 end
 
@@ -501,7 +531,7 @@ a corresponding method defined in the object.
 ``` ruby
 class Car
   include Surrealist
- 
+
   json_schema do
     { weight: Integer }
   end
