@@ -143,7 +143,8 @@ module Surrealist
     #   provided in the object's class. Values will be taken from the return values
     #   of appropriate methods from the object.
     def __build_schema(object, **args)
-      if (serializer = Surrealist::VarsHelper.find_serializer(object.class))
+      serializer = Surrealist::VarsHelper.find_serializer(object.class, tag: args[:tag])
+      if serializer
         serializer.new(object, args[:context].to_h).build_schema(args)
       else
         build_schema(instance: object, **args)

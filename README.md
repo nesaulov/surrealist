@@ -23,9 +23,10 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
   * [Nested structures](#nested-structures)
   * [Nested objects](#nested-objects)
   * [Collection Surrealization](#collection-surrealization)
-  * [Defining custom serializers](#defining-custom-serializers)
   * [Delegating Surrealization](#delegating-surrealization)
   * [Usage with Dry::Types](#usage-with-drytypes)
+  * [Defining custom serializers](#defining-custom-serializers)
+  * [Multiple serializers](#multiple-serializers)
   * [Build schema](#build-schema)
   * [Working with ORMs](#working-with-orms)
     * [ActiveRecord](#activerecord)
@@ -347,6 +348,35 @@ IncomeSerializer.new(income, current_user: GuestUser.new).surrealize
  
 IncomeSerializer.new(income, current_user: User.find(3)).surrealize
 # => '{ "amount": 200 }'
+```
+
+### Multiple serializers
+
+You can define several custom serializers for one object and use it in different cases. Just mark it with a tag:
+
+``` ruby
+class PostSerializer < Surrealist::Serializer
+  json_schema { { id: Integer, title: String, author: { name: String } } }
+end
+
+class PreviewSerializer < Surrealist::Serializer
+  json_schema { { id: Integer, title: String } }
+end
+
+class Post
+  include Surrealist
+
+  surrealize_with PostSerializer
+  surrealize_with PreviewSerializer, tag: :short
+
+  attr_reader :id, :title, :author
+end
+
+author = Struct.new(:name).new("John")
+income = Post.new(1, "Ruby is awesome", author)
+income.surrealize # => '{ "id": 1, "title": "Ruby is awesome", author: { name: "John" } }'
+
+income.surrealize(tag: :preview) # => '{ "id": 1, "title": "Ruby is awesome" }'
 ```
 
 ### Build schema

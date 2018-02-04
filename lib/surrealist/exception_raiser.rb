@@ -25,6 +25,9 @@ module Surrealist
   # Error class for cases where +namespaces_nesting_level+ is set to 0.
   class InvalidNestingLevel < ArgumentError; end
 
+  # Error class for unknown tag passed
+  class UnknownTagError < ArgumentError; end
+
   # A class that raises all Surrealist exceptions
   module ExceptionRaiser
     CLASS_NAME_NOT_PASSED           = "Can't wrap schema in root key - class name was not passed".freeze
@@ -88,6 +91,16 @@ module Surrealist
         raise Surrealist::UndefinedMethodError,
               "#{e.message}. You have probably defined a key " \
               "in the schema that doesn't have a corresponding method."
+      end
+
+      # Raises ArgumentError if a tag has no corresponding serializer
+      #
+      # @param [String] tag Wrong tag
+      #
+      # @raise Surrealist::UnknownTagError
+      def raise_unknown_tag!(tag)
+        raise Surrealist::UnknownTagError,
+              "The tag specified (#{tag}) has no corresponding serializer"
       end
     end
   end
