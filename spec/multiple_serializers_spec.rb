@@ -50,6 +50,14 @@ RSpec.describe 'Multiple serializers' do
 
       it { expect(post.surrealize(tag: :short)).to eq(expectation.to_json) }
     end
+
+    context 'unknown tag passed' do
+      it 'raises error' do
+        expect { post.surrealize(tag: :kek) }
+          .to raise_error Surrealist::UnknownTagError,
+                          'The tag specified (kek) has no corresponding serializer'
+      end
+    end
   end
 
   describe 'collection' do
