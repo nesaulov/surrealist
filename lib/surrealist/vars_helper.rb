@@ -9,8 +9,10 @@ module Surrealist
     CLASS_VARIABLE = '@@__surrealist_schema'.freeze
     # Regexp to resolve ROM structure
     ROM_REGEXP = /ROM::Struct/o
-    # Instance variable that keeps serializer class
-    SERIALIZER_CLASS = '@__surrealist_serializer'.freeze
+    # Instance variable that keeps serializer classes
+    SERIALIZER_CLASSES = '@__surrealist_serializers'.freeze
+    # Tag for default behaviour in multiple serializers
+    DEFAULT_TAG = :default
 
     class << self
       # Find the schema
@@ -41,18 +43,27 @@ module Surrealist
       # Checks if there is a serializer defined for a given class and returns it
       #
       # @param [Class] klass a class to check
+      # @param [Symbol] tag a tag associated with serializer
       #
       # @return [Class | nil]
-      def find_serializer(klass)
-        klass.instance_variable_get(SERIALIZER_CLASS)
+      def find_serializer(klass, tag: nil)
+        tag ||= DEFAULT_TAG
+        hash = klass.instance_variable_get(SERIALIZER_CLASSES)
+        serializer = hash && hash.fetch(tag.to_sym, nil)
+        Surrealist::ExceptionRaiser.raise_unknown_tag!(tag) if serializer.nil? && tag != DEFAULT_TAG
+        serializer
       end
 
       # Sets a serializer for class
       #
       # @param [Class] self_class class of object that points to serializer
       # @param [Class] serializer_class class of serializer
-      def set_serializer(self_class, serializer_class)
-        self_class.instance_variable_set(SERIALIZER_CLASS, serializer_class)
+      # @param [Symbol] tag a tag associated with serializer
+      def add_serializer(self_class, serializer_class, tag: nil)
+        tag ||= DEFAULT_TAG
+        hash = self_class.instance_variable_get(SERIALIZER_CLASSES) || {}
+        hash[tag.to_sym] = serializer_class
+        self_class.instance_variable_set(SERIALIZER_CLASSES, hash)
       end
 
       private
