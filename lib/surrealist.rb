@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'json'
+require 'oj'
 require_relative 'surrealist/any'
 require_relative 'surrealist/bool'
 require_relative 'surrealist/builder'
@@ -60,7 +60,7 @@ module Surrealist
         Helper.surrealist?(object.class) ? __build_schema(object, args) : object
       end
 
-      args[:raw] ? result : JSON.dump(result)
+      args[:raw] ? result : Oj.dump(result, mode: :compat)
     end
 
     # Dumps the object's methods corresponding to the schema
@@ -78,7 +78,7 @@ module Surrealist
     #   provided in the object's class. Values will be taken from the return values
     #   of appropriate methods from the object.
     def surrealize(instance:, **args)
-      JSON.dump(build_schema(instance: instance, **args))
+      Oj.dump(build_schema(instance: instance, **args), mode: :compat)
     end
 
     # Builds hash from schema provided in the object's class and type-checks the values.
