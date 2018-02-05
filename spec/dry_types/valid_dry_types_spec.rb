@@ -194,7 +194,7 @@ RSpec.describe 'Dry-types with valid scenarios' do
                a_true: true, a_false: false, a_bool: true, an_int: 42, a_float: 42.5,
                a_decimal: 23, a_string: 'string', an_array: [1, 2, 3], a_hash: { key: :value },
                times: {
-                 a_date: Date.new(42), a_date_time: '0042-01-01T00:00:00.000+00:00',
+                 a_date: Date.new(42), a_date_time: DateTime.new(42),
                  a_time: Time.new(42)
                })
     end
@@ -205,8 +205,8 @@ RSpec.describe 'Dry-types with valid scenarios' do
                'a_true' => true, 'a_false' => false, 'a_bool' => true, 'an_int' => 42,
                'a_float' => 42.5, 'a_decimal' => BigDecimal(23).to_s, 'a_string' => 'string',
                'an_array' => [1, 2, 3], 'a_hash' => { 'key' => 'value' }, 'times' => {
-                 'a_date' => Date.new(42).to_s, 'a_date_time' => '0042-01-01T00:00:00.000+00:00',
-                 'a_time' => '0042-01-01T00:00:00.000+03:00'
+                 'a_date' => Date.new(42).to_s, 'a_date_time' => DateTime.new(42).strftime('%FT%T.%L%:z'),
+                 'a_time' => Time.new(42).strftime('%FT%T.%L%:z')
                })
     end
 
@@ -216,7 +216,7 @@ RSpec.describe 'Dry-types with valid scenarios' do
                aTrue: true, aFalse: false, aBool: true, anInt: 42, aFloat: 42.5,
                aDecimal: 23, aString: 'string', anArray: [1, 2, 3], aHash: { key: :value },
                times: {
-                 aDate: Date.new(42), aDateTime: '0042-01-01T00:00:00.000+00:00',
+                 aDate: Date.new(42), aDateTime: DateTime.new(42),
                  aTime: Time.new(42)
                })
 
@@ -225,8 +225,8 @@ RSpec.describe 'Dry-types with valid scenarios' do
                'aTrue' => true, 'aFalse' => false, 'aBool' => true, 'anInt' => 42,
                'aFloat' => 42.5, 'aDecimal' => BigDecimal(23).to_s, 'aString' => 'string',
                'anArray' => [1, 2, 3], 'aHash' => { 'key' => 'value' }, 'times' => {
-                 'aDate' => Date.new(42).to_s, 'aDateTime' => '0042-01-01T00:00:00.000+00:00',
-                 'aTime' => '0042-01-01T00:00:00.000+03:00'
+                 'aDate' => Date.new(42).to_s, 'aDateTime' => DateTime.new(42).strftime('%FT%T.%L%:z'),
+                 'aTime' => Time.new(42).strftime('%FT%T.%L%:z')
                })
     end
   end
@@ -239,7 +239,7 @@ RSpec.describe 'Dry-types with valid scenarios' do
         .to eq(a_nil: nil, a_symbol: :a, a_class: ExampleClass, a_true: true, a_false: false,
                a_bool: true, an_int: 42, a_float: 42.5, a_decimal: 23, a_string: 'string',
                an_array: [1, 2, 3], a_hash: { key: :value }, times: {
-                 a_date: Date.new(42), a_date_time: '0042-01-01T00:00:00.000+00:00',
+                 a_date: Date.new(42), a_date_time: DateTime.new(42),
                  a_time: Time.new(42)
                })
     end
@@ -250,8 +250,9 @@ RSpec.describe 'Dry-types with valid scenarios' do
                'a_true' => true, 'a_false' => false, 'a_bool' => true, 'an_int' => 42,
                'a_float' => 42.5, 'a_decimal' => BigDecimal(23).to_s, 'a_string' => 'string',
                'an_array' => [1, 2, 3], 'a_hash' => { 'key' => 'value' }, 'times' => {
-                 'a_date' => Date.new(42).to_s, 'a_date_time' => '0042-01-01T00:00:00.000+00:00',
-                 'a_time' => '0042-01-01T00:00:00.000+03:00'
+                 'a_date' => Date.new(42).to_s,
+                 'a_date_time' => DateTime.new(42).strftime('%FT%T.%L%:z'),
+                 'a_time' => Time.new(42).strftime('%FT%T.%L%:z'),
                })
     end
 
@@ -260,7 +261,7 @@ RSpec.describe 'Dry-types with valid scenarios' do
         .to eq(aNil: nil, aSymbol: :a, aClass: ExampleClass, aTrue: true, aFalse: false,
                aBool: true, anInt: 42, aFloat: 42.5, aDecimal: 23, aString: 'string',
                anArray: [1, 2, 3], aHash: { key: :value }, times: {
-                 aDate: Date.new(42), aDateTime: '0042-01-01T00:00:00.000+00:00',
+                 aDate: Date.new(42), aDateTime: DateTime.new(42),
                  aTime: Time.new(42)
                })
 
@@ -269,8 +270,8 @@ RSpec.describe 'Dry-types with valid scenarios' do
                'aTrue' => true, 'aFalse' => false, 'aBool' => true, 'anInt' => 42,
                'aFloat' => 42.5, 'aDecimal' => BigDecimal(23).to_s, 'aString' => 'string',
                'anArray' => [1, 2, 3], 'aHash' => { 'key' => 'value' }, 'times' => {
-                 'aDate' => Date.new(42).to_s, 'aDateTime' => '0042-01-01T00:00:00.000+00:00',
-                 'aTime' => '0042-01-01T00:00:00.000+03:00'
+                 'aDate' => Date.new(42).to_s, 'aDateTime' => DateTime.new(42).strftime('%FT%T.%L%:z'),
+                 'aTime' => Time.new(42).strftime('%FT%T.%L%:z')
                })
     end
   end
@@ -306,7 +307,7 @@ RSpec.describe 'Dry-types with valid scenarios' do
 
     it 'builds schema' do
       expect(instance.build_schema)
-        .to eq(a_nil: nil, a_date: Date.new(42), a_date_time: '0042-01-01T00:00:00.000+00:00',
+        .to eq(a_nil: nil, a_date: Date.new(42), a_date_time: DateTime.new(42),
                a_time: Time.new(42), a_true: true, a_false: false, a_bool: false,
                an_int: 42, a_float: 42.5, a_decimal: BigDecimal(23), an_array: [], a_hash: {})
     end
@@ -314,23 +315,24 @@ RSpec.describe 'Dry-types with valid scenarios' do
     it 'surrealizes' do
       expect(JSON.parse(instance.surrealize))
         .to eq('a_nil' => nil, 'a_date' => Date.new(42).to_s,
-               'a_date_time' => '0042-01-01T00:00:00.000+00:00',
-               'a_time' => '0042-01-01T00:00:00.000+03:00', 'a_true' => true, 'a_false' => false,
+               'a_date_time' => DateTime.new(42).strftime('%FT%T.%L%:z'),
+               'a_time' => Time.new(42).strftime('%FT%T.%L%:z'), 'a_true' => true, 'a_false' => false,
                'a_bool' => false, 'an_int' => 42, 'a_float' => 42.5, 'a_decimal' => BigDecimal(23).to_s,
                'an_array' => [], 'a_hash' => {})
     end
 
     it 'camelizes' do
       expect(instance.build_schema(camelize: true))
-        .to eq(aNil: nil, aDate: Date.new(42), aDateTime: '0042-01-01T00:00:00.000+00:00',
+        .to eq(aNil: nil, aDate: Date.new(42), aDateTime: DateTime.new(42),
                aTime: Time.new(42), aTrue: true, aFalse: false, aBool: false,
                anInt: 42, aFloat: 42.5, aDecimal: BigDecimal(23), anArray: [], aHash: {})
 
       expect(JSON.parse(instance.surrealize(camelize: true)))
         .to eq('aNil' => nil, 'aDate' => Date.new(42).to_s,
-               'aDateTime' => '0042-01-01T00:00:00.000+00:00', 'aTime' => '0042-01-01T00:00:00.000+03:00',
-               'aTrue' => true, 'aFalse' => false, 'aBool' => false, 'anInt' => 42,
-               'aFloat' => 42.5, 'aDecimal' => BigDecimal(23).to_s, 'anArray' => [], 'aHash' => {})
+               'aDateTime' => DateTime.new(42).strftime('%FT%T.%L%:z'),
+               'aTime' => Time.new(42).strftime('%FT%T.%L%:z'), 'aTrue' => true, 'aFalse' => false,
+               'aBool' => false, 'anInt' => 42, 'aFloat' => 42.5, 'aDecimal' => BigDecimal(23).to_s,
+               'anArray' => [], 'aHash' => {})
     end
   end
 
@@ -339,26 +341,28 @@ RSpec.describe 'Dry-types with valid scenarios' do
 
     it 'builds schema' do
       expect(instance.build_schema)
-        .to eq(a_nil: nil, a_date: Date.new(42), a_date_time: '0042-01-01T00:00:00.000+00:00',
+        .to eq(a_nil: nil, a_date: Date.new(42), a_date_time: DateTime.new(42),
                a_time: Time.new(42), a_decimal: BigDecimal(23), an_array: [], a_hash: {})
     end
 
     it 'surrealizes' do
       expect(JSON.parse(instance.surrealize))
         .to eq('a_nil' => nil, 'a_date' => Date.new(42).to_s,
-               'a_date_time' => '0042-01-01T00:00:00.000+00:00', 'a_time' => '0042-01-01T00:00:00.000+03:00',
-               'a_decimal' => BigDecimal(23).to_s, 'an_array' => [], 'a_hash' => {})
+               'a_date_time' => DateTime.new(42).strftime('%FT%T.%L%:z'),
+               'a_time' => Time.new(42).strftime('%FT%T.%L%:z'), 'a_decimal' => BigDecimal(23).to_s,
+               'an_array' => [], 'a_hash' => {})
     end
 
     it 'camelizes' do
       expect(instance.build_schema(camelize: true))
-        .to eq(aNil: nil, aDate: Date.new(42), aDateTime: '0042-01-01T00:00:00.000+00:00',
+        .to eq(aNil: nil, aDate: Date.new(42), aDateTime: DateTime.new(42),
                aTime: Time.new(42), aDecimal: BigDecimal(23), anArray: [], aHash: {})
 
       expect(JSON.parse(instance.surrealize(camelize: true)))
         .to eq('aNil' => nil, 'aDate' => Date.new(42).to_s,
-               'aDateTime' => '0042-01-01T00:00:00.000+00:00', 'aTime' => '0042-01-01T00:00:00.000+03:00',
-               'aDecimal' => BigDecimal(23).to_s, 'anArray' => [], 'aHash' => {})
+               'aDateTime' => DateTime.new(42).strftime('%FT%T.%L%:z'),
+               'aTime' => Time.new(42).strftime('%FT%T.%L%:z'), 'aDecimal' => BigDecimal(23).to_s,
+               'anArray' => [], 'aHash' => {})
     end
   end
 
