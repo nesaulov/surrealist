@@ -49,7 +49,7 @@ module Surrealist
     #   # => "{\"name\":\"Nikita\",\"age\":23}"
     #   # For more examples see README
     def surrealize(**args)
-      serializer = Surrealist::VarsHelper.find_serializer(self.class, tag: args[:tag])
+      serializer = Surrealist::VarsHelper.find_serializer(self.class, tag: args[:format])
       return serializer.new(self).surrealize(args) if serializer
 
       JSON.dump(build_schema(args))
