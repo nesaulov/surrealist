@@ -45,6 +45,7 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
 * [Roadmap](#roadmap)  
 * [Contributing](#contributing)
 * [Credits](#credits)
+* [Authors](#authors)
 * [License](#license)
 
 
@@ -719,6 +720,12 @@ to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of
 
 ## Credits
 The icon was created by [Simon Child from Noun Project](https://thenounproject.com/term/salvador-dali/124566/) and is published under [Creative Commons License](https://creativecommons.org/licenses/by/3.0/us/)
+
+## Authors
+Created by [Nikita Esaulov](https://github.com/nesaulov) with help from [Alessandro Minali](https://github.com/AlessandroMinali) and [Alexey Bespalov](https://github.com/nulldef).
+
+<a href="https://github.com/umbrellio/">
+<img src="https://umbrellio.github.io/Umbrellio/supported_by_umbrellio.png" alt="Supported by Umbrellio" width="439" height="72"></a>
 
 ## License
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
