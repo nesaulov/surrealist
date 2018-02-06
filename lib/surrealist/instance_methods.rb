@@ -52,11 +52,14 @@ module Surrealist
       serializer = Surrealist::VarsHelper.find_serializer(self.class, tag: args[:tag])
       return serializer.new(self).surrealize(args) if serializer
 
-      Oj.dump(build_schema(args), mode: :compat)
+      Oj.dump(Surrealist.build_schema(instance: self, **args), mode: :compat)
     end
 
     # Invokes +Surrealist+'s class method +build_schema+
     def build_schema(**args)
+      serializer = Surrealist::VarsHelper.find_serializer(self.class, tag: args[:tag])
+      return serializer.new(self).build_schema(args) if serializer
+
       Surrealist.build_schema(instance: self, **args)
     end
   end
