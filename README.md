@@ -3,6 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/nesaulov/surrealist/badge.svg?branch=master)](https://coveralls.io/github/nesaulov/surrealist?branch=master)
 [![Inline docs](http://inch-ci.org/github/nesaulov/surrealist.svg?branch=master)](http://inch-ci.org/github/nesaulov/surrealist)
 [![Gem Version](https://badge.fury.io/rb/surrealist.svg)](https://rubygems.org/gems/surrealist)
+[![Open Source Helpers](https://www.codetriage.com/nesaulov/surrealist/badges/users.svg)](https://www.codetriage.com/nesaulov/surrealist)
 
 ![Surrealist](surrealist-icon.png)
  

@@ -2,6 +2,7 @@ AllCops:
   TargetRubyVersion: 2.2
   Exclude:
     - './gemfiles/*gemfile'
+    - './tmp/*'
 
 Documentation:
   Exclude:
