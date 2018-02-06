@@ -81,10 +81,6 @@ module Surrealist
       Oj.dump(build_schema(instance: instance, **args), mode: :compat)
     end
 
-    # def build_collection_schema(collection:, **args)
-    #   Surrealist::ExceptionRaiser.raise_invalid_collection! unless collection.respond_to?(:each)
-    # end
-
     # Builds hash from schema provided in the object's class and type-checks the values.
     #
     # @param [Object] instance of a class that has +Surrealist+ included.
