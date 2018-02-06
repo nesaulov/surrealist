@@ -54,7 +54,7 @@ module Surrealist
     #   # => "[{\"name\":\"Nikita\",\"age\":23}, {\"name\":\"Alessandro\",\"age\":24}]"
     #   # For more examples see README
     def surrealize_collection(collection, **args)
-      raise Surrealist::ExceptionRaiser.raise_invalid_collection! unless collection.respond_to?(:each)
+      Surrealist::ExceptionRaiser.raise_invalid_collection! unless collection.respond_to?(:each)
 
       result = collection.map do |object|
         Helper.surrealist?(object.class) ? __build_schema(object, args) : object
@@ -80,6 +80,10 @@ module Surrealist
     def surrealize(instance:, **args)
       Oj.dump(build_schema(instance: instance, **args), mode: :compat)
     end
+
+    # def build_collection_schema(collection:, **args)
+    #   Surrealist::ExceptionRaiser.raise_invalid_collection! unless collection.respond_to?(:each)
+    # end
 
     # Builds hash from schema provided in the object's class and type-checks the values.
     #
