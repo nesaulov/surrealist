@@ -40,6 +40,7 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
 * [Roadmap](#roadmap)
 * [Contributing](#contributing)
 * [Credits](#credits)
+* [Authors](#authors)
 * [License](#license)
 
 
@@ -560,7 +561,7 @@ to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of
 The icon was created by [Simon Child from Noun Project](https://thenounproject.com/term/salvador-dali/124566/) and is published under [Creative Commons License](https://creativecommons.org/licenses/by/3.0/us/)
 
 ## Authors
-Created by [Nikita Esaulov](https://github.com/nesaulov) with help from [Alessandro Minali](https://github.com/AlessandroMinali) and [Alexey Bespalov](https://github.com/nulldef)
+Created by [Nikita Esaulov](https://github.com/nesaulov) with help from [Alessandro Minali](https://github.com/AlessandroMinali) and [Alexey Bespalov](https://github.com/nulldef).
 
 ![Supported by Umbrellio](https://umbrellio.github.io/Umbrellio/supported_by_umbrellio.png)
 
