@@ -334,19 +334,24 @@ class Post
   include Surrealist
  
   surrealize_with PostSerializer
-  surrealize_with PreviewSerializer, tag: :short
+  surrealize_with PreviewSerializer, tag: :preview
  
   attr_reader :id, :title, :author
 end
 ```
 
-And then specify serializer with `format` option:
+And then specify serializer's tag with `for` argument:
 ``` ruby
 author = Struct.new(:name).new("John")
-income = Post.new(1, "Ruby is awesome", author)
-income.surrealize # => '{ "id": 1, "title": "Ruby is awesome", author: { name: "John" } }'
+post = Post.new(1, "Ruby is awesome", author)
+post.surrealize # => '{ "id": 1, "title": "Ruby is awesome", author: { name: "John" } }'
  
-income.surrealize(format: :preview) # => '{ "id": 1, "title": "Ruby is awesome" }'
+post.surrealize(for: :preview) # => '{ "id": 1, "title": "Ruby is awesome" }'
+```
+Or specify serializer explicitly with `serializer` argument:
+
+``` ruby
+post.surrealize(serializer: PreviewSerializer) # => '{ "id": 1, "title": "Ruby is awesome" }'
 ```
 
 ### Build schema
