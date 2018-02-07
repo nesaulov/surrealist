@@ -564,7 +564,8 @@ The icon was created by [Simon Child from Noun Project](https://thenounproject.c
 Created by [Nikita Esaulov](https://github.com/nesaulov) with help from [Alessandro Minali](https://github.com/AlessandroMinali) and [Alexey Bespalov](https://github.com/nulldef).
 
 <a href="https://github.com/umbrellio/">
-<img src="https://umbrellio.github.io/Umbrellio/supported_by_umbrellio.png" alt="Supported by Umbrellio" width="439" height="72"></a>
+<img style="float: left;" src="https://umbrellio.github.io/Umbrellio/supported_by_umbrellio.svg" alt="Supported by Umbrellio" width="439" height="72">
+</a>
 
 ## License
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
