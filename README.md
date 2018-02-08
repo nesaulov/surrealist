@@ -319,9 +319,9 @@ IncomeSerializer.new(income, current_user: User.find(3)).surrealize
 
 ### Multiple serializers
 
-Now you can define several custom serializers for one object and use it in different cases. Just mark it with a tag:
+You can define several custom serializers for one object and use it in different cases. Just mark it with a tag:
 
-```ruby
+``` ruby
 class PostSerializer < Surrealist::Serializer
   json_schema { { id: Integer, title: String, author: { name: String } } }
 end
@@ -332,18 +332,26 @@ end
 
 class Post
   include Surrealist
-
+ 
   surrealize_with PostSerializer
-  surrealize_with PreviewSerializer, tag: :short
-
+  surrealize_with PreviewSerializer, tag: :preview
+ 
   attr_reader :id, :title, :author
 end
+```
 
+And then specify serializer's tag with `for` argument:
+``` ruby
 author = Struct.new(:name).new("John")
-income = Post.new(1, "Ruby is awesome", author)
-income.surrealize # => '{ "id": 1, "title": "Ruby is awesome", author: { name: "John" } }'
+post = Post.new(1, "Ruby is awesome", author)
+post.surrealize # => '{ "id": 1, "title": "Ruby is awesome", author: { name: "John" } }'
+ 
+post.surrealize(for: :preview) # => '{ "id": 1, "title": "Ruby is awesome" }'
+```
+Or specify serializer explicitly with `serializer` argument:
 
-income.surrealize(tag: :preview) # => '{ "id": 1, "title": "Ruby is awesome" }'
+``` ruby
+post.surrealize(serializer: PreviewSerializer) # => '{ "id": 1, "title": "Ruby is awesome" }'
 ```
 
 ### Build schema
