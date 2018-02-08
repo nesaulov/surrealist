@@ -84,8 +84,9 @@ module Surrealist
       #
       # @return [String] new string with lower cased first character.
       def uncapitalize(string)
-        string[0] = string[0].downcase
-        string
+        str = string.dup
+        str[0] = str[0].downcase
+        str
       end
     end
   end

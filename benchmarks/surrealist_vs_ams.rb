@@ -204,9 +204,9 @@ benchmark_associations_collection
 # ruby 2.5.0p0 (2017-12-25 revision 61468) [x86_64-darwin16]
 # -- Instance --
 # Comparison:
-#   Surrealist: instance through .surrealize:    28945.6 i/s
-#   Surrealist: instance through Surrealist::Serializer:    22889.2 i/s - same-ish: difference falls within error
-#   AMS: instance:     1684.5 i/s - 17.18x  slower
+#   Surrealist: instance through .surrealize:    39599.6 i/s
+#   Surrealist: instance through Surrealist::Serializer:    36452.5 i/s - same-ish: difference falls within error
+#   AMS: instance:     1938.9 i/s - 20.42x  slower
 #
 # -- Collection --
 # Comparison:
@@ -218,9 +218,9 @@ benchmark_associations_collection
 #
 # -- Instance --
 # Comparison:
-#   Surrealist: instance through .surrealize:    36503.6 i/s
-#   Surrealist: instance through Surrealist::Serializer:    27772.8 i/s - 1.31x  slower
-#   AMS(without logging): instance:     4751.2 i/s - 7.68x  slower
+#   Surrealist: instance through .surrealize:    40401.4 i/s
+#   Surrealist: instance through Surrealist::Serializer:    29488.3 i/s - 1.37x  slower
+#   AMS(without logging): instance:     4571.7 i/s - 8.84x  slower
 #
 # -- Collection --
 # Comparison:
@@ -232,12 +232,12 @@ benchmark_associations_collection
 #
 # -- Instance --
 # Comparison:
-#   Surrealist (associations): instance through Surrealist::Serializer:     4122.8 i/s
-#   Surrealist (associations): instance through .surrealize:     4056.9 i/s - same-ish: difference falls within error
-#   AMS (associations): instance:     1721.8 i/s - 2.39x  slower
+#   Surrealist (associations): instance through Surrealist::Serializer:     4016.3 i/s
+#   Surrealist (associations): instance through .surrealize:     4004.6 i/s - same-ish: difference falls within error
+#   AMS (associations): instance:     1303.0 i/s - 3.08x  slower
 #
 # -- Collection --
 # Comparison:
-#   Surrealist (associations): collection through Surrealist.surrealize_collection():        2.0 i/s
-#   Surrealist (associations): collection through Surrealist::Serializer:        2.0 i/s - 1.02x  slower
-#   AMS (associations): collection:        1.3 i/s - 1.52x  slower
+#   Surrealist (associations): collection through Surrealist.surrealize_collection():        2.4 i/s
+#   Surrealist (associations): collection through Surrealist::Serializer:        2.4 i/s - 1.03x  slower
+#   AMS (associations): collection:        1.5 i/s - 1.60x  slower
