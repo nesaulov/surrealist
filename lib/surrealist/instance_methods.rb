@@ -49,18 +49,30 @@ module Surrealist
     #   # => "{\"name\":\"Nikita\",\"age\":23}"
     #   # For more examples see README
     def surrealize(**args)
-      serializer = Surrealist::VarsHelper.find_serializer(self.class, tag: args[:tag])
-      return serializer.new(self).surrealize(args) if serializer
+      return args[:serializer].new(self).surrealize(args) if args[:serializer]
+
+      if (serializer = find_serializer(args[:for]))
+        return serializer.new(self).surrealize(args)
+      end
 
       Oj.dump(Surrealist.build_schema(instance: self, **args), mode: :compat)
     end
 
     # Invokes +Surrealist+'s class method +build_schema+
     def build_schema(**args)
-      serializer = Surrealist::VarsHelper.find_serializer(self.class, tag: args[:tag])
-      return serializer.new(self).build_schema(args) if serializer
+      return args[:serializer].new(self).build_schema(args) if args[:serializer]
+
+      if (serializer = find_serializer(args[:for]))
+        return serializer.new(self).build_schema(args)
+      end
 
       Surrealist.build_schema(instance: self, **args)
+    end
+
+    private
+
+    def find_serializer(tag)
+      Surrealist::VarsHelper.find_serializer(self.class, tag: tag)
     end
   end
 end

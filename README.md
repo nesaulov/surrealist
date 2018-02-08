@@ -367,18 +367,26 @@ end
 
 class Post
   include Surrealist
-
+ 
   surrealize_with PostSerializer
-  surrealize_with PreviewSerializer, tag: :short
-
+  surrealize_with PreviewSerializer, tag: :preview
+ 
   attr_reader :id, :title, :author
 end
+```
 
+And then specify serializer's tag with `for` argument:
+``` ruby
 author = Struct.new(:name).new("John")
-income = Post.new(1, "Ruby is awesome", author)
-income.surrealize # => '{ "id": 1, "title": "Ruby is awesome", author: { name: "John" } }'
+post = Post.new(1, "Ruby is awesome", author)
+post.surrealize # => '{ "id": 1, "title": "Ruby is awesome", author: { name: "John" } }'
+ 
+post.surrealize(for: :preview) # => '{ "id": 1, "title": "Ruby is awesome" }'
+```
+Or specify serializer explicitly with `serializer` argument:
 
-income.surrealize(tag: :preview) # => '{ "id": 1, "title": "Ruby is awesome" }'
+``` ruby
+post.surrealize(serializer: PreviewSerializer) # => '{ "id": 1, "title": "Ruby is awesome" }'
 ```
 
 ### Build schema
@@ -725,7 +733,8 @@ The icon was created by [Simon Child from Noun Project](https://thenounproject.c
 Created by [Nikita Esaulov](https://github.com/nesaulov) with help from [Alessandro Minali](https://github.com/AlessandroMinali) and [Alexey Bespalov](https://github.com/nulldef).
 
 <a href="https://github.com/umbrellio/">
-<img src="https://umbrellio.github.io/Umbrellio/supported_by_umbrellio.png" alt="Supported by Umbrellio" width="439" height="72"></a>
+<img style="float: left;" src="https://umbrellio.github.io/Umbrellio/supported_by_umbrellio.svg" alt="Supported by Umbrellio" width="439" height="72">
+</a>
 
 ## License
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
