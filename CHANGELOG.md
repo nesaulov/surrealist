@@ -1,3 +1,14 @@
+# 1.0.0
+
+## Added
+* `#build_schema` for collections from `Surrealist::Serializer` (@nesaulov) #74
+* Oj dependency
+* Multiple serializers API (@nulldef) #66
+
+## Miscellaneous
+* Benchmarks for Surrealist vs AMS
+* A lot of memory & performance optimizations (@nesaulov) #64
+
 # 0.4.0
 
 ## Added

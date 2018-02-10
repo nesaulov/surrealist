@@ -24,8 +24,6 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
   * [Nested structures](#nested-structures)
   * [Nested objects](#nested-objects)
   * [Collection Surrealization](#collection-surrealization)
-  * [Delegating Surrealization](#delegating-surrealization)
-  * [Usage with Dry::Types](#usage-with-drytypes)
   * [Defining custom serializers](#defining-custom-serializers)
   * [Multiple serializers](#multiple-serializers)
   * [Build schema](#build-schema)
@@ -33,6 +31,8 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
     * [ActiveRecord](#activerecord)
     * [ROM](#rom)
     * [Sequel](#sequel)
+  * [Usage with Dry::Types](#usage-with-drytypes)  
+  * [Delegating Surrealization](#delegating-surrealization)
   * [Optional arguments](#optional-arguments)
     * [Camelization](#camelization)
     * [Include root](#include-root)
@@ -186,104 +186,6 @@ If this option is 'truthy' then the results will be an array of surrealized hash
 ```
 Surrealist.surrealize_collection(users, raw: true)
 # => [{ "name": "Nikita", "age": 23 }, { "name": "Alessandro", "age": 24 }]
-```
-Guides on where to use `#surrealize_collection` vs `#surrealize` for all ORMs are coming.
-
-### Delegating surrealization
-You can share the `json_schema` between classes:
-``` ruby
-class Host
-  include Surrealist
- 
-  json_schema do
-    { name: String }
-  end
- 
-  def name
-    'Host'
-  end
-end
-
-class Guest
-  delegate_surrealization_to Host
- 
-  def name
-    'Guest'
-  end
-end
-
-Host.new.surrealize
-# => '{ "name": "Host" }'
-Guest.new.surrealize
-# => '{ "name": "Guest" }'
-```
-Schema delegation works without inheritance as well, so if you wish you can
-delegate surrealization not only to parent classes, but to any class. Please note that
-in this case you have to `include Surrealist` in class that delegates schema as well.
-``` ruby
-class Potato
-  include Surrealist
-  delegate_surrealization_to Host
- 
-  def name
-    'Potato'
-  end
-end
-
-Potato.new.surrealize
-# => '{ "name": "Potato" }'
-```
-
-
-### Usage with Dry::Types
-You can use `Dry::Types` for type checking. Note that Surrealist does not ship
-with dry-types by default, so you should do the [installation and configuration](http://dry-rb.org/gems/dry-types/)
-by yourself. All built-in features of dry-types work, so if you use, say, `Types::Coercible::String`,
-your data will be coerced if it is able to, otherwise you will get a TypeError.
-Assuming that you have defined module called `Types`:
-
-``` ruby
-require 'dry-types'
-
-class Car
-  include Surrealist
- 
-  json_schema do
-    {
-      age:            Types::Coercible::Int,
-      brand:          Types::Coercible::String,
-      doors:          Types::Int.optional,
-      horsepower:     Types::Strict::Int.constrained(gteq: 20),
-      fuel_system:    Types::Any,
-      previous_owner: Types::String,
-    }
-  end
- 
-  def age;
-    '7'
-  end
- 
-  def previous_owner;
-    'John Doe'
-  end
- 
-  def horsepower;
-    140
-  end
- 
-  def brand;
-    'Toyota'
-  end
- 
-  def doors; end
- 
-  def fuel_system;
-    'Direct injection'
-  end
-end
-
-Car.new.surrealize
-# => '{ "age": 7, "brand": "Toyota", "doors": null, "horsepower": 140, "fuel_system": "Direct injection", "previous_owner": "John Doe" }'
 ```
 
 ### Defining custom serializers
@@ -550,6 +452,102 @@ Basically, Sequel returns instances only on `.first`, `.last`, `.[]` and `.with_
 Most of them are covered in `spec/orms/sequel` specs, please refer to them for code examples.
 Associations serialization works the same way as it does with ActiveRecord.
 
+### Usage with Dry::Types
+You can use `Dry::Types` for type checking. Note that Surrealist does not ship
+with dry-types by default, so you should do the [installation and configuration](http://dry-rb.org/gems/dry-types/)
+by yourself. All built-in features of dry-types work, so if you use, say, `Types::Coercible::String`,
+your data will be coerced if it is able to, otherwise you will get a TypeError.
+Assuming that you have defined module called `Types`:
+
+``` ruby
+require 'dry-types'
+
+class Car
+  include Surrealist
+ 
+  json_schema do
+    {
+      age:            Types::Coercible::Int,
+      brand:          Types::Coercible::String,
+      doors:          Types::Int.optional,
+      horsepower:     Types::Strict::Int.constrained(gteq: 20),
+      fuel_system:    Types::Any,
+      previous_owner: Types::String,
+    }
+  end
+ 
+  def age;
+    '7'
+  end
+ 
+  def previous_owner;
+    'John Doe'
+  end
+ 
+  def horsepower;
+    140
+  end
+ 
+  def brand;
+    'Toyota'
+  end
+ 
+  def doors; end
+ 
+  def fuel_system;
+    'Direct injection'
+  end
+end
+
+Car.new.surrealize
+# => '{ "age": 7, "brand": "Toyota", "doors": null, "horsepower": 140, "fuel_system": "Direct injection", "previous_owner": "John Doe" }'
+```
+
+### Delegating surrealization
+You can share the `json_schema` between classes:
+``` ruby
+class Host
+  include Surrealist
+ 
+  json_schema do
+    { name: String }
+  end
+ 
+  def name
+    'Host'
+  end
+end
+
+class Guest
+  delegate_surrealization_to Host
+ 
+  def name
+    'Guest'
+  end
+end
+
+Host.new.surrealize
+# => '{ "name": "Host" }'
+Guest.new.surrealize
+# => '{ "name": "Guest" }'
+```
+Schema delegation works without inheritance as well, so if you wish you can
+delegate surrealization not only to parent classes, but to any class. Please note that
+in this case you have to `include Surrealist` in class that delegates schema as well.
+``` ruby
+class Potato
+  include Surrealist
+  delegate_surrealization_to Host
+ 
+  def name
+    'Potato'
+  end
+end
+
+Potato.new.surrealize
+# => '{ "name": "Potato" }'
+```
+
 ### Optional arguments
 
 #### Camelization
@@ -717,9 +715,9 @@ type check will be passed. If you want to be strict about `nil`s consider using 
 
 ## Roadmap
 Here is a list of features that are not implemented yet (contributions are welcome):
-* Having a config that would keep serialization parameters (like camelize, for example)
+* [Having a config that would keep serialization parameters](https://github.com/nesaulov/surrealist/issues/76)
 * [DSL for serializer contexts](https://github.com/nesaulov/surrealist/issues/67) 
-
+* Memoization/caching
 
 ## Contributing
 Bug reports and pull requests are welcome on GitHub at https://github.com/nesaulov/surrealist.
