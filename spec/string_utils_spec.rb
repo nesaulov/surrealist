@@ -117,17 +117,17 @@ RSpec.describe Surrealist::StringUtils do
       snake_case snake_case::NameSpace With1::Numbers with-dashes::and-Namespaces
     ].each_with_index do |klass, index|
       it "breaks namespaces from #{klass} with default nesting level" do
-        expect(described_class.break_namespaces(klass, camelize: false, nesting_level: 666))
+        expect(described_class.break_namespaces(klass, false, 666))
           .to eq(snake_expectations[index])
       end
 
       it "breaks namespaces from #{klass} & camelizes" do
-        expect(described_class.break_namespaces(klass, camelize: true, nesting_level: 666))
+        expect(described_class.break_namespaces(klass, true, 666))
           .to eq(camelized_expectations[index])
       end
 
       it 'raises exception on nesting_level == 0' do
-        expect { described_class.break_namespaces(klass, camelize: true, nesting_level: 0) }
+        expect { described_class.break_namespaces(klass, true, 0) }
           .to raise_error(ArgumentError,
                           'Expected `namespaces_nesting_level` to be a positive integer, got: 0')
       end
@@ -139,12 +139,12 @@ RSpec.describe Surrealist::StringUtils do
       Another::with-dashes::and-Namespaces
     ].each_with_index do |klass, index|
       it "breaks namespaces from #{klass} with nesting level == 2" do
-        expect(described_class.break_namespaces(klass, camelize: false, nesting_level: 2))
+        expect(described_class.break_namespaces(klass, false, 2))
           .to eq(nested_expectations[index])
       end
 
       it "breaks namespaces from #{klass} with nesting level == 2 & camelizes them" do
-        expect(described_class.break_namespaces(klass, camelize: true, nesting_level: 2))
+        expect(described_class.break_namespaces(klass, true, 2))
           .to eq(camelized_nested_expectations[index])
       end
     end

@@ -126,13 +126,8 @@ module Surrealist
 
       Surrealist::ExceptionRaiser.raise_unknown_schema!(instance) if schema.nil?
 
-      normalized_schema = Surrealist::Copier.deep_copy(
-        hash:    schema,
-        klass:   instance.class.name,
-        carrier: carrier,
-      )
-
-      hash = Builder.new(carrier: carrier, schema: normalized_schema, instance: instance).call
+      normalized_schema = Surrealist::Copier.deep_copy(schema, carrier, instance.class.name)
+      hash = Builder.new(carrier, normalized_schema, instance).call
       carrier.camelize ? Surrealist::HashUtils.camelize_hash(hash) : hash
     end
 

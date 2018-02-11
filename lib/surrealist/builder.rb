@@ -9,7 +9,7 @@ module Surrealist
     # @param [Carrier] carrier instance of Surrealist::Carrier
     # @param [Hash] schema the schema defined in the object's class.
     # @param [Object] instance the instance of the object which methods from the schema are called on.
-    def initialize(carrier:, schema:, instance:)
+    def initialize(carrier, schema, instance)
       @carrier = carrier
       @schema = schema
       @instance = instance
@@ -24,13 +24,13 @@ module Surrealist
     #   does not have a corresponding method on the object.
     #
     # @return [Hash] a hash that will be dumped into JSON.
-    def call(schema: @schema, instance: @instance)
+    def call(schema = @schema, instance = @instance)
       schema.each do |schema_key, schema_value|
         if schema_value.is_a?(Hash)
           check_for_ar(schema, instance, schema_key, schema_value)
         else
-          ValueAssigner.assign(schema: Schema.new(schema_key, schema_value),
-                               instance: instance) { |coerced_value| schema[schema_key] = coerced_value }
+          ValueAssigner.assign(Schema.new(schema_key, schema_value),
+                               instance) { |coerced_value| schema[schema_key] = coerced_value }
         end
       end
     rescue NoMethodError => e
@@ -53,8 +53,7 @@ module Surrealist
       if ar_collection?(instance, key)
         construct_collection(schema, instance, key, value)
       else
-        call(schema:   value,
-             instance: instance.respond_to?(key) ? instance.send(key) : instance)
+        call(value, instance.respond_to?(key) ? instance.send(key) : instance)
       end
     end
 
@@ -81,11 +80,8 @@ module Surrealist
     # @return [Hash] the schema hash
     def construct_collection(schema, instance, key, value)
       schema[key] = []
-      instance.send(key).each do |i|
-        schema[key] << call(
-          schema:   Copier.deep_copy(hash: value, carrier: carrier),
-          instance: i,
-        )
+      instance.send(key).each do |inst|
+        schema[key].push(call(Copier.deep_copy(value, carrier), inst))
       end
     end
   end

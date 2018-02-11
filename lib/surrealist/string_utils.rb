@@ -37,7 +37,7 @@ module Surrealist
           snake_string.to_s.gsub(UNDERSCORE_REGEXP) { Regexp.last_match[1].capitalize }
         else
           parts = snake_string.split(UNDERSCORE, 2)
-          parts[0] << camelize(parts[1]) if parts.size > 1
+          parts[0].concat(camelize(parts[1])) if parts.size > 1
           parts[0] || EMPTY_STRING
         end
       end
@@ -68,7 +68,7 @@ module Surrealist
       # @raise Surrealist::InvalidNestingLevel if nesting level is specified as 0.
       #
       # @return [Hash] a nested hash.
-      def break_namespaces(klass, camelize:, nesting_level:)
+      def break_namespaces(klass, camelize, nesting_level)
         Surrealist::ExceptionRaiser.raise_invalid_nesting!(nesting_level) unless nesting_level > 0
 
         klass.split(NAMESPACES_SEPARATOR).last(nesting_level).reverse.inject({}) do |a, n|

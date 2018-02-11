@@ -10,6 +10,11 @@ class NullCarrier
     @namespaces_nesting_level = Surrealist::DEFAULT_NESTING_LEVEL
     @root                     = nil
   end
+
+  def no_args_provided?
+    camelize == false && include_root == false && include_namespaces == false &&
+      root.nil? && namespaces_nesting_level == Surrealist::DEFAULT_NESTING_LEVEL
+  end
 end
 
 RSpec.describe Surrealist::Copier do
@@ -89,7 +94,7 @@ RSpec.describe Surrealist::Copier do
       args_with_root_and_camelize.each do |hash|
         carrier = Surrealist::Carrier.call(hash)
         it_behaves_like 'schema is camelized and wrapped in the klass root key' do
-          let(:copy) { described_class.deep_copy(hash: object, klass: klass, carrier: carrier) }
+          let(:copy) { described_class.deep_copy(object, carrier, klass) }
         end
       end
     end
@@ -98,7 +103,7 @@ RSpec.describe Surrealist::Copier do
       args_with_root_and_without_camelize.each do |hash|
         carrier = Surrealist::Carrier.call(hash)
         it_behaves_like 'schema is wrapped in the klass root key' do
-          let(:copy) { described_class.deep_copy(hash: object, klass: klass, carrier: carrier) }
+          let(:copy) { described_class.deep_copy(object, carrier, klass) }
         end
       end
     end
@@ -107,7 +112,7 @@ RSpec.describe Surrealist::Copier do
       args_with_root_and_camelize.zip(args_with_root_and_without_camelize).flatten.compact.each do |hash|
         carrier = Surrealist::Carrier.call(hash)
         it_behaves_like 'UnknownRootError is raised' do
-          let(:copy) { described_class.deep_copy(hash: object, carrier: carrier) }
+          let(:copy) { described_class.deep_copy(object, carrier) }
         end
       end
     end
@@ -116,33 +121,33 @@ RSpec.describe Surrealist::Copier do
       args_without_root.each do |hash|
         carrier = Surrealist::Carrier.call(hash)
         it_behaves_like 'hash is cloned deeply and it`s structure is not changed' do
-          let(:copy) { described_class.deep_copy(hash: object, klass: klass, carrier: carrier) }
+          let(:copy) { described_class.deep_copy(object, carrier, klass) }
         end
       end
     end
 
     context 'with NullCarrier' do
       context 'hash & carrier' do
-        let(:copy) { described_class.deep_copy(hash: object, carrier: NullCarrier.new) }
+        let(:copy) { described_class.deep_copy(object, NullCarrier.new) }
 
         it_behaves_like 'hash is cloned deeply and it`s structure is not changed'
       end
 
       context 'with camelize' do
-        let(:copy) { described_class.deep_copy(hash: object, carrier: NullCarrier.new(true)) }
+        let(:copy) { described_class.deep_copy(object, NullCarrier.new(true)) }
 
         it_behaves_like 'hash is cloned deeply and it`s structure is not changed'
       end
 
       context 'with klass' do
-        let(:copy) { described_class.deep_copy(hash: object, klass: klass, carrier: NullCarrier.new) }
+        let(:copy) { described_class.deep_copy(object, NullCarrier.new, klass) }
 
         it_behaves_like 'hash is cloned deeply and it`s structure is not changed'
       end
 
       context 'with klass and camelize' do
         let(:copy) do
-          described_class.deep_copy(hash: object, klass: klass, carrier: NullCarrier.new(true))
+          described_class.deep_copy(object, NullCarrier.new(true), klass)
         end
 
         it_behaves_like 'hash is cloned deeply and it`s structure is not changed'

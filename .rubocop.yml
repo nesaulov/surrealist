@@ -4,6 +4,11 @@ AllCops:
     - './gemfiles/*gemfile'
     - './tmp/*'
 
+Documentation:
+  Exclude:
+    - benchmarks/*rb
+    - spec/**/*rb
+
 # Layout
 
 Layout/AlignParameters:
@@ -52,6 +57,7 @@ Lint/RescueType:
 Metrics/BlockLength:
   Exclude:
     - spec/**/*rb
+    - benchmarks
 
 Metrics/CyclomaticComplexity:
   Enabled: false
@@ -60,6 +66,7 @@ Metrics/MethodLength:
   Max: 15
 
 Metrics/LineLength:
+  Exclude: [benchmarks/*rb]
   Max: 110
 
 Metrics/PerceivedComplexity:

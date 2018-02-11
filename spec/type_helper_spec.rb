@@ -5,124 +5,124 @@ RSpec.describe Surrealist::TypeHelper do
     context 'nil values' do
       context 'plain ruby classes' do
         [
-          { value: nil, type: String },
-          { value: nil, type: Integer },
-          { value: nil, type: Array },
-          { value: nil, type: Object },
-          { value: nil, type: Any },
-          { value: nil, type: Float },
-          { value: nil, type: Hash },
-          { value: nil, type: BigDecimal },
-          { value: nil, type: Symbol },
+          [nil, String],
+          [nil, Integer],
+          [nil, Array],
+          [nil, Object],
+          [nil, Any],
+          [nil, Float],
+          [nil, Hash],
+          [nil, BigDecimal],
+          [nil, Symbol],
         ].each do |params|
           it "returns true for #{params} because value is nil" do
-            expect(described_class.valid_type?(params)).to eq true
+            expect(described_class.valid_type?(*params)).to eq true
           end
         end
       end
 
       context 'optional dry-types' do
         [
-          { value: nil, type: Types::Any },
-          { value: nil, type: Types::Form::Nil },
-          { value: nil, type: Types::Json::Nil },
-          { value: nil, type: Types::String.optional },
-          { value: nil, type: Types::Int.optional },
-          { value: nil, type: Types::Array.optional },
-          { value: nil, type: Types::Bool.optional },
-          { value: nil, type: Types::Any.optional },
-          { value: nil, type: Types::Any.optional },
-          { value: nil, type: Types::Symbol.optional },
-          { value: nil, type: Types::Class.optional },
-          { value: nil, type: Types::True.optional },
-          { value: nil, type: Types::False.optional },
-          { value: nil, type: Types::Float.optional },
-          { value: nil, type: Types::Decimal.optional },
-          { value: nil, type: Types::Hash.optional },
-          { value: nil, type: Types::Date.optional },
-          { value: nil, type: Types::DateTime.optional },
-          { value: nil, type: Types::Time.optional },
-          { value: nil, type: Types::Form::Nil.optional },
-          { value: nil, type: Types::Form::Date.optional },
-          { value: nil, type: Types::Form::DateTime.optional },
-          { value: nil, type: Types::Form::True.optional },
-          { value: nil, type: Types::Form::False.optional },
-          { value: nil, type: Types::Form::Bool.optional },
-          { value: nil, type: Types::Form::Int.optional },
-          { value: nil, type: Types::Form::Float.optional },
-          { value: nil, type: Types::Form::Decimal.optional },
-          { value: nil, type: Types::Form::Array.optional },
-          { value: nil, type: Types::Form::Hash.optional },
-          { value: nil, type: Types::Json::Nil.optional },
-          { value: nil, type: Types::Json::Date.optional },
-          { value: nil, type: Types::Json::DateTime.optional },
-          { value: nil, type: Types::Json::Time.optional },
-          { value: nil, type: Types::Json::Decimal.optional },
-          { value: nil, type: Types::Json::Array.optional },
-          { value: nil, type: Types::Json::Hash.optional },
+          [nil, Types::Any],
+          [nil, Types::Form::Nil],
+          [nil, Types::Json::Nil],
+          [nil, Types::String.optional],
+          [nil, Types::Int.optional],
+          [nil, Types::Array.optional],
+          [nil, Types::Bool.optional],
+          [nil, Types::Any.optional],
+          [nil, Types::Any.optional],
+          [nil, Types::Symbol.optional],
+          [nil, Types::Class.optional],
+          [nil, Types::True.optional],
+          [nil, Types::False.optional],
+          [nil, Types::Float.optional],
+          [nil, Types::Decimal.optional],
+          [nil, Types::Hash.optional],
+          [nil, Types::Date.optional],
+          [nil, Types::DateTime.optional],
+          [nil, Types::Time.optional],
+          [nil, Types::Form::Nil.optional],
+          [nil, Types::Form::Date.optional],
+          [nil, Types::Form::DateTime.optional],
+          [nil, Types::Form::True.optional],
+          [nil, Types::Form::False.optional],
+          [nil, Types::Form::Bool.optional],
+          [nil, Types::Form::Int.optional],
+          [nil, Types::Form::Float.optional],
+          [nil, Types::Form::Decimal.optional],
+          [nil, Types::Form::Array.optional],
+          [nil, Types::Form::Hash.optional],
+          [nil, Types::Json::Nil.optional],
+          [nil, Types::Json::Date.optional],
+          [nil, Types::Json::DateTime.optional],
+          [nil, Types::Json::Time.optional],
+          [nil, Types::Json::Decimal.optional],
+          [nil, Types::Json::Array.optional],
+          [nil, Types::Json::Hash.optional],
         ].each do |params|
           it "returns true for #{params} because value is nil and type is not strict" do
-            expect(described_class.valid_type?(params)).to eq true
+            expect(described_class.valid_type?(*params)).to eq true
           end
         end
       end
 
       context 'non-optional dry-types' do
         [
-          { value: nil, type: Types::String },
-          { value: nil, type: Types::Int },
-          { value: nil, type: Types::Array },
-          { value: nil, type: Types::Bool },
-          { value: nil, type: Types::Symbol },
-          { value: nil, type: Types::Class },
-          { value: nil, type: Types::True },
-          { value: nil, type: Types::False },
-          { value: nil, type: Types::Float },
-          { value: nil, type: Types::Decimal },
-          { value: nil, type: Types::Hash },
-          { value: nil, type: Types::Date },
-          { value: nil, type: Types::DateTime },
-          { value: nil, type: Types::Time },
-          { value: nil, type: Types::Form::Date },
-          { value: nil, type: Types::Form::DateTime },
-          { value: nil, type: Types::Form::True },
-          { value: nil, type: Types::Form::False },
-          { value: nil, type: Types::Form::Bool },
-          { value: nil, type: Types::Form::Int },
-          { value: nil, type: Types::Form::Float },
-          { value: nil, type: Types::Form::Decimal },
-          { value: nil, type: Types::Form::Array },
-          { value: nil, type: Types::Form::Hash },
-          { value: nil, type: Types::Json::Date },
-          { value: nil, type: Types::Json::DateTime },
-          { value: nil, type: Types::Json::Time },
-          { value: nil, type: Types::Json::Array },
-          { value: nil, type: Types::Json::Hash },
+          [nil, Types::String],
+          [nil, Types::Int],
+          [nil, Types::Array],
+          [nil, Types::Bool],
+          [nil, Types::Symbol],
+          [nil, Types::Class],
+          [nil, Types::True],
+          [nil, Types::False],
+          [nil, Types::Float],
+          [nil, Types::Decimal],
+          [nil, Types::Hash],
+          [nil, Types::Date],
+          [nil, Types::DateTime],
+          [nil, Types::Time],
+          [nil, Types::Form::Date],
+          [nil, Types::Form::DateTime],
+          [nil, Types::Form::True],
+          [nil, Types::Form::False],
+          [nil, Types::Form::Bool],
+          [nil, Types::Form::Int],
+          [nil, Types::Form::Float],
+          [nil, Types::Form::Decimal],
+          [nil, Types::Form::Array],
+          [nil, Types::Form::Hash],
+          [nil, Types::Json::Date],
+          [nil, Types::Json::DateTime],
+          [nil, Types::Json::Time],
+          [nil, Types::Json::Array],
+          [nil, Types::Json::Hash],
         ].each do |params|
           it "returns false for #{params} because value is nil" do
-            expect(described_class.valid_type?(params)).to eq false
+            expect(described_class.valid_type?(*params)).to eq false
           end
         end
       end
 
       context 'strict dry-types' do
         [
-          { value: nil, type: Types::Strict::Class },
-          { value: nil, type: Types::Strict::True },
-          { value: nil, type: Types::Strict::False },
-          { value: nil, type: Types::Strict::Bool },
-          { value: nil, type: Types::Strict::Int },
-          { value: nil, type: Types::Strict::Float },
-          { value: nil, type: Types::Strict::Decimal },
-          { value: nil, type: Types::Strict::String },
-          { value: nil, type: Types::Strict::Date },
-          { value: nil, type: Types::Strict::DateTime },
-          { value: nil, type: Types::Strict::Time },
-          { value: nil, type: Types::Strict::Array },
-          { value: nil, type: Types::Strict::Hash },
+          [nil, Types::Strict::Class],
+          [nil, Types::Strict::True],
+          [nil, Types::Strict::False],
+          [nil, Types::Strict::Bool],
+          [nil, Types::Strict::Int],
+          [nil, Types::Strict::Float],
+          [nil, Types::Strict::Decimal],
+          [nil, Types::Strict::String],
+          [nil, Types::Strict::Date],
+          [nil, Types::Strict::DateTime],
+          [nil, Types::Strict::Time],
+          [nil, Types::Strict::Array],
+          [nil, Types::Strict::Hash],
         ].each do |params|
           it "returns false for #{params} because value is nil & type is strict" do
-            expect(described_class.valid_type?(params)).to eq false
+            expect(described_class.valid_type?(*params)).to eq false
           end
         end
       end
@@ -130,24 +130,24 @@ RSpec.describe Surrealist::TypeHelper do
       context 'coercible dry-types' do
         context 'types that can be coerced from nil' do
           [
-            { value: nil, type: Types::Coercible::String },
-            { value: nil, type: Types::Coercible::Array },
-            { value: nil, type: Types::Coercible::Hash },
+            [nil, Types::Coercible::String],
+            [nil, Types::Coercible::Array],
+            [nil, Types::Coercible::Hash],
           ].each do |params|
             it "returns true for #{params} because nil can be coerced" do
-              expect(described_class.valid_type?(params)).to eq true
+              expect(described_class.valid_type?(*params)).to eq true
             end
           end
         end
 
         context 'types that can\'t be coerced' do
           [
-            { value: nil, type: Types::Coercible::Int },
-            { value: nil, type: Types::Coercible::Float },
-            { value: nil, type: Types::Coercible::Decimal },
+            [nil, Types::Coercible::Int],
+            [nil, Types::Coercible::Float],
+            [nil, Types::Coercible::Decimal],
           ].each do |params|
             it "returns false for #{params} because nil can't be coerced" do
-              expect(described_class.valid_type?(params)).to eq false
+              expect(described_class.valid_type?(*params)).to eq false
             end
           end
         end
@@ -156,113 +156,113 @@ RSpec.describe Surrealist::TypeHelper do
 
     context 'string values' do
       [
-        { value: 'string', type: String },
-        { value: 'string', type: Types::String },
-        { value: 'string', type: Types::Coercible::String },
-        { value: 'string', type: Types::Strict::String },
-        { value: 'string', type: Types::String.optional },
+        ['string', String],
+        ['string', Types::String],
+        ['string', Types::Coercible::String],
+        ['string', Types::Strict::String],
+        ['string', Types::String.optional],
       ].each do |params|
         it "returns true for #{params}" do
-          expect(described_class.valid_type?(params)).to eq true
+          expect(described_class.valid_type?(*params)).to eq true
         end
       end
     end
 
     context 'integer values' do
       [
-        { value: 666, type: Integer },
-        { value: 666, type: Types::Int },
-        { value: 666, type: Types::Int.optional },
-        { value: 666, type: Types::Strict::Int },
-        { value: 666, type: Types::Coercible::Int },
-        { value: 666, type: Types::Form::Int },
-        { value: 666, type: Types::Form::Int.optional },
+        [666, Integer],
+        [666, Types::Int],
+        [666, Types::Int.optional],
+        [666, Types::Strict::Int],
+        [666, Types::Coercible::Int],
+        [666, Types::Form::Int],
+        [666, Types::Form::Int.optional],
       ].each do |params|
         it "returns true for #{params}" do
-          expect(described_class.valid_type?(params)).to eq true
+          expect(described_class.valid_type?(*params)).to eq true
         end
       end
     end
 
     context 'array values' do
       [
-        { value: %w[an array], type: Array },
-        { value: %w[an array], type: Types::Array },
-        { value: %w[an array], type: Types::Array.optional },
-        { value: %w[an array], type: Types::Strict::Array },
-        { value: %w[an array], type: Types::Json::Array },
-        { value: %w[an array], type: Types::Json::Array.optional },
-        { value: %w[an array], type: Types::Form::Array },
-        { value: %w[an array], type: Types::Form::Array.optional },
-        { value: %w[an array], type: Types::Coercible::Array },
-        { value: %w[an array], type: Types::Coercible::Array.optional },
+        [%w[an array], Array],
+        [%w[an array], Types::Array],
+        [%w[an array], Types::Array.optional],
+        [%w[an array], Types::Strict::Array],
+        [%w[an array], Types::Json::Array],
+        [%w[an array], Types::Json::Array.optional],
+        [%w[an array], Types::Form::Array],
+        [%w[an array], Types::Form::Array.optional],
+        [%w[an array], Types::Coercible::Array],
+        [%w[an array], Types::Coercible::Array.optional],
       ].each do |params|
         it "returns true for #{params}" do
-          expect(described_class.valid_type?(params)).to eq true
+          expect(described_class.valid_type?(*params)).to eq true
         end
       end
     end
 
     context 'hash values' do
       [
-        { value: { a: :b }, type: Hash },
-        { value: { a: :b }, type: Types::Hash },
-        { value: { a: :b }, type: Types::Hash.optional },
-        { value: { a: :b }, type: Types::Strict::Hash },
-        { value: { a: :b }, type: Types::Form::Hash },
-        { value: { a: :b }, type: Types::Form::Hash.optional },
-        { value: { a: :b }, type: Types::Json::Hash },
-        { value: { a: :b }, type: Types::Json::Hash.optional },
-        { value: { a: :b }, type: Types::Coercible::Hash },
-        { value: { a: :b }, type: Types::Coercible::Hash.optional },
+        [{ a: :b }, Hash],
+        [{ a: :b }, Types::Hash],
+        [{ a: :b }, Types::Hash.optional],
+        [{ a: :b }, Types::Strict::Hash],
+        [{ a: :b }, Types::Form::Hash],
+        [{ a: :b }, Types::Form::Hash.optional],
+        [{ a: :b }, Types::Json::Hash],
+        [{ a: :b }, Types::Json::Hash.optional],
+        [{ a: :b }, Types::Coercible::Hash],
+        [{ a: :b }, Types::Coercible::Hash.optional],
       ].each do |params|
         it "returns true for #{params}" do
-          expect(described_class.valid_type?(params)).to eq true
+          expect(described_class.valid_type?(*params)).to eq true
         end
       end
     end
 
     context 'any values' do
       [
-        { value: nil, type: Any },
-        { value: 'nil', type: Any },
-        { value: :nil, type: Any },
-        { value: [nil], type: Any },
-        { value: { nil: :nil }, type: Any },
-        { value: nil, type: Types::Any },
-        { value: 'nil', type: Types::Any },
-        { value: :nil, type: Types::Any },
-        { value: [nil], type: Types::Any },
-        { value: { nil: :nil }, type: Types::Any },
+        [nil, Any],
+        ['nil', Any],
+        [:nil, Any],
+        [[nil], Any],
+        [{ nil: :nil }, Any],
+        [nil, Types::Any],
+        ['nil', Types::Any],
+        [:nil, Types::Any],
+        [[nil], Types::Any],
+        [{ nil: :nil }, Types::Any],
       ].each do |params|
         it "returns true for #{params}" do
-          expect(described_class.valid_type?(params)).to eq true
+          expect(described_class.valid_type?(*params)).to eq true
         end
       end
     end
 
     context 'boolean values' do
       [
-        { value: true, type: Bool },
-        { value: false, type: Bool },
-        { value: false, type: Types::Bool },
-        { value: true, type: Types::Bool },
+        [true, Bool],
+        [false, Bool],
+        [false, Types::Bool],
+        [true, Types::Bool],
       ].each do |params|
         it "returns true for #{params}" do
-          expect(described_class.valid_type?(params)).to eq true
+          expect(described_class.valid_type?(*params)).to eq true
         end
       end
     end
 
     context 'symbol values' do
       [
-        { value: :sym, type: Symbol },
-        { value: :sym, type: Types::Symbol },
-        { value: :sym, type: Types::Symbol.optional },
-        { value: :sym, type: Types::Strict::Symbol },
+        [:sym, Symbol],
+        [:sym, Types::Symbol],
+        [:sym, Types::Symbol.optional],
+        [:sym, Types::Strict::Symbol],
       ].each do |params|
         it "returns true for #{params}" do
-          expect(described_class.valid_type?(params)).to eq true
+          expect(described_class.valid_type?(*params)).to eq true
         end
       end
     end
@@ -270,63 +270,63 @@ RSpec.describe Surrealist::TypeHelper do
 
   describe '#coerce' do
     [
-      { value: nil, type: String },
-      { value: nil, type: Integer },
-      { value: nil, type: Array },
-      { value: nil, type: Object },
-      { value: nil, type: Any },
-      { value: nil, type: Float },
-      { value: nil, type: Hash },
-      { value: nil, type: BigDecimal },
-      { value: nil, type: Symbol },
-      { value: 'something', type: String },
-      { value: 'something', type: Integer },
-      { value: 'something', type: Array },
-      { value: 'something', type: Object },
-      { value: 'something', type: Any },
-      { value: 'something', type: Float },
-      { value: 'something', type: Hash },
-      { value: 'something', type: BigDecimal },
-      { value: 'something', type: Symbol },
+      [nil, String],
+      [nil, Integer],
+      [nil, Array],
+      [nil, Object],
+      [nil, Any],
+      [nil, Float],
+      [nil, Hash],
+      [nil, BigDecimal],
+      [nil, Symbol],
+      ['something', String],
+      ['something', Integer],
+      ['something', Array],
+      ['something', Object],
+      ['something', Any],
+      ['something', Float],
+      ['something', Hash],
+      ['something', BigDecimal],
+      ['something', Symbol],
     ].each do |params|
       it "returns value for non-dry-types for #{params}" do
-        expect(described_class.coerce(params)).to eq(params[:value])
+        expect(described_class.coerce(*params)).to eq(params.first)
       end
     end
 
     [
-      { value: 'smth', type: Types::String },
-      { value: 23, type: Types::Int },
-      { value: [2], type: Types::Array },
-      { value: true, type: Types::Bool },
-      { value: :sym, type: Types::Symbol },
-      { value: Array, type: Types::Class },
-      { value: true, type: Types::True },
-      { value: false, type: Types::False },
-      { value: 2.4, type: Types::Float },
-      { value: 35.4, type: Types::Decimal },
-      { value: { k: :v }, type: Types::Hash },
-      { value: Date.new, type: Types::Date },
-      { value: DateTime.new, type: Types::DateTime },
-      { value: Time.new, type: Types::Time },
-      { value: Date.new, type: Types::Form::Date },
-      { value: DateTime.new, type: Types::Form::DateTime },
-      { value: true, type: Types::Form::True },
-      { value: false, type: Types::Form::False },
-      { value: true, type: Types::Form::Bool },
-      { value: 3, type: Types::Form::Int },
-      { value: 3.5, type: Types::Form::Float },
-      { value: 56.2, type: Types::Form::Decimal },
-      { value: %w[ar ray], type: Types::Form::Array },
-      { value: { k: :v }, type: Types::Form::Hash },
-      { value: Date.new, type: Types::Json::Date },
-      { value: DateTime.new, type: Types::Json::DateTime },
-      { value: Time.new, type: Types::Json::Time },
-      { value: %w[ar ray], type: Types::Json::Array },
-      { value: { k: :v }, type: Types::Json::Hash },
+      ['smth', Types::String],
+      [23, Types::Int],
+      [[2], Types::Array],
+      [true, Types::Bool],
+      [:sym, Types::Symbol],
+      [Array, Types::Class],
+      [true, Types::True],
+      [false, Types::False],
+      [2.4, Types::Float],
+      [35.4, Types::Decimal],
+      [{ k: :v }, Types::Hash],
+      [Date.new, Types::Date],
+      [DateTime.new, Types::DateTime],
+      [Time.new, Types::Time],
+      [Date.new, Types::Form::Date],
+      [DateTime.new, Types::Form::DateTime],
+      [true, Types::Form::True],
+      [false, Types::Form::False],
+      [true, Types::Form::Bool],
+      [3, Types::Form::Int],
+      [3.5, Types::Form::Float],
+      [56.2, Types::Form::Decimal],
+      [%w[ar ray], Types::Form::Array],
+      [{ k: :v }, Types::Form::Hash],
+      [Date.new, Types::Json::Date],
+      [DateTime.new, Types::Json::DateTime],
+      [Time.new, Types::Json::Time],
+      [%w[ar ray], Types::Json::Array],
+      [{ k: :v }, Types::Json::Hash],
     ].each do |params|
       it "returns value if it doesn't have to be coerced for #{params}" do
-        expect(described_class.coerce(params)).to eq(params[:value])
+        expect(described_class.coerce(*params)).to eq(params.first)
       end
     end
   end

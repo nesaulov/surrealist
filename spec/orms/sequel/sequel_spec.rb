@@ -4,7 +4,7 @@ require_relative 'models'
 
 RSpec.describe 'Sequel integration' do
   # Basically, Sequel returns instance only on .first, .last and .[].
-  # And instances are returned for all other methods.
+  # And collections are returned for all other methods.
   describe 'instances' do
     let(:subject) { instance.surrealize }
 
