@@ -33,9 +33,6 @@ Layout/MultilineOperationIndentation:
 Layout/SpaceInLambdaLiteral:
   EnforcedStyle: require_space
 
-Layout/SpaceInsideBrackets:
-  Enabled: false
-
 # Lint
 Lint/AmbiguousBlockAssociation:
   Enabled: false
@@ -152,3 +149,7 @@ Style/TrailingCommaInLiteral:
 
 Style/MethodMissing:
   Enabled: false
+
+Style/EvalWithLocation:
+  Exclude:
+    - spec/**/*.rb  
