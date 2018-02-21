@@ -151,4 +151,5 @@ Style/MethodMissing:
   Enabled: false
 
 Style/EvalWithLocation:
-  Enabled: false
+  Exclude:
+    - spec/**/*.rb
