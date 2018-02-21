@@ -81,6 +81,8 @@ module Surrealist
       Oj.dump(build_schema(instance: instance, **args), mode: :compat)
     end
 
+    # rubocop:disable Metrics/AbcSize
+
     # Builds hash from schema provided in the object's class and type-checks the values.
     #
     # @param [Object] instance of a class that has +Surrealist+ included.
@@ -121,17 +123,52 @@ module Surrealist
     #   # => { name: 'Nikita', age: 23 }
     #   # For more examples see README
     def build_schema(instance:, **args)
-      carrier = Surrealist::Carrier.call(args)
       schema = Surrealist::VarsHelper.find_schema(instance.class)
-
       Surrealist::ExceptionRaiser.raise_unknown_schema!(instance) if schema.nil?
 
+      parameters = default_args ? default_args.merge(args) : args
+      carrier = Surrealist::Carrier.call(parameters)
       normalized_schema = Surrealist::Copier.deep_copy(schema, carrier, instance.class.name)
       hash = Builder.new(carrier, normalized_schema, instance).call
       carrier.camelize ? Surrealist::HashUtils.camelize_hash(hash) : hash
     end
+    # rubocop:enable Metrics/AbcSize
+
+    # Sets default serialization arguments.
+    #
+    # @param [Hash] hash arguments to be set (@see Surrealist::Carrier)
+    #
+    # @example set config
+    #   Surrealist.config = { camelize: true, include_root: true }
+    def config=(hash)
+      @default_args = hash.nil? ? Surrealist::Copier::EMPTY_HASH : hash
+    end
+
+    # Reads current default serialization arguments.
+    #
+    # @return [Hash] default arguments (@see Surrealist::Carrier)
+    def config
+      default_args || Surrealist::Copier::EMPTY_HASH
+    end
+
+    # Sets default serialization arguments with a block
+    #
+    # @param [Proc] _block a block which will be yielded to Surrealist::Carrier instance
+    #
+    # @example set config
+    #   Surrealist.configure do |config|
+    #     config.camelize = true
+    #     config.include_root = true
+    #   end
+    def configure(&_block)
+      carrier = Surrealist::Carrier.new
+      yield(carrier)
+      @default_args = carrier.parameters
+    end
 
     private
+
+    attr_accessor :default_args
 
     # Checks if there is a serializer (< Surrealist::Serializer) defined for the object and delegates
     # surrealization to it.

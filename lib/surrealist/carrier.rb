@@ -2,10 +2,11 @@
 
 module Surrealist
   # A data structure to carry arguments across methods.
+  # @api private
   class Carrier
     BOOLEANS = [true, false].freeze
 
-    attr_reader :camelize, :include_root, :include_namespaces, :root, :namespaces_nesting_level
+    attr_accessor :camelize, :include_root, :include_namespaces, :root, :namespaces_nesting_level
 
     # Public wrapper for Carrier.
     #
@@ -43,8 +44,17 @@ module Surrealist
       self
     end
 
+    # Checks if all arguments are set to default
     def no_args_provided?
       @no_args ||= no_args
+    end
+
+    # Returns all arguments
+    #
+    # @return [Hash]
+    def parameters
+      { camelize: camelize, include_root: include_root, include_namespaces: include_namespaces,
+        root: root, namespaces_nesting_level: namespaces_nesting_level }
     end
 
     private
@@ -85,6 +95,7 @@ module Surrealist
       root.is_a?(String) && @root = root.strip
     end
 
+    # Checks if all arguments are set to default
     def no_args
       !camelize && !include_root && !include_namespaces && root.nil? &&
         namespaces_nesting_level == DEFAULT_NESTING_LEVEL
