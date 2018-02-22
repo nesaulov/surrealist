@@ -81,6 +81,8 @@ module Surrealist
       Oj.dump(build_schema(instance: instance, **args), mode: :compat)
     end
 
+    # rubocop:disable Metrics/AbcSize
+
     # Builds hash from schema provided in the object's class and type-checks the values.
     #
     # @param [Object] instance of a class that has +Surrealist+ included.
@@ -121,14 +123,42 @@ module Surrealist
     #   # => { name: 'Nikita', age: 23 }
     #   # For more examples see README
     def build_schema(instance:, **args)
-      carrier = Surrealist::Carrier.call(args)
       schema = Surrealist::VarsHelper.find_schema(instance.class)
-
       Surrealist::ExceptionRaiser.raise_unknown_schema!(instance) if schema.nil?
 
+      parameters = config ? config.merge(args) : args
+      carrier = Surrealist::Carrier.call(parameters)
       normalized_schema = Surrealist::Copier.deep_copy(schema, carrier, instance.class.name)
       hash = Builder.new(carrier, normalized_schema, instance).call
       carrier.camelize ? Surrealist::HashUtils.camelize_hash(hash) : hash
+    end
+    # rubocop:enable Metrics/AbcSize
+
+    # Reads current default serialization arguments.
+    #
+    # @return [Hash] default arguments (@see Surrealist::Carrier)
+    def config
+      @default_args || Surrealist::Copier::EMPTY_HASH
+    end
+
+    # Sets default serialization arguments with a block
+    #
+    # @param [Hash] hash arguments to be set (@see Surrealist::Carrier)
+    # @param [Proc] _block a block which will be yielded to Surrealist::Carrier instance
+    #
+    # @example set config
+    #   Surrealist.configure do |config|
+    #     config.camelize = true
+    #     config.include_root = true
+    #   end
+    def configure(hash = nil, &_block)
+      if block_given?
+        carrier = Surrealist::Carrier.new
+        yield(carrier)
+        @default_args = carrier.parameters
+      else
+        @default_args = hash.nil? ? Surrealist::Copier::EMPTY_HASH : hash
+      end
     end
 
     private

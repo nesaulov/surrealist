@@ -152,4 +152,4 @@ Style/MethodMissing:
 
 Style/EvalWithLocation:
   Exclude:
-    - spec/**/*.rb  
+    - spec/**/*.rb
