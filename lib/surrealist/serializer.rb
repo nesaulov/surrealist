@@ -31,6 +31,16 @@ module Surrealist
   class Serializer
     extend Surrealist::ClassMethods
 
+    def self.serializer_context(*array)
+      raise 'Please provide an array of symbols to `.serializer_context`' unless array.is_a?(Array)
+
+      array.uniq.compact.each do |method|
+        define_method method.to_sym do
+          context[method]
+        end
+      end
+    end
+
     # NOTE: #context will work only when using serializer explicitly,
     #   e.g `CatSerializer.new(Cat.new(3), food: CatFood.new)`
     #   And then food will be available inside serializer via `context[:food]`
