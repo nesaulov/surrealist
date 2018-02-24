@@ -31,14 +31,16 @@ module Surrealist
   class Serializer
     extend Surrealist::ClassMethods
 
-    def self.serializer_context(*array)
-      raise 'Please provide an array of symbols to `.serializer_context`' unless array.is_a?(Array)
-
-      array.uniq.compact.each do |method|
-        define_method method.to_sym do
-          context[method]
+    class << self
+      def serializer_context(*array)
+        unless array.reject(&-> (i) { i.is_a?(Symbol) }).empty?
+          raise ArgumentError, 'Please provide an array of symbols to `.serializer_context`'
         end
+
+        array.each { |method| define_method(method) { context[method] } }
       end
+
+      alias serializer_contexts serializer_context
     end
 
     # NOTE: #context will work only when using serializer explicitly,
