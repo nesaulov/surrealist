@@ -38,6 +38,7 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
     * [Include root](#include-root)
     * [Root](#root)
     * [Include namespaces](#include-namespaces)
+  * [Configuration](#configuration)  
   * [Bool and Any](#bool-and-any)
   * [Type errors](#type-errors)
   * [Undefined methods in schema](#undefined-methods-in-schema)
@@ -653,6 +654,31 @@ By default all namespaces will be taken. If you want you can explicitly specify 
 withdraws.surrealize(include_namespaces: true, namespaces_nesting_level: 2)
 # => '{ "report_system": { "withdraws": { "withdraws_amount": 34 } } }'
 ```
+
+### Configuration
+
+There are two ways of setting default arguments for serialization, 
+by passing a block to `Surrealist.configure`:
+```ruby 
+Surrealist.configure do |config|
+  config.camelize = true
+  config.namespaces_nesting_level = 2
+end
+```
+And by passing a hash:
+
+`Surrealist.configure(camelize: true, include_root: true)`
+
+These arguments will be applied to all calls of `#build_schema` and `#surrealize`. 
+If these methods will be called with arguments, they will be merged with respect to explicitly passed ones:
+
+```ruby 
+Surrealist.configure(camelize: true, include_root: true)
+ 
+Something.new.surrealize(camelize: false) 
+# will result in Something.new.surrealize(camelize: false, include_root: true) 
+```
+
 
 ### Bool and Any
 If you have a parameter that is of boolean type, or if you don't care about the type, you
