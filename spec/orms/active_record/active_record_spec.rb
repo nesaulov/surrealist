@@ -112,7 +112,7 @@ RSpec.describe 'ActiveRecord integration' do
           it 'fails if scope returns a single record' do
             expect { Surrealist.surrealize_collection(lambda.call) }
               .to raise_error Surrealist::InvalidCollectionError,
-                              'Can\'t serialize collection - must respond to :each'
+                              'Can\'t serialize collection - must behave like enumerable'
           end
         end
       end
@@ -205,7 +205,7 @@ RSpec.describe 'ActiveRecord integration' do
       it 'fails' do
         expect { Surrealist.surrealize_collection(Object) }
           .to raise_error(Surrealist::InvalidCollectionError,
-                          'Can\'t serialize collection - must respond to :each')
+                          'Can\'t serialize collection - must behave like enumerable')
       end
     end
 

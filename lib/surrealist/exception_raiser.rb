@@ -31,7 +31,7 @@ module Surrealist
   # A class that raises all Surrealist exceptions
   module ExceptionRaiser
     CLASS_NAME_NOT_PASSED           = "Can't wrap schema in root key - class name was not passed".freeze
-    MUST_RESPOND_TO_EACH            = "Can't serialize collection - must respond to :each".freeze
+    MUST_BEHAVE_LIKE_ENUMERABLE     = "Can't serialize collection - must behave like enumerable".freeze
     CLASS_DOESNT_INCLUDE_SURREALIST = 'Class does not include Surrealist'.freeze
 
     class << self
@@ -64,7 +64,7 @@ module Surrealist
       #
       # @raise Surrealist::InvalidCollectionError
       def raise_invalid_collection!
-        raise Surrealist::InvalidCollectionError, MUST_RESPOND_TO_EACH
+        raise Surrealist::InvalidCollectionError, MUST_BEHAVE_LIKE_ENUMERABLE
       end
 
       # Raises ArgumentError if namespaces_nesting_level is not an integer.
