@@ -67,6 +67,19 @@ class Song < Sequel::Model
   json_schema { { title: String } }
 end
 
+class ArtistSerializer < Surrealist::Serializer
+  json_schema { { name: String } }
+end
+
+class ArtistWithCustomSerializer < Sequel::Model(:artists)
+  include Surrealist
+
+  one_to_many :albums
+  many_to_many :songs
+
+  surrealize_with ArtistSerializer
+end
+
 7.times { |i| Artist.insert(name: "Artist #{i}", age: (18 + i * 4)) }
 
 Artist.each_with_index do |artist, i|

@@ -11,5 +11,17 @@ module Surrealist
     def self.surrealist?(klass)
       klass < Surrealist || klass < Surrealist::Serializer
     end
+
+    def self.collection?(object)
+      # 4.2 AR relation object did not include Enumerable (it defined
+      # all necessary method through ActiveRecord::Delegation module),
+      # so we need to explicitly check for this
+      object.is_a?(Enumerable) || ar_relation?(object)
+    end
+
+    def self.ar_relation?(object)
+      defined?(ActiveRecord) && object.is_a?(ActiveRecord::Relation)
+    end
+    private_class_method :ar_relation?
   end
 end

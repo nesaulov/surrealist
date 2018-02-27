@@ -53,7 +53,7 @@ module Surrealist
 
     # Checks whether object is a collection or an instance and serializes it
     def surrealize(**args)
-      if object.respond_to?(:each)
+      if Helper.collection?(object)
         Surrealist.surrealize_collection(object, args.merge(context: context))
       else
         Surrealist.surrealize(instance: self, **args)
@@ -62,7 +62,7 @@ module Surrealist
 
     # Passes build_schema to Surrealist
     def build_schema(**args)
-      if object.respond_to?(:each)
+      if Helper.collection?(object)
         build_collection_schema(args)
       else
         Surrealist.build_schema(instance: self, **args)
