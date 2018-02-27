@@ -96,7 +96,7 @@ Performance/UnfreezeString:
 
 # ¯\_(ツ)_/¯
 Style/AsciiComments:
-  AllowedChars: [ツ, ¯]
+  Enabled: false
 
 Style/MixinUsage:
   Exclude:
