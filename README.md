@@ -254,7 +254,26 @@ IncomeSerializer.new(income, current_user: GuestUser.new).surrealize
 IncomeSerializer.new(income, current_user: User.find(3)).surrealize
 # => '{ "amount": 200 }'
 ```
-
+If you happen to pass a context to a serializer, there is a handy DSL to reduce the number of methods
+you have to define yourself. DSL looks as follows
+``` ruby
+class IncomeSerializer < Surrealist::Serializer
+  serializer_context :current_user
+  json_schema { { amount: Integer } }
+  
+  def amount
+    current_user.guest? ? 100000000 : object.amount
+  end
+end
+``` 
+`.serializer_context` takes an array of symbols and dynamically defines instance methods from them.
+So `.serializer_context :current_user` will become
+``` ruby
+def current_user
+  context[:current_user]
+end
+``` 
+There is also an alias in the plural form: `.serializer_contexts`.
 ### Multiple serializers
 
 You can define several custom serializers for one object and use it in different cases. Just mark it with a tag:
