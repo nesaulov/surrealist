@@ -32,6 +32,12 @@ module Surrealist
     extend Surrealist::ClassMethods
 
     class << self
+      # Defines instance methods that read values from the context hash.
+      #
+      # @param [Array<Symbol>] array
+      #   an array of symbols which represent method names
+      #
+      # @raise ArgumentError if type of argument is not an array of symbols
       def serializer_context(*array)
         unless array.reject(&-> (i) { i.is_a?(Symbol) }).empty?
           raise ArgumentError, 'Please provide an array of symbols to `.serializer_context`'
@@ -40,6 +46,7 @@ module Surrealist
         array.each { |method| define_method(method) { context[method] } }
       end
 
+      # Plural form ¯\_(ツ)_/¯
       alias serializer_contexts serializer_context
     end
 

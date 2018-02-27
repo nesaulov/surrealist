@@ -266,8 +266,8 @@ class IncomeSerializer < Surrealist::Serializer
   end
 end
 ``` 
-`.serializer_context` takes an array of symbols and dynamically defines instance methods from them.
-So `.serializer_context :current_user` will become
+`.serializer_context` takes an array of symbols and dynamically defines instance methods
+that read values from the context hash. So `.serializer_context :current_user` will become
 ``` ruby
 def current_user
   context[:current_user]
