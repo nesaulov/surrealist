@@ -54,7 +54,7 @@ module Surrealist
     #   # => "[{\"name\":\"Nikita\",\"age\":23}, {\"name\":\"Alessandro\",\"age\":24}]"
     #   # For more examples see README
     def surrealize_collection(collection, **args)
-      Surrealist::ExceptionRaiser.raise_invalid_collection! unless collection.respond_to?(:each)
+      Surrealist::ExceptionRaiser.raise_invalid_collection! unless Helper.collection?(collection)
 
       result = collection.map do |object|
         Helper.surrealist?(object.class) ? __build_schema(object, args) : object

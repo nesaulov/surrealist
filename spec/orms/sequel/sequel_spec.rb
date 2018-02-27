@@ -293,4 +293,49 @@ RSpec.describe 'Sequel integration' do
       end
     end
   end
+
+  describe 'custom serializer' do
+    describe 'instances' do
+      context 'implicit usage' do
+        let(:instance) { ArtistWithCustomSerializer.first }
+        let(:subject) { instance.surrealize }
+
+        it { is_expected.to eq({ name: 'Artist 0' }.to_json) }
+        it_behaves_like 'error is not raised for valid params: instance'
+        it_behaves_like 'error is raised for invalid params: instance'
+      end
+
+      context 'explicit usage' do
+        let(:instance) { Artist.first }
+        let(:subject) { ArtistSerializer.new(instance).surrealize }
+
+        it { is_expected.to eq({ name: 'Artist 0' }.to_json) }
+        it_behaves_like 'error is not raised for valid params: instance'
+        it_behaves_like 'error is raised for invalid params: instance'
+      end
+    end
+
+    describe 'collections' do
+      let(:all) { Array.new(7) { |i| { name: "Artist #{i}" } } }
+      let(:serialized_collection) { all.to_json }
+
+      context 'implicit usage' do
+        let(:collection) { ArtistWithCustomSerializer.all }
+        let(:subject) { Surrealist.surrealize_collection(collection) }
+
+        it { is_expected.to eq(serialized_collection) }
+        it_behaves_like 'error is not raised for valid params: collection'
+        it_behaves_like 'error is raised for invalid params: collection'
+      end
+
+      context 'explicit usage' do
+        let(:collection) { Artist.all }
+        let(:subject) { ArtistSerializer.new(collection).surrealize }
+
+        it { is_expected.to eq(serialized_collection) }
+        it_behaves_like 'error is not raised for valid params: collection'
+        it_behaves_like 'error is raised for invalid params: collection'
+      end
+    end
+  end
 end
