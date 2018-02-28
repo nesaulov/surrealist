@@ -10,15 +10,10 @@ matrix:
       gemfile: Gemfile
     - rvm: 2.5.0
       gemfile: Gemfile
-    - rvm: 2.4.2
+    - rvm: 2.4.3
       gemfile: Gemfile
-    - rvm: 2.4.0
+    - rvm: 2.3.6
       gemfile: Gemfile
-    - rvm: 2.3.5
-      gemfile: Gemfile
-    - rvm: 2.3.1
-      gemfile: Gemfile
-    - rvm: 2.2.5
+    - rvm: 2.2.9
       gemfile: gemfiles/activerecord42.gemfile
-    - rvm: 2.2.0
-      gemfile: gemfiles/activerecord42.gemfile
+
