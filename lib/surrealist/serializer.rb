@@ -39,7 +39,7 @@ module Surrealist
       #
       # @raise ArgumentError if type of argument is not an array of symbols
       def serializer_context(*array)
-        unless array.reject(&-> (i) { i.is_a?(Symbol) }).empty?
+        unless array.all? { |i| i.is_a? Symbol }
           raise ArgumentError, 'Please provide an array of symbols to `.serializer_context`'
         end
 
