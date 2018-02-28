@@ -2,6 +2,7 @@
 
 ## Added
 * Configuration of default serialization params ([@nesaulov][]) [#77](https://github.com/nesaulov/surrealist/pull/77)
+* DSL for custom serializers context ([@nesaulov][]) [#80](https://github.com/nesaulov/surrealist/pull/80)
 
 ## Fixed
 * Fix failing serialization with sequel & custom serializers ([@azhi][]) [#84](https://github.com/nesaulov/surrealist/pull/84)
