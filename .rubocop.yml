@@ -94,6 +94,10 @@ Performance/UnfreezeString:
 
 # Style
 
+# ¯\_(ツ)_/¯
+Style/AsciiComments:
+  Enabled: false
+
 Style/MixinUsage:
   Exclude:
     - spec/**/*rb
