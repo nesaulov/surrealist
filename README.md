@@ -760,8 +760,6 @@ type check will be passed. If you want to be strict about `nil`s consider using 
 
 ## Roadmap
 Here is a list of features that are not implemented yet (contributions are welcome):
-* [Having a config that would keep serialization parameters](https://github.com/nesaulov/surrealist/issues/76)
-* [DSL for serializer contexts](https://github.com/nesaulov/surrealist/issues/67)
 * Memoization/caching
 
 ## Contributing
