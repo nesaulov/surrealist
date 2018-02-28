@@ -31,6 +31,25 @@ module Surrealist
   class Serializer
     extend Surrealist::ClassMethods
 
+    class << self
+      # Defines instance methods that read values from the context hash.
+      #
+      # @param [Array<Symbol>] array
+      #   an array of symbols which represent method names
+      #
+      # @raise ArgumentError if type of argument is not an array of symbols
+      def serializer_context(*array)
+        unless array.all? { |i| i.is_a? Symbol }
+          raise ArgumentError, 'Please provide an array of symbols to `.serializer_context`'
+        end
+
+        array.each { |method| define_method(method) { context[method] } }
+      end
+
+      # Plural form ¯\_(ツ)_/¯
+      alias serializer_contexts serializer_context
+    end
+
     # NOTE: #context will work only when using serializer explicitly,
     #   e.g `CatSerializer.new(Cat.new(3), food: CatFood.new)`
     #   And then food will be available inside serializer via `context[:food]`
