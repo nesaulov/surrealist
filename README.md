@@ -115,7 +115,7 @@ class Person
       nested: {
         at: {
           any: Integer,
-          level: Boolean,
+          level: Bool,
         },
       },
     }
