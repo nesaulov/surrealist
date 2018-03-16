@@ -53,7 +53,11 @@ end
 
 class AuthorSurrealistSerializer < Surrealist::Serializer
   json_schema do
-    { name: String, last_name: String, full_name: String, age: Integer, books: Object }
+    { name: String, last_name: String, full_name: String, age: Integer, books: Array }
+  end
+
+  def books
+    object.books.to_a
   end
 
   def full_name
