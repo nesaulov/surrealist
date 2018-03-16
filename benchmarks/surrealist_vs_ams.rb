@@ -25,7 +25,7 @@ ActiveRecord::Schema.define do
   create_table :books do |table|
     table.column :title, :string
     table.column :year, :string
-    table.belongs_to :author
+    table.belongs_to :author, foreign_key: true
   end
 end
 
@@ -76,7 +76,7 @@ class Book < ActiveRecord::Base
   include Surrealist
   surrealize_with BookSurrealistSerializer
 
-  belongs_to :author
+  belongs_to :author, required: true
 end
 
 class AuthorSerializer < ActiveModel::Serializer
@@ -96,7 +96,7 @@ end
 N = 3000
 N.times { User.create!(name: random_name, email: "#{random_name}@test.com") }
 (N / 2).times { Author.create!(name: random_name, last_name: random_name, age: rand(80)) }
-N.times { Book.create!(title: random_name, year: "19#{rand(10..99)}", author_id: rand(1..N)) }
+N.times { Book.create!(title: random_name, year: "19#{rand(10..99)}", author_id: rand(1..N / 2)) }
 
 def benchmark_instance(ams_arg = '')
   user = User.find(rand(1..N))
