@@ -135,11 +135,13 @@ def benchmark_instance(ams_arg = '')
 
   names = ["AMS#{ams_arg}: instance",
            'Surrealist: instance through .surrealize',
-           'Surrealist: instance through Surrealist::Serializer']
+           'Surrealist: instance through Surrealist::Serializer',
+           'ActiveModel::Serializers::JSON instance']
 
   serializers = [-> { UserAMSSerializer.new(user).to_json },
                  -> { user.surrealize },
-                 -> { UserSurrealistSerializer.new(user).surrealize }]
+                 -> { UserSurrealistSerializer.new(user).surrealize },
+                 -> { user.to_json(only: %i[name email]) }]
 
   benchmark(names, serializers)
 end
@@ -149,7 +151,8 @@ def benchmark_collection(ams_arg = '')
 
   names = ["AMS#{ams_arg}: collection",
            'Surrealist: collection through Surrealist.surrealize_collection()',
-           'Surrealist: collection through Surrealist::Serializer']
+           'Surrealist: collection through Surrealist::Serializer',
+           'ActiveModel::Serializers::JSON collection']
 
   serializers = [lambda do
                    ActiveModel::Serializer::CollectionSerializer.new(
@@ -157,7 +160,8 @@ def benchmark_collection(ams_arg = '')
                    ).to_json
                  end,
                  -> { Surrealist.surrealize_collection(users) },
-                 -> { UserSurrealistSerializer.new(users).surrealize }]
+                 -> { UserSurrealistSerializer.new(users).surrealize },
+                 -> { users.to_json(only: %i[name email]) }]
 
   benchmark(names, serializers)
 end
@@ -167,21 +171,28 @@ def benchmark_associations_instance
 
   names = ['AMS (associations): instance',
            'Surrealist (associations): instance through .surrealize',
-           'Surrealist (associations): instance through Surrealist::Serializer']
+           'Surrealist (associations): instance through Surrealist::Serializer',
+           'ActiveModel::Serializers::JSON (associations)']
 
   serializers = [-> { AuthorAMSSerializer.new(instance).to_json },
                  -> { instance.surrealize },
-                 -> { AuthorSurrealistSerializer.new(instance).surrealize }]
+                 -> { AuthorSurrealistSerializer.new(instance).surrealize },
+                 lambda do
+                   instance.to_json(only: %i[name last_name age], methods: %i[full_name],
+                                    include: { books: { only: %i[title year] } })
+                 end]
 
   benchmark(names, serializers)
 end
 
+# rubocop:disable Metrics/MethodLength
 def benchmark_associations_collection
   collection = Author.all
 
   names = ['AMS (associations): collection',
            'Surrealist (associations): collection through Surrealist.surrealize_collection()',
-           'Surrealist (associations): collection through Surrealist::Serializer']
+           'Surrealist (associations): collection through Surrealist::Serializer',
+           'ActiveModel::Serializers::JSON (associations): collection']
 
   serializers = [lambda do
                    ActiveModel::Serializer::CollectionSerializer.new(
@@ -189,10 +200,15 @@ def benchmark_associations_collection
                    ).to_json
                  end,
                  -> { Surrealist.surrealize_collection(collection) },
-                 -> { AuthorSurrealistSerializer.new(collection).surrealize }]
+                 -> { AuthorSurrealistSerializer.new(collection).surrealize },
+                 lambda do
+                   collection.to_json(only: %i[name last_name age], methods: %i[full_name],
+                                      include: { books: { only: %i[title year] } })
+                 end]
 
   benchmark(names, serializers)
 end
+# rubocop:enable Metrics/MethodLength
 
 # Default configuration
 benchmark_instance
