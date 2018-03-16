@@ -130,13 +130,13 @@ def benchmark(names, serializers)
   end
 end
 
-def benchmark_instance(ams_arg = '')
+def benchmark_instance(ams_arg: '', am_arg: '')
   user = User.find(rand(1..N))
 
   names = ["AMS#{ams_arg}: instance",
            'Surrealist: instance through .surrealize',
            'Surrealist: instance through Surrealist::Serializer',
-           'ActiveModel::Serializers::JSON instance']
+           "ActiveModel::Serializers::JSON#{am_arg} instance"]
 
   serializers = [-> { UserAMSSerializer.new(user).to_json },
                  -> { user.surrealize },
@@ -146,13 +146,13 @@ def benchmark_instance(ams_arg = '')
   benchmark(names, serializers)
 end
 
-def benchmark_collection(ams_arg = '')
+def benchmark_collection(ams_arg: '', am_arg: '')
   users = User.all
 
   names = ["AMS#{ams_arg}: collection",
            'Surrealist: collection through Surrealist.surrealize_collection()',
            'Surrealist: collection through Surrealist::Serializer',
-           'ActiveModel::Serializers::JSON collection']
+           "ActiveModel::Serializers::JSON#{am_arg} collection"]
 
   serializers = [lambda do
                    ActiveModel::Serializer::CollectionSerializer.new(
@@ -218,8 +218,18 @@ benchmark_collection
 puts "\n------- Turning off AMS logger -------\n"
 ActiveModelSerializers.logger.level = Logger::Severity::UNKNOWN
 
-benchmark_instance('(without logging)')
-benchmark_collection('(without logging)')
+benchmark_instance(ams_arg: '(without logging)')
+benchmark_collection(ams_arg: '(without logging)')
+
+# Associations
+benchmark_associations_instance
+benchmark_associations_collection
+
+puts "\n------- Enabling Oj.optimize_rails() -------\n"
+Oj.optimize_rails
+
+benchmark_instance(ams_arg: '(without logging)', am_arg: '(with Oj)')
+benchmark_collection(ams_arg: '(without logging)', am_arg: '(with Oj)')
 
 # Associations
 benchmark_associations_instance
