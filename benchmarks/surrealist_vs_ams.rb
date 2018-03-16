@@ -49,6 +49,10 @@ class UserSurrealistSerializer < Surrealist::Serializer
   json_schema { { name: String, email: String } }
 end
 
+class UserAMSSerializer < ActiveModel::Serializer
+  attributes :name, :email
+end
+
 ### Associations ###
 
 class AuthorSurrealistSerializer < Surrealist::Serializer
@@ -69,11 +73,24 @@ class BookSurrealistSerializer < Surrealist::Serializer
   json_schema { { title: String, year: String } }
 end
 
+class BookAMSSerializer < ActiveModel::Serializer
+  attributes :title, :year
+end
+
+class AuthorAMSSerializer < ActiveModel::Serializer
+  attributes :name, :last_name, :full_name, :age
+  has_many :books, serializer: BookAMSSerializer
+end
+
 class Author < ActiveRecord::Base
   include Surrealist
   surrealize_with AuthorSurrealistSerializer
 
   has_many :books
+
+  def full_name
+    "#{name} #{last_name}"
+  end
 end
 
 class Book < ActiveRecord::Base
@@ -83,111 +100,98 @@ class Book < ActiveRecord::Base
   belongs_to :author, required: true
 end
 
-class AuthorSerializer < ActiveModel::Serializer
-  attributes :name, :last_name, :age
-
-  attribute :full_name do
-    "#{object.name} #{object.last_name}"
-  end
-
-  has_many :books
-end
-
-class BookSerializer < ActiveModel::Serializer
-  attributes :title, :year
-end
-
 N = 3000
 N.times { User.create!(name: random_name, email: "#{random_name}@test.com") }
 (N / 2).times { Author.create!(name: random_name, last_name: random_name, age: rand(80)) }
 N.times { Book.create!(title: random_name, year: "19#{rand(10..99)}", author_id: rand(1..N / 2)) }
 
-def benchmark_instance(ams_arg = '')
-  user = User.find(rand(1..N))
+def sort(obj)
+  case obj
+  when Array then obj.map { |el| sort(el) }.sort_by(&:zip)
+  when Hash then obj.transform_values { |v| sort(v) }
+  else obj
+  end
+end
+
+def check_correctness(serializers)
+  results = serializers.map(&:call).map { |r| sort(JSON.parse(r)) }
+  raise 'Results are not the same' if results.uniq.size > 1
+end
+
+def benchmark(names, serializers)
+  check_correctness(serializers)
 
   Benchmark.ips do |x|
     x.config(time: 5, warmup: 2)
 
-    x.report("AMS#{ams_arg}: instance") do
-      ActiveModelSerializers::SerializableResource.new(user).to_json
-    end
-
-    x.report('Surrealist: instance through .surrealize') do
-      user.surrealize
-    end
-
-    x.report('Surrealist: instance through Surrealist::Serializer') do
-      UserSurrealistSerializer.new(user).surrealize
-    end
+    names.zip(serializers).each { |name, proc| x.report(name, &proc) }
 
     x.compare!
   end
+end
+
+def benchmark_instance(ams_arg = '')
+  user = User.find(rand(1..N))
+
+  names = ["AMS#{ams_arg}: instance",
+           'Surrealist: instance through .surrealize',
+           'Surrealist: instance through Surrealist::Serializer']
+
+  serializers = [-> { UserAMSSerializer.new(user).to_json },
+                 -> { user.surrealize },
+                 -> { UserSurrealistSerializer.new(user).surrealize }]
+
+  benchmark(names, serializers)
 end
 
 def benchmark_collection(ams_arg = '')
   users = User.all
 
-  Benchmark.ips do |x|
-    x.config(time: 5, warmup: 2)
+  names = ["AMS#{ams_arg}: collection",
+           'Surrealist: collection through Surrealist.surrealize_collection()',
+           'Surrealist: collection through Surrealist::Serializer']
 
-    x.report("AMS#{ams_arg}: collection") do
-      ActiveModelSerializers::SerializableResource.new(users).to_json
-    end
+  serializers = [lambda do
+                   ActiveModel::Serializer::CollectionSerializer.new(
+                     users, root: nil, serializer: UserAMSSerializer
+                   ).to_json
+                 end,
+                 -> { Surrealist.surrealize_collection(users) },
+                 -> { UserSurrealistSerializer.new(users).surrealize }]
 
-    x.report('Surrealist: collection through Surrealist.surrealize_collection()') do
-      Surrealist.surrealize_collection(users)
-    end
-
-    x.report('Surrealist: collection through Surrealist::Serializer') do
-      UserSurrealistSerializer.new(users).surrealize
-    end
-
-    x.compare!
-  end
+  benchmark(names, serializers)
 end
 
 def benchmark_associations_instance
   instance = Author.find(rand((1..(N / 2))))
 
-  Benchmark.ips do |x|
-    x.config(time: 5, warmup: 2)
+  names = ['AMS (associations): instance',
+           'Surrealist (associations): instance through .surrealize',
+           'Surrealist (associations): instance through Surrealist::Serializer']
 
-    x.report('AMS (associations): instance') do
-      ActiveModelSerializers::SerializableResource.new(instance).to_json
-    end
+  serializers = [-> { AuthorAMSSerializer.new(instance).to_json },
+                 -> { instance.surrealize },
+                 -> { AuthorSurrealistSerializer.new(instance).surrealize }]
 
-    x.report('Surrealist (associations): instance through .surrealize') do
-      instance.surrealize
-    end
-
-    x.report('Surrealist (associations): instance through Surrealist::Serializer') do
-      AuthorSurrealistSerializer.new(instance).surrealize
-    end
-
-    x.compare!
-  end
+  benchmark(names, serializers)
 end
 
 def benchmark_associations_collection
   collection = Author.all
 
-  Benchmark.ips do |x|
-    x.config(time: 5, warmup: 2)
+  names = ['AMS (associations): collection',
+           'Surrealist (associations): collection through Surrealist.surrealize_collection()',
+           'Surrealist (associations): collection through Surrealist::Serializer']
 
-    x.report('AMS (associations): collection') do
-      ActiveModelSerializers::SerializableResource.new(collection).to_json
-    end
+  serializers = [lambda do
+                   ActiveModel::Serializer::CollectionSerializer.new(
+                     collection, root: nil, serializer: AuthorAMSSerializer
+                   ).to_json
+                 end,
+                 -> { Surrealist.surrealize_collection(collection) },
+                 -> { AuthorSurrealistSerializer.new(collection).surrealize }]
 
-    x.report('Surrealist (associations): collection through Surrealist.surrealize_collection()') do
-      Surrealist.surrealize_collection(collection)
-    end
-
-    x.report('Surrealist (associations): collection through Surrealist::Serializer') do
-      AuthorSurrealistSerializer.new(collection).surrealize
-    end
-
-    x.compare!
-  end
+  benchmark(names, serializers)
 end
 
 # Default configuration
