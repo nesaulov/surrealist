@@ -13,8 +13,8 @@ module Surrealist
       def assign(schema, instance)
         value = raw_value(instance, schema)
 
-        # array to track and prevent infinite self references in surrealization
-        @stack ||= []
+        # set to track and prevent infinite self references in surrealization
+        @skip_set ||= Set.new
 
         if value.respond_to?(:build_schema)
           yield assign_nested_record(instance, value)
@@ -61,11 +61,8 @@ module Surrealist
       #
       # @return [Array] of schemas
       def assign_nested_collection(instance, value)
-        return if @stack.include?(value.first.class)
-        @stack.push(instance.class).push(value.first.class)
-        result = Surrealist.surrealize_collection(value, raw: true)
-        @stack.delete(instance.class)
-        result
+        return if @skip_set.include?(value.first.class)
+        with_skip_set(instance.class) { Surrealist.surrealize_collection(value, raw: true) }
       end
 
       # Assists in recursively generating schema for a record while preventing infinite self-referencing
@@ -75,10 +72,20 @@ module Surrealist
       #
       # @return [Hash] schema
       def assign_nested_record(instance, value)
-        return if @stack.include?(value.class)
-        @stack.push(instance.class)
-        result = value.build_schema
-        @stack.delete(instance.class)
+        return if @skip_set.include?(value.class)
+        with_skip_set(instance.class) { value.build_schema }
+      end
+
+      # Run block with klass in skip set
+      #
+      # @param [Class] klass of current instance.
+      #
+      # @return [Object] block result
+      def with_skip_set(klass)
+        return yield if @skip_set.include?(klass)
+        @skip_set.add(klass)
+        result = yield
+        @skip_set.delete(klass)
         result
       end
     end

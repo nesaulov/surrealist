@@ -196,6 +196,10 @@ end
 # Associations
 #
 
+class BookSerializer < Surrealist::Serializer
+  json_schema { { awards: Object } }
+end
+
 class Book < ActiveRecord::Base
   has_and_belongs_to_many :authors
   belongs_to :genre
@@ -216,6 +220,7 @@ class Book < ActiveRecord::Base
       },
     }
   end
+  surrealize_with BookSerializer, tag: :awards
 end
 
 class Author < ActiveRecord::Base
