@@ -46,7 +46,7 @@ module Surrealist
 
     # Checks if all arguments are set to default
     def no_args_provided?
-      @no_args ||= no_args
+      @no_args_provided ||= no_args_provided
     end
 
     # Returns all arguments
@@ -96,7 +96,7 @@ module Surrealist
     end
 
     # Checks if all arguments are set to default
-    def no_args
+    def no_args_provided
       !camelize && !include_root && !include_namespaces && root.nil? &&
         namespaces_nesting_level == DEFAULT_NESTING_LEVEL
     end

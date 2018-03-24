@@ -87,9 +87,9 @@ module Surrealist
       # method on the object.
       #
       # @raise Surrealist::UndefinedMethodError
-      def raise_invalid_key!(e)
+      def raise_invalid_key!(err)
         raise Surrealist::UndefinedMethodError,
-              "#{e.message}. You have probably defined a key " \
+              "#{err.message}. You have probably defined a key " \
               "in the schema that doesn't have a corresponding method."
       end
 
