@@ -44,6 +44,13 @@ RSpec.describe Surrealist do
         end
       end
 
+      context 'collection several times' do
+        before { Book.first.build_schema(for: :awards) }
+        let(:subject) { Book.first.build_schema(for: :awards) }
+
+        it { expect(subject).to match(awards: Array.new(3) { { title: 'Nobel Prize' } }) }
+      end
+
       context 'has associations' do
         it 'works' do
           expect(Surrealist.surrealize_collection(Employee.all))
