@@ -1,3 +1,8 @@
+# 1.1.1
+
+## Fixed
+* Bug with several serializations in a row ([@past-one][]) [#90](https://github.com/nesaulov/surrealist/pull/90)
+
 # 1.1.0
 
 ## Added
@@ -82,5 +87,5 @@
 [@nulldef]: https://github.com/nulldef
 [@azhi]: https://github.com/azhi
 [@chrisatanasian]: https://github.com/chrisatanasian
-
+[@past-one]: https://github.com/past-one
 
