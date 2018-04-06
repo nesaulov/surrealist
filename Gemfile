@@ -7,6 +7,7 @@ group :development, :test do
   gem 'active_model_serializers', '~> 0.10.0'
   gem 'activerecord'
   gem 'benchmark-ips'
+  gem 'blueprinter'
   gem 'coveralls', require: false
   gem 'dry-struct'
   gem 'dry-types'

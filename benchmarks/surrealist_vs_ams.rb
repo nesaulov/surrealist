@@ -1,8 +1,10 @@
+# rubocop:disable Metrics/AbcSize,Metrics/MethodLength
 require_relative '../lib/surrealist'
 require 'benchmark/ips'
 require 'active_record'
 require 'active_model'
 require 'active_model_serializers'
+require 'blueprinter'
 
 ActiveRecord::Base.establish_connection(
   adapter:  'sqlite3',
@@ -53,6 +55,10 @@ class UserAMSSerializer < ActiveModel::Serializer
   attributes :name, :email
 end
 
+class UserBlueprint < Blueprinter::Base
+  fields :name, :email
+end
+
 ### Associations ###
 
 class AuthorSurrealistSerializer < Surrealist::Serializer
@@ -77,9 +83,21 @@ class BookAMSSerializer < ActiveModel::Serializer
   attributes :title, :year
 end
 
+class BookBlueprint < Blueprinter::Base
+  fields :title, :year
+end
+
 class AuthorAMSSerializer < ActiveModel::Serializer
   attributes :name, :last_name, :full_name, :age
   has_many :books, serializer: BookAMSSerializer
+end
+
+class AuthorBlueprint < Blueprinter::Base
+  fields :name, :last_name, :age
+  field :full_name do |author|
+    "#{author.name} #{author.last_name}"
+  end
+  association :books, blueprint: BookBlueprint
 end
 
 class Author < ActiveRecord::Base
@@ -107,7 +125,7 @@ N.times { Book.create!(title: random_name, year: "19#{rand(10..99)}", author_id:
 
 def sort(obj)
   case obj
-  when Array then obj.map { |el| sort(el) }.sort_by(&:zip)
+  when Array then obj.map { |el| sort(el) }
   when Hash then obj.transform_values { |v| sort(v) }
   else obj
   end
@@ -130,29 +148,32 @@ def benchmark(names, serializers)
   end
 end
 
-def benchmark_instance(ams_arg: '', am_arg: '')
+def benchmark_instance(ams_arg: '', oj_arg: '')
   user = User.find(rand(1..N))
 
-  names = ["AMS#{ams_arg}: instance",
+  names = ["AMS#{[ams_arg, oj_arg].join(' ')}: instance",
            'Surrealist: instance through .surrealize',
            'Surrealist: instance through Surrealist::Serializer',
-           "ActiveModel::Serializers::JSON#{am_arg} instance"]
+           "ActiveModel::Serializers::JSON#{oj_arg} instance",
+           "Blueprinter#{oj_arg}"]
 
   serializers = [-> { UserAMSSerializer.new(user).to_json },
                  -> { user.surrealize },
                  -> { UserSurrealistSerializer.new(user).surrealize },
-                 -> { user.to_json(only: %i[name email]) }]
+                 -> { user.to_json(only: %i[name email]) },
+                 -> { UserBlueprint.render(user) }]
 
   benchmark(names, serializers)
 end
 
-def benchmark_collection(ams_arg: '', am_arg: '')
+def benchmark_collection(ams_arg: '', oj_arg: '')
   users = User.all
 
-  names = ["AMS#{ams_arg}: collection",
+  names = ["AMS#{[ams_arg, oj_arg].join(' ')}: collection",
            'Surrealist: collection through Surrealist.surrealize_collection()',
            'Surrealist: collection through Surrealist::Serializer',
-           "ActiveModel::Serializers::JSON#{am_arg} collection"]
+           "ActiveModel::Serializers::JSON#{oj_arg} collection",
+           "Blueprinter collection#{oj_arg}"]
 
   serializers = [lambda do
                    ActiveModel::Serializer::CollectionSerializer.new(
@@ -161,7 +182,8 @@ def benchmark_collection(ams_arg: '', am_arg: '')
                  end,
                  -> { Surrealist.surrealize_collection(users) },
                  -> { UserSurrealistSerializer.new(users).surrealize },
-                 -> { users.to_json(only: %i[name email]) }]
+                 -> { users.to_json(only: %i[name email]) },
+                 -> { UserBlueprint.render(users) }]
 
   benchmark(names, serializers)
 end
@@ -172,7 +194,8 @@ def benchmark_associations_instance
   names = ['AMS (associations): instance',
            'Surrealist (associations): instance through .surrealize',
            'Surrealist (associations): instance through Surrealist::Serializer',
-           'ActiveModel::Serializers::JSON (associations)']
+           'ActiveModel::Serializers::JSON (associations)',
+           'Blueprinter (associations)']
 
   serializers = [-> { AuthorAMSSerializer.new(instance).to_json },
                  -> { instance.surrealize },
@@ -180,19 +203,20 @@ def benchmark_associations_instance
                  lambda do
                    instance.to_json(only: %i[name last_name age], methods: %i[full_name],
                                     include: { books: { only: %i[title year] } })
-                 end]
+                 end,
+                 -> { AuthorBlueprint.render(instance) }]
 
   benchmark(names, serializers)
 end
 
-# rubocop:disable Metrics/MethodLength
 def benchmark_associations_collection
   collection = Author.all
 
   names = ['AMS (associations): collection',
            'Surrealist (associations): collection through Surrealist.surrealize_collection()',
            'Surrealist (associations): collection through Surrealist::Serializer',
-           'ActiveModel::Serializers::JSON (associations): collection']
+           'ActiveModel::Serializers::JSON (associations): collection',
+           'Blueprinter (associations): collection']
 
   serializers = [lambda do
                    ActiveModel::Serializer::CollectionSerializer.new(
@@ -204,11 +228,11 @@ def benchmark_associations_collection
                  lambda do
                    collection.to_json(only: %i[name last_name age], methods: %i[full_name],
                                       include: { books: { only: %i[title year] } })
-                 end]
+                 end,
+                 -> { AuthorBlueprint.render(collection) }]
 
   benchmark(names, serializers)
 end
-# rubocop:enable Metrics/MethodLength
 
 # Default configuration
 benchmark_instance
@@ -225,11 +249,14 @@ benchmark_collection(ams_arg: '(without logging)')
 benchmark_associations_instance
 benchmark_associations_collection
 
-puts "\n------- Enabling Oj.optimize_rails() -------\n"
+puts "\n------- Enabling Oj.optimize_rails() & Blueprinter config.generator = Oj -------\n"
 Oj.optimize_rails
+Blueprinter.configure do |config|
+  config.generator = Oj
+end
 
-benchmark_instance(ams_arg: '(without logging)', am_arg: '(with Oj)')
-benchmark_collection(ams_arg: '(without logging)', am_arg: '(with Oj)')
+benchmark_instance(ams_arg: '(without logging)', oj_arg: '(with Oj)')
+benchmark_collection(ams_arg: '(without logging)', oj_arg: '(with Oj)')
 
 # Associations
 benchmark_associations_instance
@@ -275,3 +302,4 @@ benchmark_associations_collection
 #   Surrealist (associations): collection through Surrealist.surrealize_collection():        2.4 i/s
 #   Surrealist (associations): collection through Surrealist::Serializer:        2.4 i/s - 1.03x  slower
 #   AMS (associations): collection:        1.5 i/s - 1.60x  slower
+# rubocop:enable Metrics/AbcSize,Metrics/MethodLength
