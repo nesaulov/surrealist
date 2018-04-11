@@ -1,8 +1,10 @@
+# rubocop:disable Metrics/AbcSize,Metrics/MethodLength
 require_relative '../lib/surrealist'
 require 'benchmark/ips'
 require 'active_record'
 require 'active_model'
 require 'active_model_serializers'
+require 'blueprinter'
 
 ActiveRecord::Base.establish_connection(
   adapter:  'sqlite3',
@@ -25,7 +27,7 @@ ActiveRecord::Schema.define do
   create_table :books do |table|
     table.column :title, :string
     table.column :year, :string
-    table.belongs_to :author
+    table.belongs_to :author, foreign_key: true
   end
 end
 
@@ -49,11 +51,23 @@ class UserSurrealistSerializer < Surrealist::Serializer
   json_schema { { name: String, email: String } }
 end
 
+class UserAMSSerializer < ActiveModel::Serializer
+  attributes :name, :email
+end
+
+class UserBlueprint < Blueprinter::Base
+  fields :name, :email
+end
+
 ### Associations ###
 
 class AuthorSurrealistSerializer < Surrealist::Serializer
   json_schema do
-    { name: String, last_name: String, full_name: String, age: Integer, books: Object }
+    { name: String, last_name: String, full_name: String, age: Integer, books: Array }
+  end
+
+  def books
+    object.books.to_a
   end
 
   def full_name
@@ -65,125 +79,159 @@ class BookSurrealistSerializer < Surrealist::Serializer
   json_schema { { title: String, year: String } }
 end
 
+class BookAMSSerializer < ActiveModel::Serializer
+  attributes :title, :year
+end
+
+class BookBlueprint < Blueprinter::Base
+  fields :title, :year
+end
+
+class AuthorAMSSerializer < ActiveModel::Serializer
+  attributes :name, :last_name, :full_name, :age
+  has_many :books, serializer: BookAMSSerializer
+end
+
+class AuthorBlueprint < Blueprinter::Base
+  fields :name, :last_name, :age
+  field :full_name do |author|
+    "#{author.name} #{author.last_name}"
+  end
+  association :books, blueprint: BookBlueprint
+end
+
 class Author < ActiveRecord::Base
   include Surrealist
   surrealize_with AuthorSurrealistSerializer
 
   has_many :books
+
+  def full_name
+    "#{name} #{last_name}"
+  end
 end
 
 class Book < ActiveRecord::Base
   include Surrealist
   surrealize_with BookSurrealistSerializer
 
-  belongs_to :author
-end
-
-class AuthorSerializer < ActiveModel::Serializer
-  attributes :name, :last_name, :age
-
-  attribute :full_name do
-    "#{object.name} #{object.last_name}"
-  end
-
-  has_many :books
-end
-
-class BookSerializer < ActiveModel::Serializer
-  attributes :title, :year
+  belongs_to :author, required: true
 end
 
 N = 3000
 N.times { User.create!(name: random_name, email: "#{random_name}@test.com") }
 (N / 2).times { Author.create!(name: random_name, last_name: random_name, age: rand(80)) }
-N.times { Book.create!(title: random_name, year: "19#{rand(10..99)}", author_id: rand(1..N)) }
+N.times { Book.create!(title: random_name, year: "19#{rand(10..99)}", author_id: rand(1..N / 2)) }
 
-def benchmark_instance(ams_arg = '')
-  user = User.find(rand(1..N))
+def sort(obj)
+  case obj
+  when Array then obj.map { |el| sort(el) }
+  when Hash then obj.transform_values { |v| sort(v) }
+  else obj
+  end
+end
+
+def check_correctness(serializers)
+  results = serializers.map(&:call).map { |r| sort(JSON.parse(r)) }
+  raise 'Results are not the same' if results.uniq.size > 1
+end
+
+def benchmark(names, serializers)
+  check_correctness(serializers)
 
   Benchmark.ips do |x|
     x.config(time: 5, warmup: 2)
 
-    x.report("AMS#{ams_arg}: instance") do
-      ActiveModelSerializers::SerializableResource.new(user).to_json
-    end
-
-    x.report('Surrealist: instance through .surrealize') do
-      user.surrealize
-    end
-
-    x.report('Surrealist: instance through Surrealist::Serializer') do
-      UserSurrealistSerializer.new(user).surrealize
-    end
+    names.zip(serializers).each { |name, proc| x.report(name, &proc) }
 
     x.compare!
   end
 end
 
-def benchmark_collection(ams_arg = '')
+def benchmark_instance(ams_arg: '', oj_arg: '')
+  user = User.find(rand(1..N))
+
+  names = ["AMS#{[ams_arg, oj_arg].join(' ')}: instance",
+           'Surrealist: instance through .surrealize',
+           'Surrealist: instance through Surrealist::Serializer',
+           "ActiveModel::Serializers::JSON#{oj_arg} instance",
+           "Blueprinter#{oj_arg}"]
+
+  serializers = [-> { UserAMSSerializer.new(user).to_json },
+                 -> { user.surrealize },
+                 -> { UserSurrealistSerializer.new(user).surrealize },
+                 -> { user.to_json(only: %i[name email]) },
+                 -> { UserBlueprint.render(user) }]
+
+  benchmark(names, serializers)
+end
+
+def benchmark_collection(ams_arg: '', oj_arg: '')
   users = User.all
 
-  Benchmark.ips do |x|
-    x.config(time: 5, warmup: 2)
+  names = ["AMS#{[ams_arg, oj_arg].join(' ')}: collection",
+           'Surrealist: collection through Surrealist.surrealize_collection()',
+           'Surrealist: collection through Surrealist::Serializer',
+           "ActiveModel::Serializers::JSON#{oj_arg} collection",
+           "Blueprinter collection#{oj_arg}"]
 
-    x.report("AMS#{ams_arg}: collection") do
-      ActiveModelSerializers::SerializableResource.new(users).to_json
-    end
+  serializers = [lambda do
+                   ActiveModel::Serializer::CollectionSerializer.new(
+                     users, root: nil, serializer: UserAMSSerializer
+                   ).to_json
+                 end,
+                 -> { Surrealist.surrealize_collection(users) },
+                 -> { UserSurrealistSerializer.new(users).surrealize },
+                 -> { users.to_json(only: %i[name email]) },
+                 -> { UserBlueprint.render(users) }]
 
-    x.report('Surrealist: collection through Surrealist.surrealize_collection()') do
-      Surrealist.surrealize_collection(users)
-    end
-
-    x.report('Surrealist: collection through Surrealist::Serializer') do
-      UserSurrealistSerializer.new(users).surrealize
-    end
-
-    x.compare!
-  end
+  benchmark(names, serializers)
 end
 
 def benchmark_associations_instance
   instance = Author.find(rand((1..(N / 2))))
 
-  Benchmark.ips do |x|
-    x.config(time: 5, warmup: 2)
+  names = ['AMS (associations): instance',
+           'Surrealist (associations): instance through .surrealize',
+           'Surrealist (associations): instance through Surrealist::Serializer',
+           'ActiveModel::Serializers::JSON (associations)',
+           'Blueprinter (associations)']
 
-    x.report('AMS (associations): instance') do
-      ActiveModelSerializers::SerializableResource.new(instance).to_json
-    end
+  serializers = [-> { AuthorAMSSerializer.new(instance).to_json },
+                 -> { instance.surrealize },
+                 -> { AuthorSurrealistSerializer.new(instance).surrealize },
+                 lambda do
+                   instance.to_json(only: %i[name last_name age], methods: %i[full_name],
+                                    include: { books: { only: %i[title year] } })
+                 end,
+                 -> { AuthorBlueprint.render(instance) }]
 
-    x.report('Surrealist (associations): instance through .surrealize') do
-      instance.surrealize
-    end
-
-    x.report('Surrealist (associations): instance through Surrealist::Serializer') do
-      AuthorSurrealistSerializer.new(instance).surrealize
-    end
-
-    x.compare!
-  end
+  benchmark(names, serializers)
 end
 
 def benchmark_associations_collection
   collection = Author.all
 
-  Benchmark.ips do |x|
-    x.config(time: 5, warmup: 2)
+  names = ['AMS (associations): collection',
+           'Surrealist (associations): collection through Surrealist.surrealize_collection()',
+           'Surrealist (associations): collection through Surrealist::Serializer',
+           'ActiveModel::Serializers::JSON (associations): collection',
+           'Blueprinter (associations): collection']
 
-    x.report('AMS (associations): collection') do
-      ActiveModelSerializers::SerializableResource.new(collection).to_json
-    end
+  serializers = [lambda do
+                   ActiveModel::Serializer::CollectionSerializer.new(
+                     collection, root: nil, serializer: AuthorAMSSerializer
+                   ).to_json
+                 end,
+                 -> { Surrealist.surrealize_collection(collection) },
+                 -> { AuthorSurrealistSerializer.new(collection).surrealize },
+                 lambda do
+                   collection.to_json(only: %i[name last_name age], methods: %i[full_name],
+                                      include: { books: { only: %i[title year] } })
+                 end,
+                 -> { AuthorBlueprint.render(collection) }]
 
-    x.report('Surrealist (associations): collection through Surrealist.surrealize_collection()') do
-      Surrealist.surrealize_collection(collection)
-    end
-
-    x.report('Surrealist (associations): collection through Surrealist::Serializer') do
-      AuthorSurrealistSerializer.new(collection).surrealize
-    end
-
-    x.compare!
-  end
+  benchmark(names, serializers)
 end
 
 # Default configuration
@@ -194,8 +242,21 @@ benchmark_collection
 puts "\n------- Turning off AMS logger -------\n"
 ActiveModelSerializers.logger.level = Logger::Severity::UNKNOWN
 
-benchmark_instance('(without logging)')
-benchmark_collection('(without logging)')
+benchmark_instance(ams_arg: '(without logging)')
+benchmark_collection(ams_arg: '(without logging)')
+
+# Associations
+benchmark_associations_instance
+benchmark_associations_collection
+
+puts "\n------- Enabling Oj.optimize_rails() & Blueprinter config.generator = Oj -------\n"
+Oj.optimize_rails
+Blueprinter.configure do |config|
+  config.generator = Oj
+end
+
+benchmark_instance(ams_arg: '(without logging)', oj_arg: '(with Oj)')
+benchmark_collection(ams_arg: '(without logging)', oj_arg: '(with Oj)')
 
 # Associations
 benchmark_associations_instance
@@ -241,3 +302,4 @@ benchmark_associations_collection
 #   Surrealist (associations): collection through Surrealist.surrealize_collection():        2.4 i/s
 #   Surrealist (associations): collection through Surrealist::Serializer:        2.4 i/s - 1.03x  slower
 #   AMS (associations): collection:        1.5 i/s - 1.60x  slower
+# rubocop:enable Metrics/AbcSize,Metrics/MethodLength
