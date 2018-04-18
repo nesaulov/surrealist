@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'oj'
+require 'set'
 require_relative 'surrealist/any'
 require_relative 'surrealist/bool'
 require_relative 'surrealist/builder'
