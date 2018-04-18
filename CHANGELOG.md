@@ -1,3 +1,8 @@
+# 1.1.2
+
+## Fixed
+* Bug with inheritance and mixins ([@nesaulov][]) [#93](https://github.com/nesaulov/surrealist/pull/93)
+
 # 1.1.1
 
 ## Fixed
