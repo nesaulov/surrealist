@@ -55,6 +55,28 @@ module Surrealist
       SchemaDefiner.call(self, yield)
     end
 
+    # A DSL method to return the defined schema.
+    # @example DSL usage example
+    #   class Person
+    #     include Surrealist
+    #
+    #     json_schema do
+    #       { name: String }
+    #     end
+    #
+    #     def name
+    #       'Parent'
+    #     end
+    #   end
+    #
+    #   Person.defined_schema
+    #   # => { name: String }
+    def defined_schema
+      read_schema.tap do |schema|
+        raise UnknownSchemaError if schema.nil?
+      end
+    end
+
     # A DSL method to delegate schema in a declarative style. Must reference a valid
     # class that includes Surrealist
     #
@@ -101,9 +123,17 @@ module Surrealist
     def surrealize_with(klass, tag: Surrealist::VarsHelper::DEFAULT_TAG)
       if klass < Surrealist::Serializer
         Surrealist::VarsHelper.add_serializer(self, klass, tag: tag)
+        instance_variable_set(VarsHelper::PARENT_VARIABLE, klass.defined_schema)
       else
         raise ArgumentError, "#{klass} should be inherited from Surrealist::Serializer"
       end
+    end
+
+    private
+
+    def read_schema
+      instance_variable_get(VarsHelper::INSTANCE_VARIABLE) ||
+        instance_variable_get(VarsHelper::PARENT_VARIABLE)
     end
   end
 end
