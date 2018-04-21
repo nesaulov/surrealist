@@ -21,6 +21,7 @@ require 'rom-repository'
 require_relative '../lib/surrealist'
 
 require_relative 'support/shared_contexts/parameters_contexts'
+require_relative 'support/shared_examples/hash_examples'
 require_relative 'orms/active_record/models'
 require_relative 'orms/sequel/models'
 
