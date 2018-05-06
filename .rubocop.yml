@@ -9,7 +9,7 @@ Documentation:
     - benchmarks/*rb
     - spec/**/*rb
 
-# Layout
+#  Layout
 
 Layout/AlignParameters:
   Enabled: true
