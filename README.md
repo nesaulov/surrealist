@@ -27,6 +27,7 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
   * [Defining custom serializers](#defining-custom-serializers)
   * [Multiple serializers](#multiple-serializers)
   * [Build schema](#build-schema)
+  * [Defined schema](#defined-schema)
   * [Working with ORMs](#working-with-orms)
     * [ActiveRecord](#activerecord)
     * [ROM](#rom)
@@ -260,19 +261,19 @@ you have to define yourself. DSL looks as follows
 class IncomeSerializer < Surrealist::Serializer
   serializer_context :current_user
   json_schema { { amount: Integer } }
-  
+
   def amount
     current_user.guest? ? 100000000 : object.amount
   end
 end
-``` 
+```
 `.serializer_context` takes an array of symbols and dynamically defines instance methods
 that read values from the context hash. So `.serializer_context :current_user` will become
 ``` ruby
 def current_user
   context[:current_user]
 end
-``` 
+```
 There is also an alias in the plural form: `.serializer_contexts`.
 ### Multiple serializers
 
@@ -319,6 +320,14 @@ a hash instead of a JSON string. From the previous example:
 ``` ruby
 Car.new.build_schema
 # => { age: 7, brand: "Toyota", doors: nil, horsepower: 140, fuel_system: "Direct injection", previous_owner: "John Doe" }
+```
+
+### Defined schema
+Use the `.defined_schema` method to get the schema that has been defined with `json_schema`:
+
+``` ruby
+User.defined_schema
+# => { name: String, age: Integer }
 ```
 
 ### Working with ORMs

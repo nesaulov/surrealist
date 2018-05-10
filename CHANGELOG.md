@@ -1,3 +1,8 @@
+# Next (unreleased)
+
+## Added
+* `.defined_schema` to return the schema that has been defined with `json_schema` ([@glaucocustodio][]) [#98](https://github.com/nesaulov/surrealist/pull/98)
+
 # 1.1.2
 
 ## Fixed
@@ -87,6 +92,7 @@
 * Allow nil values by default.
 * Allow nested objects.
 
+[@glaucocustodio]: https://github.com/glaucocustodio
 [@nesaulov]: https://github.com/nesaulov
 [@AlessandroMinali]: https://github.com/AlessandroMinali
 [@nulldef]: https://github.com/nulldef
