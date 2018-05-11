@@ -101,6 +101,16 @@ Plural = Class.new(Surrealist::Serializer) do
   json_schema { { user_name: String, mouse_name: String, cow_name: String } }
 end
 
+class Foo
+  def test
+    'test'
+  end
+end
+
+class FooSerializer < Surrealist::Serializer
+  json_schema { { test: String } }
+end
+
 RSpec.describe Surrealist::Serializer do
   describe 'Explicit surrealization through `Serializer.new`' do
     describe 'instance' do
@@ -273,6 +283,16 @@ RSpec.describe Surrealist::Serializer do
         let(:instance) { Plural.new(nil, **args) }
 
         it { expect(instance.build_schema).to eq(user_name: 'Dave', mouse_name: 'Pes', cow_name: 'Cat') }
+      end
+    end
+  end
+
+  describe 'method delegation' do
+    context 'Kernel#test' do
+      let(:hash) { FooSerializer.new(Foo.new).build_schema }
+
+      it 'does not invoke Kernel method when falling back on method_missing' do
+        expect(hash).to eq(test: 'test')
       end
     end
   end
