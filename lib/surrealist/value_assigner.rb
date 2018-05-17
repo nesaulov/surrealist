@@ -34,8 +34,21 @@ module Surrealist
       #
       # @return [Object] value to be further processed
       def raw_value(instance, schema)
-        value = instance.is_a?(Hash) ? instance[schema.key] : instance.send(schema.key)
+        value = instance.is_a?(Hash) ? instance[schema.key] : invoke_method(instance, schema.key)
         coerce_value(value, schema)
+      end
+
+      # Checks if there is a custom serializer defined for the object and invokes the method
+      #   on it first.
+      #
+      # @param [Object] instance an instance of a model or a serializer
+      # @param [Symbol] method the schema key that represents the method to be invoked
+      #
+      # @return [Object] the return value of the method
+      def invoke_method(instance, method)
+        object = instance.instance_variable_get(:@object)
+
+        object && object.respond_to?(method) ? object.send(method) : instance.send(method)
       end
 
       # Coerces value if type check is passed
