@@ -158,8 +158,53 @@ class Chips < Potato
   # expecting: Surrealist::UnknownSchemaError
 end
 
+class ComplexNumber < Surrealist::Serializer
+  json_schema do
+    {
+      real: Integer,
+      imaginary: Integer,
+    }
+  end
+end
+
+class DeepHash < Surrealist::Serializer
+  json_schema do
+    {
+      list: Array,
+      nested: {
+        left: String,
+        right: Integer,
+      },
+    }
+  end
+end
+
+class HashRoot < Surrealist::Serializer
+  json_schema do
+    { nested: ComplexNumber.defined_schema }
+  end
+end
+
 RSpec.describe Surrealist do
   describe '#build_schema' do
+    context 'with hash arg' do
+      specify do
+        expect(ComplexNumber.new({real: 1, imaginary: 2}).build_schema).to eq(real: 1, imaginary: 2)
+      end
+    end
+
+    context 'deep hash arg' do
+      specify do
+        expect(DeepHash.new({list: [1, 2], nested: { right: 4, left: 'three'}}).build_schema).to eq({list: [1, 2], nested: { right: 4, left: 'three'}})
+      end
+    end
+
+    context 'root hash with object inside' do
+      specify do
+        expect(HashRoot.new({nested: OpenStruct.new(real: 1, imaginary: -1)}).build_schema).to eq({nested: { real: 1, imaginary: -1}})
+      end
+    end
+
     context 'with defined schema' do
       context 'with correct types' do
         it 'works' do
