@@ -10,7 +10,7 @@ group :development, :test do
   gem 'blueprinter'
   gem 'coveralls', require: false
   gem 'dry-struct'
-  gem 'dry-types', '= 0.12.2'
+  gem 'dry-types', '= 0.13.2'
   gem 'rom', '~> 4.0'
   gem 'rom-repository'
   gem 'rom-sql'
