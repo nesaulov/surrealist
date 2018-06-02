@@ -33,6 +33,9 @@ Layout/MultilineOperationIndentation:
 Layout/SpaceInLambdaLiteral:
   EnforcedStyle: require_space
 
+Layout/ClosingParenthesisIndentation:
+  Enabled: true
+
 # Lint
 Lint/AmbiguousBlockAssociation:
   Enabled: false
