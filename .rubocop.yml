@@ -49,6 +49,9 @@ Lint/NonLocalExitFromIterator:
 Lint/RescueType:
   Enabled: true
 
+Lint/SplatKeywordArguments:
+  Enabled: false
+
 # Metrics
 
 Metrics/BlockLength:
@@ -154,7 +157,10 @@ Style/TrailingCommaInArrayLiteral:
 Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: comma
 
-Style/MethodMissing:
+Style/MissingRespondToMissing:
+  Enabled: false
+
+Style/MethodMissingSuper:
   Enabled: false
 
 Style/EvalWithLocation:
