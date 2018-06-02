@@ -92,7 +92,7 @@ RSpec.describe Surrealist do
 
         expect(JSON.parse(
                  instance.surrealize(include_namespaces: true, camelize: true, include_root: true),
-        )).to eq(camel_json)
+               )).to eq(camel_json)
       end
     end
 
