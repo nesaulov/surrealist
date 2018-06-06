@@ -157,14 +157,14 @@ RSpec.describe Surrealist::Serializer do
         let(:flour) { Struct.new(:amount).new(40) }
         let(:instance) { { color: 'yellow', amount: 60 } }
 
-        describe "#surrealize" do
+        describe '#surrealize' do
           subject(:json) { PancakeSerializer.new(instance, flour: flour).surrealize }
           let(:expectation) { { amount: 60, color: 'yellow' }.to_json }
 
           it { is_expected.to eq expectation }
         end
 
-        describe "#surrealize with include root" do
+        describe '#surrealize with include root' do
           subject(:json) { PancakeSerializer.new(instance, flour: flour).surrealize(include_root: true) }
           # NOTE: include root doesn't work as well when we call serializer in such way
           let(:expectation) { { pancake_serializer: { amount: 60, color: 'yellow' } }.to_json }
@@ -172,7 +172,7 @@ RSpec.describe Surrealist::Serializer do
           it { is_expected.to eq expectation }
         end
 
-        describe "#surrealize with camelize" do
+        describe '#surrealize with camelize' do
           let(:instance) { { name: 'Pepe' } }
           subject(:json) { DogeSerializer.new(instance, flour: flour).surrealize(camelize: true) }
           let(:expectation) { { name: 'Pepe', nameLength: 4 }.to_json }
