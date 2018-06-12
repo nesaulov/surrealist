@@ -54,7 +54,7 @@ module Surrealist
     #   e.g `CatSerializer.new(Cat.new(3), food: CatFood.new)`
     #   And then food will be available inside serializer via `context[:food]`
     def initialize(object, **context)
-      @object = object
+      @object = wrap_hash_into_struct(object)
       @context = context
     end
 
@@ -93,6 +93,10 @@ module Surrealist
     # Methods not found inside serializer will be invoked on the object
     def respond_to_missing?(method, include_private = false)
       object.respond_to?(method) || super
+    end
+
+    def wrap_hash_into_struct(object)
+      object.instance_of?(Hash) ? OpenStruct.new(object) : object
     end
   end
 end
