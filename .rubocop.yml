@@ -33,6 +33,9 @@ Layout/MultilineOperationIndentation:
 Layout/SpaceInLambdaLiteral:
   EnforcedStyle: require_space
 
+Layout/ClosingParenthesisIndentation:
+  Enabled: true
+
 # Lint
 Lint/AmbiguousBlockAssociation:
   Enabled: false
@@ -48,6 +51,9 @@ Lint/NonLocalExitFromIterator:
 
 Lint/RescueType:
   Enabled: true
+
+Lint/SplatKeywordArguments:
+  Enabled: false
 
 # Metrics
 
@@ -154,7 +160,10 @@ Style/TrailingCommaInArrayLiteral:
 Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: comma
 
-Style/MethodMissing:
+Style/MissingRespondToMissing:
+  Enabled: false
+
+Style/MethodMissingSuper:
   Enabled: false
 
 Style/EvalWithLocation:
