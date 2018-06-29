@@ -129,6 +129,8 @@ module Surrealist
       Surrealist::ExceptionRaiser.raise_unknown_schema!(instance) if schema.nil?
 
       parameters = config ? config.merge(args) : args
+
+      # TODO: Refactor (something pipeline-like would do here, perhaps a builder of some sort)
       carrier = Surrealist::Carrier.call(parameters)
       copied_schema = Surrealist::Copier.deep_copy(schema)
       built_schema = Builder.new(carrier, copied_schema, instance).call

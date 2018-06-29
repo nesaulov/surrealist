@@ -328,6 +328,7 @@ RSpec.describe Surrealist do
           },
         }
       end
+
       let(:camel_hash) do
         {
           evilEvents: {
@@ -337,6 +338,7 @@ RSpec.describe Surrealist do
           },
         }
       end
+
       let(:snake_json) do
         {
           'evil_events' => {
@@ -346,6 +348,7 @@ RSpec.describe Surrealist do
           },
         }
       end
+
       let(:camel_json) do
         {
           'evilEvents' => {

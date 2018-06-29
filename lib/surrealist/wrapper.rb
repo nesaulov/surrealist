@@ -22,6 +22,7 @@ module Surrealist
       private
 
       # Deeply copies the schema hash and wraps it if there is a need to.
+      # TODO: refactor
       #
       # @param [Object] hash object to be copied.
       # @param [String] klass instance's class name.
