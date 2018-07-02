@@ -105,10 +105,18 @@ class Foo
   def test
     'test'
   end
+
+  def new_test
+    'object_test'
+  end
 end
 
 class FooSerializer < Surrealist::Serializer
-  json_schema { { test: String } }
+  json_schema { { test: String, new_test: String } }
+
+  def new_test
+    'serializer_test'
+  end
 end
 
 RSpec.describe Surrealist::Serializer do
@@ -155,7 +163,7 @@ RSpec.describe Surrealist::Serializer do
       describe 'serializing hash' do
         let(:milk) { Struct.new(:amount).new(20) }
         let(:flour) { Struct.new(:amount).new(40) }
-        let(:instance) { { color: 'yellow', amount: 60 } }
+        let(:instance) { { color: 'yellow', milk: milk } }
 
         describe '#surrealize' do
           subject(:json) { PancakeSerializer.new(instance, flour: flour).surrealize }
@@ -317,11 +325,18 @@ RSpec.describe Surrealist::Serializer do
   end
 
   describe 'method delegation' do
-    context 'Kernel#test' do
-      let(:hash) { FooSerializer.new(Foo.new).build_schema }
+    let(:instance) { FooSerializer.new(Foo.new) }
+    let(:hash) { instance.build_schema }
 
+    context 'Kernel#test' do
       it 'does not invoke Kernel method when falling back on method_missing' do
-        expect(hash).to eq(test: 'test')
+        expect(hash[:test]).to eq('test')
+      end
+    end
+
+    context 'serializer precedence call' do
+      it 'inkokes the instance method instead of the object one' do
+        expect(hash[:new_test]).to eq(instance.new_test)
       end
     end
   end

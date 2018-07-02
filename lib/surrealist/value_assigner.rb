@@ -39,7 +39,7 @@ module Surrealist
       end
 
       # Checks if there is a custom serializer defined for the object and invokes the method
-      #   on it first.
+      #   on it first only if the serializer has not defined the same method.
       #
       # @param [Object] instance an instance of a model or a serializer
       # @param [Symbol] method the schema key that represents the method to be invoked
@@ -48,7 +48,9 @@ module Surrealist
       def invoke_method(instance, method)
         object = instance.instance_variable_get(:@object)
 
-        object && object.respond_to?(method) ? object.send(method) : instance.send(method)
+        instance_method = instance.class.method_defined?(method)
+        invoke_object = !instance_method && object && object.respond_to?(method)
+        invoke_object ? object.send(method) : instance.send(method)
       end
 
       # Coerces value if type check is passed
