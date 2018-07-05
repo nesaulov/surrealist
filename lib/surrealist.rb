@@ -18,6 +18,7 @@ require_relative 'surrealist/string_utils'
 require_relative 'surrealist/type_helper'
 require_relative 'surrealist/value_assigner'
 require_relative 'surrealist/vars_helper'
+require_relative 'surrealist/wrapper'
 
 # Main module that provides the +json_schema+ class method and +surrealize+ instance method.
 module Surrealist
@@ -128,10 +129,13 @@ module Surrealist
       Surrealist::ExceptionRaiser.raise_unknown_schema!(instance) if schema.nil?
 
       parameters = config ? config.merge(args) : args
+
+      # TODO: Refactor (something pipeline-like would do here, perhaps a builder of some sort)
       carrier = Surrealist::Carrier.call(parameters)
-      normalized_schema = Surrealist::Copier.deep_copy(schema, carrier, instance.class.name)
-      hash = Builder.new(carrier, normalized_schema, instance).call
-      carrier.camelize ? Surrealist::HashUtils.camelize_hash(hash) : hash
+      copied_schema = Surrealist::Copier.deep_copy(schema)
+      built_schema = Builder.new(carrier, copied_schema, instance).call
+      wrapped_schema = Surrealist::Wrapper.wrap(built_schema, carrier, instance.class.name)
+      carrier.camelize ? Surrealist::HashUtils.camelize_hash(wrapped_schema) : wrapped_schema
     end
     # rubocop:enable Metrics/AbcSize
 
@@ -139,7 +143,7 @@ module Surrealist
     #
     # @return [Hash] default arguments (@see Surrealist::Carrier)
     def config
-      @default_args || Surrealist::Copier::EMPTY_HASH
+      @default_args || Surrealist::HashUtils::EMPTY_HASH
     end
 
     # Sets default serialization arguments with a block
@@ -158,7 +162,7 @@ module Surrealist
         yield(carrier)
         @default_args = carrier.parameters
       else
-        @default_args = hash.nil? ? Surrealist::Copier::EMPTY_HASH : hash
+        @default_args = hash.nil? ? Surrealist::HashUtils::EMPTY_HASH : hash
       end
     end
 

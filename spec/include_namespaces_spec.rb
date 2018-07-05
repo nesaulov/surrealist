@@ -31,8 +31,48 @@ class BusinessSystem::Cashout::ReportSystem::Withdraws
   # } } }
 end
 
+module EvilEvents
+  module Core
+    class Metadata
+      include Surrealist
+
+      json_schema do
+        { core: Bool, author: String }
+      end
+
+      def core
+        true
+      end
+
+      def author
+        '0exp'
+      end
+    end
+  end
+  # expecting: evil_events: { core: {
+  #   metadata: { core: true, author: '0exp' }
+  # } }
+end
+
 RSpec.describe Surrealist do
   describe 'include_namespaces optional argument' do
+    shared_examples 'functioning surrealist' do
+      it 'builds schema' do
+        expect(instance.build_schema(include_namespaces: true)).to eq(snake_hash)
+      end
+
+      it 'surrealizes' do
+        expect(JSON.parse(instance.surrealize(include_namespaces: true))).to eq(snake_json)
+      end
+
+      it 'camelizes' do
+        expect(instance.build_schema(include_namespaces: true, camelize: true)).to eq(camel_hash)
+
+        expect(JSON.parse(instance.surrealize(include_namespaces: true, camelize: true)))
+          .to eq(camel_json)
+      end
+    end
+
     let(:instance) { BusinessSystem::Cashout::ReportSystem::Withdraws.new }
 
     context 'without level of nesting' do
@@ -65,20 +105,7 @@ RSpec.describe Surrealist do
         }
       end
 
-      it 'builds schema' do
-        expect(instance.build_schema(include_namespaces: true)).to eq(snake_hash)
-      end
-
-      it 'surrealizes' do
-        expect(JSON.parse(instance.surrealize(include_namespaces: true))).to eq(snake_json)
-      end
-
-      it 'camelizes' do
-        expect(instance.build_schema(include_namespaces: true, camelize: true)).to eq(camel_hash)
-
-        expect(JSON.parse(instance.surrealize(include_namespaces: true, camelize: true)))
-          .to eq(camel_json)
-      end
+      it_behaves_like 'functioning surrealist'
 
       specify 'include_root is ignored' do
         expect(instance.build_schema(include_namespaces: true, include_root: true))
@@ -287,6 +314,52 @@ RSpec.describe Surrealist do
           end
         end
       end
+    end
+
+    context 'with matching namespace and method names' do
+      let(:instance) { EvilEvents::Core::Metadata.new }
+
+      let(:snake_hash) do
+        {
+          evil_events: {
+            core: {
+              metadata: { core: true, author: '0exp' },
+            },
+          },
+        }
+      end
+
+      let(:camel_hash) do
+        {
+          evilEvents: {
+            core: {
+              metadata: { core: true, author: '0exp' },
+            },
+          },
+        }
+      end
+
+      let(:snake_json) do
+        {
+          'evil_events' => {
+            'core' => {
+              'metadata' => { 'core' => true, 'author' => '0exp' },
+            },
+          },
+        }
+      end
+
+      let(:camel_json) do
+        {
+          'evilEvents' => {
+            'core' => {
+              'metadata' => { 'core' => true, 'author' => '0exp' },
+            },
+          },
+        }
+      end
+
+      it_behaves_like 'functioning surrealist'
     end
   end
 end
