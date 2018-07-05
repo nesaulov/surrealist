@@ -47,9 +47,9 @@ module Surrealist
       # @return [Object] the return value of the method
       def invoke_method(instance, method)
         object = instance.instance_variable_get(:@object)
-
-        instance_method = instance.class.method_defined?(method)
-        invoke_object = !instance_method && object && object.respond_to?(method)
+        instance_method = instance.class.instance_methods(false).include?(method) ||
+          instance.class.private_instance_methods(false).include?(method)
+        invoke_object = !instance_method && object && object.respond_to?(method, true)
         invoke_object ? object.send(method) : instance.send(method)
       end
 
