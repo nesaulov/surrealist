@@ -87,7 +87,7 @@ module Surrealist
 
     # Methods not found inside serializer will be invoked on the object
     def method_missing(method, *args, &block)
-      object.public_send(method, *args, &block)
+      object.public_send(method, *args, &block) || super
     end
 
     # Methods not found inside serializer will be invoked on the object

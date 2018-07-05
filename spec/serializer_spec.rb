@@ -109,13 +109,29 @@ class Foo
   def new_test
     'object_test'
   end
+
+  private
+
+  def private_test
+    'private_test'
+  end
+
+  def another_private
+    'another_private'
+  end
 end
 
 class FooSerializer < Surrealist::Serializer
-  json_schema { { test: String, new_test: String } }
+  json_schema do
+    { test: String, new_test: String, private_test: String, another_private: String }
+  end
 
   def new_test
     'serializer_test'
+  end
+
+  private def private_test
+    'serializer_private_test'
   end
 end
 
@@ -325,7 +341,8 @@ RSpec.describe Surrealist::Serializer do
   end
 
   describe 'method delegation' do
-    let(:instance) { FooSerializer.new(Foo.new) }
+    let(:model) { Foo.new }
+    let(:instance) { FooSerializer.new(model) }
     let(:hash) { instance.build_schema }
 
     context 'Kernel#test' do
@@ -335,8 +352,10 @@ RSpec.describe Surrealist::Serializer do
     end
 
     context 'serializer precedence call' do
-      it 'inkokes the instance method instead of the object one' do
+      it 'invokes the instance method instead of the object one' do
         expect(hash[:new_test]).to eq(instance.new_test)
+        expect(hash[:private_test]).to eq(instance.send(:private_test))
+        expect(hash[:another_private]).to eq(model.send(:another_private))
       end
     end
   end
