@@ -103,19 +103,35 @@ end
 
 class Foo
   def test
-    'test'
+    'model test'
   end
 
   def new_test
-    'object_test'
+    'model public method'
+  end
+
+  private
+
+  def private_test
+    'model private method'
+  end
+
+  def another_private
+    'model private method'
   end
 end
 
 class FooSerializer < Surrealist::Serializer
-  json_schema { { test: String, new_test: String } }
+  json_schema do
+    { test: String, new_test: String, private_test: String, another_private: String }
+  end
 
   def new_test
-    'serializer_test'
+    'serializer public method'
+  end
+
+  private def private_test
+    'serializer private method'
   end
 end
 
@@ -325,18 +341,21 @@ RSpec.describe Surrealist::Serializer do
   end
 
   describe 'method delegation' do
-    let(:instance) { FooSerializer.new(Foo.new) }
+    let(:model) { Foo.new }
+    let(:instance) { FooSerializer.new(model) }
     let(:hash) { instance.build_schema }
 
     context 'Kernel#test' do
       it 'does not invoke Kernel method when falling back on method_missing' do
-        expect(hash[:test]).to eq('test')
+        expect(hash[:test]).to eq('model test')
       end
     end
 
     context 'serializer precedence call' do
-      it 'inkokes the instance method instead of the object one' do
-        expect(hash[:new_test]).to eq(instance.new_test)
+      it 'invokes the instance method instead of the object one' do
+        expect(hash[:new_test]).to eq('serializer public method')
+        expect(hash[:private_test]).to eq('serializer private method')
+        expect(hash[:another_private]).to eq('model private method')
       end
     end
   end
