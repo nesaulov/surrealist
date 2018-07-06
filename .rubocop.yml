@@ -52,9 +52,6 @@ Lint/NonLocalExitFromIterator:
 Lint/RescueType:
   Enabled: true
 
-Lint/SplatKeywordArguments:
-  Enabled: false
-
 # Metrics
 
 Metrics/BlockLength:
@@ -102,6 +99,9 @@ Performance/UnfreezeString:
 
 # ¯\_(ツ)_/¯
 Style/AsciiComments:
+  Enabled: false
+
+Style/AccessModifierDeclarations:
   Enabled: false
 
 Style/MixinUsage:
