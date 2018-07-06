@@ -40,6 +40,7 @@ to serialize nested objects and structures. [Introductory blogpost.](https://med
     * [Root](#root)
     * [Include namespaces](#include-namespaces)
   * [Configuration](#configuration)
+  * [Hash serialization](#hash-serialization)
   * [Bool and Any](#bool-and-any)
   * [Type errors](#type-errors)
   * [Undefined methods in schema](#undefined-methods-in-schema)
@@ -687,7 +688,7 @@ withdraws.surrealize(include_namespaces: true, namespaces_nesting_level: 2)
 
 There are two ways of setting default arguments for serialization,
 by passing a block to `Surrealist.configure`:
-```ruby
+``` ruby
 Surrealist.configure do |config|
   config.camelize = true
   config.namespaces_nesting_level = 2
@@ -700,13 +701,28 @@ And by passing a hash:
 These arguments will be applied to all calls of `#build_schema` and `#surrealize`.
 If these methods will be called with arguments, they will be merged with respect to explicitly passed ones:
 
-```ruby
+``` ruby
 Surrealist.configure(camelize: true, include_root: true)
 
 Something.new.surrealize(camelize: false)
 # will result in Something.new.surrealize(camelize: false, include_root: true)
 ```
 
+### Hash serialization
+
+You can pass a hash to serializer and it will use the keys instead of methods.
+
+``` ruby
+class HashSerializer < Surrealist::Serializer
+  json_schema { { string: String, int: Integer } }
+end
+
+HashSerializer.new(string: 'string', int: 4).surrealize
+# => '{ "string": "string", "int": 4}'
+
+HashSerializer.new(string: 'string', int: 'not int').surrealize
+# => Surrealist::InvalidTypeError: Wrong type for key `int`. Expected Integer, got String.
+```
 
 ### Bool and Any
 If you have a parameter that is of boolean type, or if you don't care about the type, you
@@ -769,7 +785,8 @@ type check will be passed. If you want to be strict about `nil`s consider using 
 
 ## Roadmap
 Here is a list of features that are not implemented yet (contributions are welcome):
-* Memoization/caching
+* Automatic endpoint documentation
+* API for validating (contracts) without actually serializing to JSON (maybe with deserialization from JSON)
 
 ## Contributing
 Bug reports and pull requests are welcome on GitHub at https://github.com/nesaulov/surrealist.
