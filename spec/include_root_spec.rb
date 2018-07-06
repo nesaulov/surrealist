@@ -78,6 +78,22 @@ class Code
   end
 end
 
+class Matryoshka
+  include Surrealist
+
+  json_schema do
+    { matryoshka: Integer, color: String }
+  end
+
+  def matryoshka
+    10
+  end
+
+  def color
+    'blue'
+  end
+end
+
 RSpec.describe Surrealist do
   describe 'include_root option' do
     context 'simple example' do
@@ -187,6 +203,28 @@ RSpec.describe Surrealist do
 
         expect(JSON.parse(instance.surrealize(include_root: true, camelize: true)))
           .to eq('ruby' => { 'age' => '22 years' })
+      end
+    end
+
+    context 'root with same name as one of props' do
+      let(:instance) { Matryoshka.new }
+
+      it 'builds schema' do
+        expect(instance.build_schema(include_root: true))
+          .to eq(matryoshka: { matryoshka: 10, color: 'blue' })
+      end
+
+      it 'surrealizes' do
+        expect(JSON.parse(instance.surrealize(include_root: true)))
+          .to eq('matryoshka' => { 'matryoshka' => 10, 'color' => 'blue' })
+      end
+
+      it 'camelizes' do
+        expect(instance.build_schema(include_root: true, camelize: true))
+          .to eq(matryoshka: { matryoshka: 10, color: 'blue' })
+
+        expect(JSON.parse(instance.surrealize(include_root: true, camelize: true)))
+          .to eq('matryoshka' => { 'matryoshka' => 10, 'color' => 'blue' })
       end
     end
   end

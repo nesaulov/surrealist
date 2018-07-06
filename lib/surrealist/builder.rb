@@ -80,7 +80,7 @@ module Surrealist
     # @return [Hash] the schema hash
     def construct_collection(schema, instance, key, value)
       schema[key] = instance.send(key).map do |inst|
-        call(Copier.deep_copy(value, carrier), inst)
+        call(Copier.deep_copy(value), inst)
       end
     end
   end

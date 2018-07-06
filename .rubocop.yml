@@ -169,3 +169,6 @@ Style/MethodMissingSuper:
 Style/EvalWithLocation:
   Exclude:
     - spec/**/*.rb
+
+Style/AccessModifierDeclarations:
+  Enabled: false

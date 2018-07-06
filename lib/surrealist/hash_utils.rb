@@ -3,6 +3,8 @@
 module Surrealist
   # A helper class for hashes transformations.
   module HashUtils
+    EMPTY_HASH = {}.freeze
+
     class << self
       # Converts hash's keys to camelBack keys.
       #
