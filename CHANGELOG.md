@@ -1,3 +1,14 @@
+# 1.3.0
+
+## Added
+
+* Hash serialization ([@stefkin][]) [#106](https://github.com/nesaulov/surrealist/pull/106)
+
+## Fixed
+
+* Conflict when root and object property share the same name ([@akxcv][]) [#99](https://github.com/nesaulov/surrealist/pull/99)
+* Precedence was given to object method instead of serializer one ([@gjhenrique][] & [@nesaulov][]) [#110](https://github.com/nesaulov/surrealist/pull/110) & [#111](https://github.com/nesaulov/surrealist/pull/111)
+
 # 1.2.0
 
 ## Added
@@ -102,4 +113,5 @@
 [@azhi]: https://github.com/azhi
 [@chrisatanasian]: https://github.com/chrisatanasian
 [@past-one]: https://github.com/past-one
-
+[@stefkin]: https://github.com/stefkin
+[@gjhenrique]: https://github.com/gjhenrique
