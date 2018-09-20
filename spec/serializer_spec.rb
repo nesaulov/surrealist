@@ -135,6 +135,12 @@ class FooSerializer < Surrealist::Serializer
   end
 end
 
+class FooChildSerializer < FooSerializer
+  json_schema do
+    { new_test: String, private_test: String }
+  end
+end
+
 RSpec.describe Surrealist::Serializer do
   describe 'Explicit surrealization through `Serializer.new`' do
     describe 'instance' do
@@ -356,6 +362,16 @@ RSpec.describe Surrealist::Serializer do
         expect(hash[:new_test]).to eq('serializer public method')
         expect(hash[:private_test]).to eq('serializer private method')
         expect(hash[:another_private]).to eq('model private method')
+      end
+
+      context 'when serializer inherited' do
+        let(:instance) { FooChildSerializer.new(model) }
+        let(:hash) { instance.build_schema }
+
+        it 'prefer parent serializer method before object method with the same name' do
+          expect(hash[:new_test]).to eq('serializer public method')
+          expect(hash[:private_test]).to eq('serializer private method')
+        end
       end
     end
   end
