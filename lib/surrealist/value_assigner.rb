@@ -47,8 +47,8 @@ module Surrealist
       # @return [Object] the return value of the method
       def invoke_method(instance, method)
         object = instance.instance_variable_get(:@object)
-        instance_method = instance.class.instance_methods(false).include?(method) ||
-          instance.class.private_instance_methods(false).include?(method)
+        instance_method = instance.class.method_defined?(method) ||
+                          instance.class.private_method_defined?(method)
         invoke_object = !instance_method && object && object.respond_to?(method, true)
         invoke_object ? object.send(method) : instance.send(method)
       end
@@ -77,6 +77,7 @@ module Surrealist
       # @return [Array] of schemas
       def assign_nested_collection(instance, value)
         return if @skip_set.include?(value.first.class)
+
         with_skip_set(instance.class) { Surrealist.surrealize_collection(value, raw: true) }
       end
 
@@ -88,6 +89,7 @@ module Surrealist
       # @return [Hash] schema
       def assign_nested_record(instance, value)
         return if @skip_set.include?(value.class)
+
         with_skip_set(instance.class) { value.build_schema }
       end
 
@@ -98,6 +100,7 @@ module Surrealist
       # @return [Object] block result
       def with_skip_set(klass)
         return yield if @skip_set.include?(klass)
+
         @skip_set.add(klass)
         result = yield
         @skip_set.delete(klass)

@@ -48,6 +48,26 @@ module Surrealist
 
       # Plural form ¯\_(ツ)_/¯
       alias serializer_contexts serializer_context
+
+      # Only lookup for methods defined in Surrealist::Serializer subclasses
+      #   to prevent invoke of Kernel methods
+      #
+      # @param [Symbol] method method to be invoked
+      #
+      # @return [Boolean]
+      def method_defined?(method)
+        return true if instance_methods(false).include?(method)
+        return false if superclass == Surrealist::Serializer
+
+        super
+      end
+
+      def private_method_defined?(method)
+        return true if private_instance_methods(false).include?(method)
+        return false if superclass == Surrealist::Serializer
+
+        super
+      end
     end
 
     # NOTE: #context will work only when using serializer explicitly,
