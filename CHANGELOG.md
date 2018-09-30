@@ -1,3 +1,8 @@
+# 1.3.1
+
+## Fixed
+* Invoke parent serializer method instead of object method with the same names ([@kolasss][]) [#118](https://github.com/nesaulov/surrealist/pull/118)
+
 # 1.3.0
 
 ## Added
@@ -115,3 +120,4 @@
 [@past-one]: https://github.com/past-one
 [@stefkin]: https://github.com/stefkin
 [@gjhenrique]: https://github.com/gjhenrique
+[@kolasss]: https://github.com/kolasss
