@@ -90,7 +90,8 @@ module Surrealist
       def raise_invalid_key!(err)
         raise Surrealist::UndefinedMethodError,
               "#{err.message}. You have probably defined a key " \
-              "in the schema that doesn't have a corresponding method."
+              "in the schema that doesn't have a corresponding method.",
+              err.backtrace
       end
 
       # Raises ArgumentError if a tag has no corresponding serializer
