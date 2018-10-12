@@ -50,6 +50,18 @@ class Baz
   # }
 end
 
+class SerializerBar < Surrealist::Serializer
+  json_schema do
+    {
+      foo: Integer
+    }
+  end
+end
+
+class Bar
+  def foo; 1; end;
+end
+
 class WrongTypes
   include Surrealist
 
@@ -198,6 +210,16 @@ RSpec.describe Surrealist do
           expect(instance.build_schema(camelize: true))
             .to eq(foo: 4, bar: [1, 3, 5], anything: [{ some: 'thing' }],
                    nested: { leftSide: 'left', rightSide: true })
+        end
+      end
+
+      context 'with collection' do
+        let(:collection) { [Bar.new, Bar.new] }
+        let(:instance) { SerializerBar.new(collection) }
+
+        it 'serializes' do
+          expect(JSON.parse(instance.surrealize))
+            .to eq( [{ 'foo' => 1 }, { 'foo' => 1 }] )
         end
       end
 

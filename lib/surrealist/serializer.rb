@@ -81,7 +81,7 @@ module Surrealist
     # Checks whether object is a collection or an instance and serializes it
     def surrealize(**args)
       if Helper.collection?(object)
-        Surrealist.surrealize_collection(object, args.merge(context: context))
+        Surrealist.surrealize_collection(object, self.class, args.merge(context: context))
       else
         Surrealist.surrealize(instance: self, **args)
       end
