@@ -55,11 +55,12 @@ module Surrealist
     #   Surrealist.surrealize_collection(User.all)
     #   # => "[{\"name\":\"Nikita\",\"age\":23}, {\"name\":\"Alessandro\",\"age\":24}]"
     #   # For more examples see README
-    def surrealize_collection(collection, **args)
+    def surrealize_collection(collection, serializer_klass = nil, **args)
       Surrealist::ExceptionRaiser.raise_invalid_collection! unless Helper.collection?(collection)
 
       result = collection.map do |object|
-        Helper.surrealist?(object.class) ? __build_schema(object, args) : object
+        Helper.surrealist?(object.class) ? __build_schema(object, args) :
+          serializer_klass ? __build_schema(object, args.merge(serializer: serializer_klass)) : object
       end
 
       args[:raw] ? result : Oj.dump(result, mode: :compat)
