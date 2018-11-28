@@ -121,8 +121,8 @@ RSpec.describe 'ActiveRecord integration' do
     context 'associations' do
       let(:first_book) do
         [
-          { title:  'The Adventures of Tom Sawyer',
-            genre:  { name: 'Adventures' },
+          { title: 'The Adventures of Tom Sawyer',
+            genre: { name: 'Adventures' },
             awards: [
               { title: 'Nobel Prize', id: 1 },
               { title: 'Nobel Prize', id: 4 },

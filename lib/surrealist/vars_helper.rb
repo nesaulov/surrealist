@@ -8,7 +8,7 @@ module Surrealist
     # Class variable name that is set by SchemaDefiner
     CLASS_VARIABLE = '@@__surrealist_schema'.freeze
     # Regexp to resolve ROM structure
-    ROM_REGEXP = /ROM::Struct/o
+    ROM_REGEXP = /ROM::Struct/o.freeze
     # Instance variable that keeps serializer classes
     SERIALIZER_CLASSES = '@__surrealist_serializers'.freeze
     # Tag for default behaviour in multiple serializers

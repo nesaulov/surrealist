@@ -7,7 +7,7 @@ require 'active_model_serializers'
 require 'blueprinter'
 
 ActiveRecord::Base.establish_connection(
-  adapter:  'sqlite3',
+  adapter: 'sqlite3',
   database: ':memory:',
 )
 

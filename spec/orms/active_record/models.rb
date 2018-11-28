@@ -2,7 +2,7 @@ require 'active_record'
 require_relative '../../../lib/surrealist'
 
 ActiveRecord::Base.establish_connection(
-  adapter:  'sqlite3',
+  adapter: 'sqlite3',
   database: ':memory:',
 )
 
@@ -210,7 +210,7 @@ class Book < ActiveRecord::Base
 
   json_schema do
     {
-      title:  String,
+      title: String,
       genre: {
         name: String,
       },

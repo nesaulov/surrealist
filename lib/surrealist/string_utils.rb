@@ -6,9 +6,9 @@ module Surrealist
     DASH                  = '-'.freeze
     UNDERSCORE            = '_'.freeze
     EMPTY_STRING          = ''.freeze
-    DASH_REGEXP1          = /([A-Z]+)([A-Z][a-z])/o
-    DASH_REGEXP2          = /([a-z\d])([A-Z])/o
-    UNDERSCORE_REGEXP     = /(?:^|_)([^_\s]+)/o
+    DASH_REGEXP1          = /([A-Z]+)([A-Z][a-z])/o.freeze
+    DASH_REGEXP2          = /([a-z\d])([A-Z])/o.freeze
+    UNDERSCORE_REGEXP     = /(?:^|_)([^_\s]+)/o.freeze
     NAMESPACES_SEPARATOR  = '::'.freeze
     UNDERSCORE_SUBSTITUTE = '\1_\2'.freeze
 

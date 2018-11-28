@@ -5,10 +5,10 @@ class Note
 
   json_schema do
     {
-      foo:    Integer,
-      bar:    Array,
+      foo: Integer,
+      bar: Array,
       nested: {
-        left:  String,
+        left: String,
         right: Bool,
       },
     }
