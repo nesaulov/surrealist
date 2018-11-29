@@ -247,6 +247,7 @@ RSpec.describe Surrealist::TypeHelper do
         [false, Bool],
         [false, Types::Bool],
         [true, Types::Bool],
+        [nil, Bool],
       ].each do |params|
         it "returns true for #{params}" do
           expect(described_class.valid_type?(*params)).to eq true

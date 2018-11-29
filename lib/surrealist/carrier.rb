@@ -4,7 +4,7 @@ module Surrealist
   # A data structure to carry arguments across methods.
   # @api private
   class Carrier
-    BOOLEANS = [true, false].freeze
+    BOOLEANS = [true, false, nil].freeze
 
     attr_accessor :camelize, :include_root, :include_namespaces, :root, :namespaces_nesting_level
 
@@ -64,7 +64,7 @@ module Surrealist
     def check_booleans!
       booleans_hash.each do |key, value|
         unless BOOLEANS.include?(value)
-          raise ArgumentError, "Expected `#{key}` to be either true or false, got #{value}"
+          raise ArgumentError, "Expected `#{key}` to be either true, false or nil, got #{value}"
         end
       end
     end
