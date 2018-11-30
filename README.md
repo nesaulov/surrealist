@@ -7,8 +7,7 @@
 
 ![Surrealist](surrealist-icon.png)
 
-A gem that provides DSL for serialization of plain old Ruby objects to JSON in a declarative style
-by defining a `json_schema`. It also provides a trivial type checking in the runtime before serialization.
+Surrealist is a schema-driven object serialization ruby library. It also provides a trivial type checking in the runtime before serialization.
 [Yard documentation](http://www.rubydoc.info/github/nesaulov/surrealist/master)
 
 
