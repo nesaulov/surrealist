@@ -1,3 +1,9 @@
+# 1.3.2
+
+## Fixed
+* Preserve exception backtrace in case of Surrealist::UndefinedMethodError ([@akxcv][]) [#122](https://github.com/nesaulov/surrealist/pull/122)
+* Fix nil values for Boolean type ([@nesaulov][]) [#127](https://github.com/nesaulov/surrealist/pull/127)
+
 # 1.3.1
 
 ## Fixed
