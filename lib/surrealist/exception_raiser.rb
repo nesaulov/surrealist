@@ -30,9 +30,9 @@ module Surrealist
 
   # A class that raises all Surrealist exceptions
   module ExceptionRaiser
-    CLASS_NAME_NOT_PASSED           = "Can't wrap schema in root key - class name was not passed".freeze
-    MUST_BEHAVE_LIKE_ENUMERABLE     = "Can't serialize collection - must behave like enumerable".freeze
-    CLASS_DOESNT_INCLUDE_SURREALIST = 'Class does not include Surrealist'.freeze
+    CLASS_NAME_NOT_PASSED           = "Can't wrap schema in root key - class name was not passed"
+    MUST_BEHAVE_LIKE_ENUMERABLE     = "Can't serialize collection - must behave like enumerable"
+    CLASS_DOESNT_INCLUDE_SURREALIST = 'Class does not include Surrealist'
 
     class << self
       # Raises Surrealist::InvalidSchemaDelegation if destination of delegation does not

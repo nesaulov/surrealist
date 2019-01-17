@@ -17,10 +17,10 @@ class SeriousCat
 
   json_schema do
     {
-      weight:   Types::String,
+      weight: Types::String,
       cat_food: {
         amount: Types::Strict::Int,
-        brand:  Types::Strict::String,
+        brand: Types::Strict::String,
       },
     }
   end
@@ -127,7 +127,7 @@ RSpec.describe Surrealist do
 
       it 'surrealizes' do
         expect(JSON.parse(instance.surrealize(include_root: true)))
-          .to eq('serious_cat' => { 'weight'   => '3 kilos',
+          .to eq('serious_cat' => { 'weight' => '3 kilos',
                                     'cat_food' => { 'amount' => 3, 'brand' => 'Whiskas' } })
       end
 
@@ -136,7 +136,7 @@ RSpec.describe Surrealist do
           .to eq(seriousCat: { weight: '3 kilos', catFood: { amount: 3, brand: 'Whiskas' } })
 
         expect(JSON.parse(instance.surrealize(include_root: true, camelize: true)))
-          .to eq('seriousCat' => { 'weight'  => '3 kilos',
+          .to eq('seriousCat' => { 'weight' => '3 kilos',
                                    'catFood' => { 'amount' => 3, 'brand' => 'Whiskas' } })
       end
     end

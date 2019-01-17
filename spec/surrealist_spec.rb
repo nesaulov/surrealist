@@ -5,11 +5,11 @@ class Baz
 
   json_schema do
     {
-      foo:    Integer,
-      bar:    Array,
+      foo: Integer,
+      bar: Array,
       anything: Any,
       nested: {
-        left_side:  String,
+        left_side: String,
         right_side: Bool,
       },
     }

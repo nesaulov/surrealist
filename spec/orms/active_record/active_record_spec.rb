@@ -42,9 +42,9 @@ RSpec.describe 'ActiveRecord integration' do
     -> { ARScope.rec_last! },
   ]
 
-  collection_scopes.push(-> { ARScope.coll_extending }) unless ruby_22
+  collection_scopes.push(-> { ARScope.coll_extending }) unless ruby_23
 
-  unless ruby_22 # AR 4.2 doesn't have these methods
+  unless ruby_23 # AR 4.2 doesn't have these methods
     record_scopes.push([
       -> { ARScope.rec_third_to_last },
       -> { ARScope.rec_third_to_last! },
@@ -121,8 +121,8 @@ RSpec.describe 'ActiveRecord integration' do
     context 'associations' do
       let(:first_book) do
         [
-          { title:  'The Adventures of Tom Sawyer',
-            genre:  { name: 'Adventures' },
+          { title: 'The Adventures of Tom Sawyer',
+            genre: { name: 'Adventures' },
             awards: [
               { title: 'Nobel Prize', id: 1 },
               { title: 'Nobel Prize', id: 4 },
@@ -225,7 +225,7 @@ RSpec.describe 'ActiveRecord integration' do
 
     context 'scopes' do
       context 'query methods' do
-        error = ruby_22 ? NameError : NoMethodError
+        error = ruby_23 ? NameError : NoMethodError
 
         collection_scopes.flatten.each do |lambda|
           it 'fails if scope returns a collection of records' do

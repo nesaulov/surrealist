@@ -3,7 +3,7 @@
 module Surrealist
   # A class that defines a method on the object that stores the schema.
   module SchemaDefiner
-    SCHEMA_TYPE_ERROR = 'Schema should be defined as a hash'.freeze
+    SCHEMA_TYPE_ERROR = 'Schema should be defined as a hash'
 
     class << self
       # Defines an instance variable on the object that stores the schema.
