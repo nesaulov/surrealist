@@ -1,6 +1,6 @@
 language: ruby
 sudo: false
-before_install: gem install bundler -v 1.17.3
+before_install: gem install bundler
 script: bundle exec rake
 matrix:
   fast_finish: true
