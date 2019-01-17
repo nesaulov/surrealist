@@ -7,12 +7,12 @@ matrix:
   include:
     - rvm: ruby-head
       gemfile: Gemfile
+    - rvm: 2.6
+      gemfile: Gemfile
     - rvm: 2.5
       gemfile: Gemfile
     - rvm: 2.4
       gemfile: Gemfile
     - rvm: 2.3
-      gemfile: Gemfile
-    - rvm: 2.2
       gemfile: gemfiles/activerecord42.gemfile
 

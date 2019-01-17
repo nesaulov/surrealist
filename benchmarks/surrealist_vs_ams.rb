@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
 require_relative '../lib/surrealist'
 require 'benchmark/ips'
@@ -7,7 +9,7 @@ require 'active_model_serializers'
 require 'blueprinter'
 
 ActiveRecord::Base.establish_connection(
-  adapter:  'sqlite3',
+  adapter: 'sqlite3',
   database: ':memory:',
 )
 
