@@ -152,12 +152,12 @@ RSpec.describe Surrealist do
     it 'includes root' do
       expect(JSON.parse(human.surrealize(camelize: true, include_root: true)))
         .to eq('human' => {
-          'name'          => 'John', 'lastName' => 'Doe', 'properties' => {
+          'name' => 'John', 'lastName' => 'Doe', 'properties' => {
             'gender' => 'male', 'age' => 42
           }, 'creditCard' => {
             'cardNumber' => 1234, 'cardHolder' => 'John Doe'
           }, 'children'   => {
-            'male'   => { 'count' => 2 },
+            'male' => { 'count' => 2 },
             'female' => { 'count' => 1 },
           }
         })
@@ -166,7 +166,7 @@ RSpec.describe Surrealist do
         .to eq(human: {
           name: 'John', lastName: 'Doe', properties: { gender: 'male', age: 42 },
           creditCard: { cardNumber: 1234, cardHolder: 'John Doe' },
-          children:   { male: { count: 2 }, female: { count: 1 } }
+          children: { male: { count: 2 }, female: { count: 1 } }
         })
     end
   end

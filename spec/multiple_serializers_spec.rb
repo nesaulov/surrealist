@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShortPostSerializer < Surrealist::Serializer
   json_schema do
     {

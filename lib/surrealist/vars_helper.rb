@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 module Surrealist
   # Module for finding and setting hash into vars
   module VarsHelper
     # Instance variable name that is set by SchemaDefiner
-    INSTANCE_VARIABLE = '@__surrealist_schema'.freeze
+    INSTANCE_VARIABLE = '@__surrealist_schema'
     # Instance's parent instance variable name that is set by SchemaDefiner
-    PARENT_VARIABLE = '@__surrealist_schema_parent'.freeze
+    PARENT_VARIABLE = '@__surrealist_schema_parent'
     # Class variable name that is set by SchemaDefiner
-    CLASS_VARIABLE = '@@__surrealist_schema'.freeze
+    CLASS_VARIABLE = '@@__surrealist_schema'
     # Regexp to resolve ROM structure
-    ROM_REGEXP = /ROM::Struct/o
+    ROM_REGEXP = /ROM::Struct/o.freeze
     # Instance variable that keeps serializer classes
-    SERIALIZER_CLASSES = '@__surrealist_serializers'.freeze
+    SERIALIZER_CLASSES = '@__surrealist_serializers'
     # Tag for default behaviour in multiple serializers
     DEFAULT_TAG = :default
 
@@ -49,7 +51,7 @@ module Surrealist
       def find_serializer(klass, tag: nil)
         tag ||= DEFAULT_TAG
         hash = klass.instance_variable_get(SERIALIZER_CLASSES)
-        serializer = hash && hash.fetch(tag.to_sym, nil)
+        serializer = hash&.fetch(tag.to_sym, nil)
         Surrealist::ExceptionRaiser.raise_unknown_tag!(tag) if serializer.nil? && tag != DEFAULT_TAG
         serializer
       end

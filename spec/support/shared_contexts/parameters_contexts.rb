@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../parameters'
 
 shared_context 'error is raised for invalid params: instance' do

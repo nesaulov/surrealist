@@ -3,14 +3,14 @@
 module Surrealist
   # A helper class for strings transformations.
   module StringUtils
-    DASH                  = '-'.freeze
-    UNDERSCORE            = '_'.freeze
-    EMPTY_STRING          = ''.freeze
-    DASH_REGEXP1          = /([A-Z]+)([A-Z][a-z])/o
-    DASH_REGEXP2          = /([a-z\d])([A-Z])/o
-    UNDERSCORE_REGEXP     = /(?:^|_)([^_\s]+)/o
-    NAMESPACES_SEPARATOR  = '::'.freeze
-    UNDERSCORE_SUBSTITUTE = '\1_\2'.freeze
+    DASH                  = '-'
+    UNDERSCORE            = '_'
+    EMPTY_STRING          = ''
+    DASH_REGEXP1          = /([A-Z]+)([A-Z][a-z])/o.freeze
+    DASH_REGEXP2          = /([a-z\d])([A-Z])/o.freeze
+    UNDERSCORE_REGEXP     = /(?:^|_)([^_\s]+)/o.freeze
+    NAMESPACES_SEPARATOR  = '::'
+    UNDERSCORE_SUBSTITUTE = '\1_\2'
 
     class << self
       # Converts a string to snake_case.
@@ -69,7 +69,7 @@ module Surrealist
       #
       # @return [Hash] a nested hash.
       def break_namespaces(klass, camelize, nesting_level)
-        Surrealist::ExceptionRaiser.raise_invalid_nesting!(nesting_level) unless nesting_level > 0
+        Surrealist::ExceptionRaiser.raise_invalid_nesting!(nesting_level) unless nesting_level.positive?
 
         klass.split(NAMESPACES_SEPARATOR).last(nesting_level).reverse.inject({}) do |a, n|
           camelize ? Hash[camelize(uncapitalize(n), false).to_sym => a] : Hash[underscore(n).to_sym => a]

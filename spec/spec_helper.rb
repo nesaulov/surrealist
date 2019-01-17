@@ -30,8 +30,8 @@ RSpec.configure do |config|
   config.order = 'random'
 end
 
-def ruby_22
-  ::RUBY_VERSION =~ /2.2/
+def ruby_23
+  ::RUBY_VERSION =~ /2.3/
 end
 
 module Types

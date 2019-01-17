@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 VALID_PARAMS = [
   { camelize: true,  include_namespaces: true, include_root: true,
     root: 'root', namespaces_nesting_level: 3 },
