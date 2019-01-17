@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 module Surrealist
-  # A helper class for wrapphing hashes.
+  # A helper class for wrapping hashes.
   module Wrapper
     class << self
       # Wraps the schema hash into root/namespaces if there is a need to.
