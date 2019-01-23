@@ -4,6 +4,7 @@
 [![Inline docs](http://inch-ci.org/github/nesaulov/surrealist.svg?branch=master)](http://inch-ci.org/github/nesaulov/surrealist)
 [![Gem Version](https://badge.fury.io/rb/surrealist.svg)](https://rubygems.org/gems/surrealist)
 [![Open Source Helpers](https://www.codetriage.com/nesaulov/surrealist/badges/users.svg)](https://www.codetriage.com/nesaulov/surrealist)
+[![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
 ![Surrealist](surrealist-icon.png)
 
