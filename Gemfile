@@ -15,6 +15,6 @@ group :development, :test do
   gem 'rom-repository'
   gem 'rom-sql'
   gem 'sequel'
-  gem 'sqlite3'
+  gem 'sqlite3', '~> 1.4'
   gem 'yard', require: false unless ENV['TRAVIS']
 end
