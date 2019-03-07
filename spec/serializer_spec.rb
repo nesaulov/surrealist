@@ -217,16 +217,12 @@ RSpec.describe Surrealist::Serializer do
         end
       end
 
-      describe 'serialize Struct as single object' do
+      describe 'serializing  a single struct' do
         let(:person) { TestStruct.new('John', 'Dow') }
         let(:expectation) { { name: 'John', other_param: 'Dow' } }
-        subject(:json) { TestStructSerializer.new(person).build_schema }
+        subject(:hash) { TestStructSerializer.new(person).build_schema }
 
         it { is_expected.to eq expectation }
-
-        it 'raise surrealize instead surrealize_collection with struct' do
-          expect(Surrealist::Helper.collection?(person)).to eq false
-        end
       end
     end
 
@@ -268,23 +264,24 @@ RSpec.describe Surrealist::Serializer do
           it { is_expected.to eq expectation }
         end
       end
-    end
 
-    describe 'collection of Struct' do
-      let(:person1) { TestStruct.new('John', 'Dow') }
-      let(:person2) { TestStruct.new('Mountain', 'Dew') }
-      let(:person3) { TestStruct.new('Harley', 'Queen') }
-      let(:struct_collection) { [person1, person2, person3] }
-      let(:expectation) do
-        [
-          { name: 'John', other_param: 'Dow' },
-          { name: 'Mountain', other_param: 'Dew' },
-          { name: 'Harley', other_param: 'Queen' },
-        ]
+      describe 'collection of structs' do
+        let(:person1) { TestStruct.new('John', 'Dow') }
+        let(:person2) { TestStruct.new('Mountain', 'Dew') }
+        let(:person3) { TestStruct.new('Harley', 'Queen') }
+        let(:struct_collection) { [person1, person2, person3] }
+        let(:expectation) do
+          [
+            { name: 'John', other_param: 'Dow' },
+            { name: 'Mountain', other_param: 'Dew' },
+            { name: 'Harley', other_param: 'Queen' },
+          ]
+        end
+
+        subject(:json) { TestStructSerializer.new(struct_collection).build_schema }
+
+        it { is_expected.to eq expectation }
       end
-      subject(:json) { TestStructSerializer.new(struct_collection).build_schema }
-
-      it { is_expected.to eq expectation }
     end
   end
 
