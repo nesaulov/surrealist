@@ -6,7 +6,7 @@ RSpec.describe Surrealist::Helper do
   describe 'serializing  a single struct' do
     let(:person) { TestStruct.new('John', 'Dow') }
 
-    it 'raise surrealize instead surrealize_collection with struct' do
+    specify 'a struct is not treated as a collection' do
       expect(Surrealist::Helper.collection?(person)).to eq false
     end
   end
