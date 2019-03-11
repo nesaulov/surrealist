@@ -16,7 +16,9 @@ module Surrealist
       # 4.2 AR relation object did not include Enumerable (it defined
       # all necessary method through ActiveRecord::Delegation module),
       # so we need to explicitly check for this
-      (object.is_a?(Enumerable) && !object.instance_of?(Hash)) || ar_relation?(object)
+      return false if object.is_a?(Struct)
+
+      object.is_a?(Enumerable) && !object.instance_of?(Hash) || ar_relation?(object)
     end
 
     def self.ar_relation?(object)
