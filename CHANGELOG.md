@@ -1,3 +1,8 @@
+# 1.3.3
+
+## Fixed
+* Struct serialization ([@wildkain][]) [#135](https://github.com/nesaulov/surrealist/pull/135)
+
 # 1.3.2
 
 ## Fixed
@@ -127,3 +132,4 @@
 [@stefkin]: https://github.com/stefkin
 [@gjhenrique]: https://github.com/gjhenrique
 [@kolasss]: https://github.com/kolasss
+[@wildkain]: https://github.com/wildkain
