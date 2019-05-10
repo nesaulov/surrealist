@@ -19,11 +19,12 @@ module Surrealist
       #
       # @return [String] new underscored string.
       def underscore(string)
-        string.gsub(NAMESPACES_SEPARATOR, UNDERSCORE)
-          .gsub(DASH_REGEXP1, UNDERSCORE_SUBSTITUTE)
-          .gsub(DASH_REGEXP2, UNDERSCORE_SUBSTITUTE)
-          .tr(DASH, UNDERSCORE)
-          .downcase
+        dup = string.gsub(NAMESPACES_SEPARATOR, UNDERSCORE)
+        dup.gsub!(DASH_REGEXP1, UNDERSCORE_SUBSTITUTE)
+        dup.gsub!(DASH_REGEXP2, UNDERSCORE_SUBSTITUTE)
+        dup.tr!(DASH, UNDERSCORE)
+        dup.downcase!
+        dup
       end
 
       # Camelizes a string.
