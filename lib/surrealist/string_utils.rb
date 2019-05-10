@@ -72,7 +72,7 @@ module Surrealist
       def break_namespaces(klass, camelize, nesting_level)
         Surrealist::ExceptionRaiser.raise_invalid_nesting!(nesting_level) unless nesting_level.positive?
 
-        klass.split(NAMESPACES_SEPARATOR).last(nesting_level).reverse.inject({}) do |a, n|
+        klass.split(NAMESPACES_SEPARATOR).last(nesting_level).reverse!.inject({}) do |a, n|
           key = (camelize ? camelize(uncapitalize(n), false) : underscore(n)).to_sym
 
           { key => a }
