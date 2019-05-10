@@ -12,10 +12,10 @@ module Surrealist
       #
       # @return [Hash] camelized hash.
       def camelize_hash(hash)
-        if hash.is_a?(Hash)
-          Hash[hash.map { |k, v| [camelize_key(k, false), camelize_hash(v)] }]
-        else
-          hash
+        return hash unless hash.is_a?(Hash)
+
+        hash.each_with_object({}) do |(k, v), obj|
+          obj[camelize_key(k, false)] = camelize_hash(v)
         end
       end
 
