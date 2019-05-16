@@ -60,7 +60,7 @@ module Surrealist
                    else
                      Surrealist::StringUtils.underscore(root).to_sym
                    end
-        result = Hash[root_key => {}]
+        result = { root_key => {} }
         Surrealist::Copier.deep_copy(schema, result[root_key])
 
         result

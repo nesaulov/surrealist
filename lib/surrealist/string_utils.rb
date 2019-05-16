@@ -19,11 +19,12 @@ module Surrealist
       #
       # @return [String] new underscored string.
       def underscore(string)
-        string.gsub(NAMESPACES_SEPARATOR, UNDERSCORE)
-          .gsub(DASH_REGEXP1, UNDERSCORE_SUBSTITUTE)
-          .gsub(DASH_REGEXP2, UNDERSCORE_SUBSTITUTE)
-          .tr(DASH, UNDERSCORE)
-          .downcase
+        dup = string.gsub(NAMESPACES_SEPARATOR, UNDERSCORE)
+        dup.gsub!(DASH_REGEXP1, UNDERSCORE_SUBSTITUTE)
+        dup.gsub!(DASH_REGEXP2, UNDERSCORE_SUBSTITUTE)
+        dup.tr!(DASH, UNDERSCORE)
+        dup.downcase!
+        dup
       end
 
       # Camelizes a string.
@@ -71,8 +72,10 @@ module Surrealist
       def break_namespaces(klass, camelize, nesting_level)
         Surrealist::ExceptionRaiser.raise_invalid_nesting!(nesting_level) unless nesting_level.positive?
 
-        klass.split(NAMESPACES_SEPARATOR).last(nesting_level).reverse.inject({}) do |a, n|
-          camelize ? Hash[camelize(uncapitalize(n), false).to_sym => a] : Hash[underscore(n).to_sym => a]
+        klass.split(NAMESPACES_SEPARATOR).last(nesting_level).reverse!.inject({}) do |a, n|
+          key = (camelize ? camelize(uncapitalize(n), false) : underscore(n)).to_sym
+
+          { key => a }
         end
       end
 
