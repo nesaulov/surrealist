@@ -147,6 +147,14 @@ class TestStructSerializer < Surrealist::Serializer
   json_schema { { name: String, other_param: String } }
 end
 
+class AliasSerializer < Surrealist::Serializer
+  json_schema { { param: String } }
+
+  def param
+    other_param
+  end
+end
+
 RSpec.describe Surrealist::Serializer do
   describe 'Explicit surrealization through `Serializer.new`' do
     describe 'instance' do
@@ -217,10 +225,18 @@ RSpec.describe Surrealist::Serializer do
         end
       end
 
-      describe 'serializing  a single struct' do
+      describe 'serializing a single struct' do
         let(:person) { TestStruct.new('John', 'Dow') }
         let(:expectation) { { name: 'John', other_param: 'Dow' } }
         subject(:hash) { TestStructSerializer.new(person).build_schema }
+
+        it { is_expected.to eq expectation }
+      end
+
+      describe 'serializing when direct instance method call returns nil' do
+        let(:person) { TestStruct.new('John', nil) }
+        let(:expectation) { { param: nil } }
+        subject(:hash) { AliasSerializer.new(person).build_schema }
 
         it { is_expected.to eq expectation }
       end
