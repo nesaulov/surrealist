@@ -4,7 +4,8 @@ module Surrealist
   # A class that builds a hash from the schema and type-checks the values.
   class Builder
     # Struct to carry schema along
-    Schema = Struct.new(:key, :value).freeze
+    Schema = Struct.new(:key, :value)
+    Schema.freeze
 
     # @param [Carrier] carrier instance of Surrealist::Carrier
     # @param [Hash] schema the schema defined in the object's class.
