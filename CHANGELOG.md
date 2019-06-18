@@ -1,3 +1,9 @@
+# 1.3.4
+
+## Fixed
+* Performance and memory improvements ([@krzysiek1507][])[#140](https://github.com/nesaulov/surrealist/pull/140)
+* Fix serializing when direct instance method call returns nil ([@past-one][]) [#141](https://github.com/nesaulov/surrealist/pull/141)
+
 # 1.3.3
 
 ## Fixed
@@ -133,3 +139,4 @@
 [@gjhenrique]: https://github.com/gjhenrique
 [@kolasss]: https://github.com/kolasss
 [@wildkain]: https://github.com/wildkain
+[@krzysiek1507]: https://github.com/krzysiek1507
