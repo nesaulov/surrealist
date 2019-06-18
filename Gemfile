@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development, :test do
-  gem 'active_model_serializers', '~> 0.10.0'
+  gem 'active_model_serializers', '~> 0.10'
   gem 'activerecord'
   gem 'benchmark-ips'
   gem 'blueprinter'

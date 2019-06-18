@@ -1,5 +1,5 @@
 AllCops:
-  TargetRubyVersion: 2.3
+  TargetRubyVersion: 2.4
   Exclude:
     - './gemfiles/*gemfile'
     - './tmp/*'
@@ -18,10 +18,10 @@ Layout/EmptyLineBetweenDefs:
   Exclude:
     - spec/**/*rb
 
-Layout/IndentArray:
+Layout/IndentFirstArrayElement:
   EnforcedStyle: consistent
 
-Layout/IndentHash:
+Layout/IndentFirstHashElement:
   EnforcedStyle: consistent
 
 Layout/MultilineMethodCallIndentation:
@@ -83,17 +83,6 @@ Naming/AccessorMethodName:
 Naming/PredicateName:
   NamePrefixBlacklist:
     - is_
-
-# Performance
-
-Performance/Caller:
-  Enabled: true
-
-Performance/Casecmp:
-  Enabled: true
-
-Performance/UnfreezeString:
-  Enabled: true
 
 # Style
 

@@ -22,13 +22,13 @@ Gem::Specification.new do |spec|
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
-  spec.required_ruby_version = '>= 2.3.0'
+  spec.required_ruby_version = '>= 2.4.0'
 
   spec.add_runtime_dependency 'oj', '~> 3.0'
 
-  spec.add_development_dependency 'bundler'
+  spec.add_development_dependency 'bundler', '~> 2.0'
   spec.add_development_dependency 'pry', '~> 0.12'
   spec.add_development_dependency 'rake', '~> 12.3'
   spec.add_development_dependency 'rspec', '~> 3.8'
-  spec.add_development_dependency 'rubocop', '~> 0.66'
+  spec.add_development_dependency 'rubocop', '~> 0.71'
 end
