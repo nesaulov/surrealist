@@ -42,9 +42,9 @@ RSpec.describe 'ActiveRecord integration' do
     -> { ARScope.rec_last! },
   ]
 
-  collection_scopes.push(-> { ARScope.coll_extending }) unless ruby_23
+  collection_scopes.push(-> { ARScope.coll_extending }) unless ruby_24
 
-  unless ruby_23 # AR 4.2 doesn't have these methods
+  unless ruby_24 # AR 4.2 doesn't have these methods
     record_scopes.push([
       -> { ARScope.rec_third_to_last },
       -> { ARScope.rec_third_to_last! },
@@ -225,7 +225,7 @@ RSpec.describe 'ActiveRecord integration' do
 
     context 'scopes' do
       context 'query methods' do
-        error = ruby_23 ? NameError : NoMethodError
+        error = ruby_24 ? NameError : NoMethodError
 
         collection_scopes.flatten.each do |lambda|
           it 'fails if scope returns a collection of records' do
