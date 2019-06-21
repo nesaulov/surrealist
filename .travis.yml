@@ -12,7 +12,5 @@ matrix:
     - rvm: 2.5
       gemfile: Gemfile
     - rvm: 2.4
-      gemfile: Gemfile
-    - rvm: 2.3
       gemfile: gemfiles/activerecord42.gemfile
 

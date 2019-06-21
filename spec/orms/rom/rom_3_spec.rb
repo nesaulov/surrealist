@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-if ruby_23
+if ruby_24
   class UserModel
     include Surrealist
 
