@@ -8,10 +8,11 @@ module Surrealist
       #
       # @param [Object] instance the instance of the object which methods from the schema are called on.
       # @param [Struct] schema containing a single schema key and value
+      # @param [Configuration] configuration to use
       #
       # @return [Hash] schema
-      def assign(schema, instance)
-        value = raw_value(instance, schema)
+      def assign(schema, instance, config)
+        value = raw_value(instance, schema, config)
 
         # set to track and prevent infinite self references in surrealization
         @skip_set ||= Set.new
@@ -31,11 +32,12 @@ module Surrealist
       #
       # @param [Object] instance the instance of the object which methods from the schema are called on.
       # @param [Struct] schema containing a single schema key and value
+      # @param [Configuration] configuration to use
       #
       # @return [Object] value to be further processed
-      def raw_value(instance, schema)
+      def raw_value(instance, schema, config)
         value = instance.is_a?(Hash) ? instance[schema.key] : invoke_method(instance, schema.key)
-        coerce_value(value, schema)
+        coerce_value(value, schema, config)
       end
 
       # Checks if there is a custom serializer defined for the object and invokes the method
@@ -57,16 +59,23 @@ module Surrealist
       #
       # @param [Object] value the value to be checked and coerced
       # @param [Struct] schema containing a single schema key and value
+      # @param [Configuration] configuration to use
       #
       # @raise +Surrealist::InvalidTypeError+ if type-check failed at some point.
       #
       # @return [Object] value to be further processed
-      def coerce_value(value, schema)
-        unless TypeHelper.valid_type?(value, schema.value)
-          raise Surrealist::InvalidTypeError,
-                "Wrong type for key `#{schema.key}`. Expected #{schema.value}, got #{value.class}."
+      def coerce_value(value, schema, config)
+        type_system = config.type_system
+
+        type_system.check_type(value, schema.value).tap do |result|
+          result.success? { return type_system.coerce(value, schema.value) }
+          result.failure? do |error_message|
+            raise(
+              Surrealist::InvalidTypeError,
+              "Wrong type for key `#{schema.key}`. #{error_message}.",
+            )
+          end
         end
-        TypeHelper.coerce(value, schema.value)
       end
 
       # Assists in recursively generating schema for records while preventing infinite self-referencing

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../lib/surrealist'
-
 TestClass = Class.new do
   include Surrealist
 
@@ -49,7 +47,7 @@ RSpec.describe Surrealist do
       end
 
       it 'is accessible as .config()' do
-        expect(Surrealist.config).to eq(camelize: true, root: :nope)
+        expect(Surrealist.config.settings).to include(camelize: true, root: :nope)
       end
     end
   end
@@ -81,9 +79,10 @@ RSpec.describe Surrealist do
       end
 
       it 'is accessible as .config() (with all other args merged)' do
-        expect(Surrealist.config)
+        expect(Surrealist.config.settings)
             .to eq(camelize: false, include_root: false, include_namespaces: false,
-                   root: :new, namespaces_nesting_level: 666)
+                   root: :new, namespace_nesting_level: 666,
+                   type_system: Surrealist::TypeSystems::Builtin)
       end
     end
   end
@@ -105,6 +104,16 @@ RSpec.describe Surrealist do
       before { Surrealist.configure { |c| c.root = :new } }
 
       it { expect(instance.build_schema).to eq(new: { id_num: 2 }) }
+    end
+  end
+
+  describe '.configure(something invalid)' do
+    it 'fails' do
+      expect { Surrealist.configure('kek') }.to raise_error(
+        ArgumentError,
+        'Expected `config` to be a hash, nil, or an instance of Surrealist::Configuration,
+        but got: kek'.squish,
+      )
     end
   end
 end

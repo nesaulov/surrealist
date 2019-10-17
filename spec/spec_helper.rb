@@ -28,6 +28,7 @@ require_relative 'orms/sequel/models'
 RSpec.configure do |config|
   config.disable_monkey_patching!
   config.order = 'random'
+  config.after(:example) { Surrealist.configure(Surrealist::Configuration::DEFAULT) }
 end
 
 def ruby_24

@@ -64,6 +64,20 @@ class WrongTypes
   # expecting: Surrealist::InvalidTypeError
 end
 
+class WrongBoolType
+  include Surrealist
+
+  json_schema do
+    { foo: Bool }
+  end
+
+  def foo
+    'kek'
+  end
+
+  # expecting: Surrealist::InvalidTypeError
+end
+
 class WithoutSchema
   include Surrealist
 
@@ -208,6 +222,17 @@ RSpec.describe Surrealist do
           expect { WrongTypes.new.surrealize }
             .to raise_error(Surrealist::InvalidTypeError, error_text)
           expect { WrongTypes.new.build_schema }
+            .to raise_error(Surrealist::InvalidTypeError, error_text)
+        end
+      end
+
+      context 'with wrong types' do
+        it 'raises TypeError' do
+          error_text = 'Wrong type for key `foo`. Expected Bool, got String.'
+
+          expect { WrongBoolType.new.surrealize }
+            .to raise_error(Surrealist::InvalidTypeError, error_text)
+          expect { WrongBoolType.new.build_schema }
             .to raise_error(Surrealist::InvalidTypeError, error_text)
         end
       end

@@ -7,18 +7,18 @@ module Surrealist
       # Wraps the schema hash into root/namespaces if there is a need to.
       #
       # @param [Object] hash to be wrapped.
-      # @param [Object] carrier instance of Carrier class that carries arguments passed to +surrealize+
+      # @param [Configuration] configuration instance built from arguments passed to +surrealize+
       # @param [String] klass instance's class name.
       #
       # @return [Hash] a wrapped hash.
-      def wrap(hash, carrier, klass = false)
-        namespaces_condition = carrier.include_namespaces || carrier.namespaces_nesting_level != DEFAULT_NESTING_LEVEL # rubocop:disable Metrics/LineLength
+      def wrap(hash, config, klass = false)
+        namespace_condition = config.include_namespaces? || config.namespace_nesting_level != DEFAULT_NESTING_LEVEL # rubocop:disable Metrics/LineLength
 
-        if !klass && (carrier.include_root || namespaces_condition)
+        if !klass && (config.include_root? || namespace_condition)
           Surrealist::ExceptionRaiser.raise_unknown_root!
         end
 
-        possibly_wrapped_hash(hash, klass, carrier, namespaces_condition)
+        possibly_wrapped_hash(hash, klass, config, namespace_condition)
       end
 
       private
@@ -28,20 +28,20 @@ module Surrealist
       #
       # @param [Object] hash object to be copied.
       # @param [String] klass instance's class name.
-      # @param [Object] carrier instance of Carrier class that carries arguments passed to +surrealize+
-      # @param [Bool] namespaces_condition whether to wrap into namespace.
+      # @param [Configuration] configuration instance built from arguments passed to +surrealize+
+      # @param [Bool] namespace_condition whether to wrap into namespace.
       #
       # @return [Hash] deeply copied hash, possibly wrapped.
-      def possibly_wrapped_hash(hash, klass, carrier, namespaces_condition)
-        return hash if carrier.no_args_provided?
+      def possibly_wrapped_hash(hash, klass, config, namespace_condition)
+        return hash if config.default?
 
-        if carrier.root
-          wrap_schema_into_root(hash, carrier, carrier.root.to_s)
-        elsif namespaces_condition
-          wrap_schema_into_namespace(hash, carrier, klass)
-        elsif carrier.include_root
+        if config.root
+          wrap_schema_into_root(hash, config, config.root.to_s)
+        elsif namespace_condition
+          wrap_schema_into_namespace(hash, config, klass)
+        elsif config.include_root?
           actual_class = Surrealist::StringUtils.extract_class(klass)
-          wrap_schema_into_root(hash, carrier, actual_class)
+          wrap_schema_into_root(hash, config, actual_class)
         else
           hash
         end
@@ -54,8 +54,8 @@ module Surrealist
       # @param [String] root what the schema will be wrapped into
       #
       # @return [Hash] a hash with schema wrapped inside a root key.
-      def wrap_schema_into_root(schema, carrier, root)
-        root_key = if carrier.camelize
+      def wrap_schema_into_root(schema, config, root)
+        root_key = if config.camelize?
                      Surrealist::StringUtils.camelize(root, false).to_sym
                    else
                      Surrealist::StringUtils.underscore(root).to_sym
@@ -69,13 +69,13 @@ module Surrealist
       # Wraps schema into a nested hash of namespaces.
       #
       # @param [Hash] schema main schema.
-      # @param [String] klass name of the class where schema is defined.
       # @param [Object] carrier instance of Carrier class that carries arguments passed to +surrealize+
+      # @param [String] klass name of the class where schema is defined.
       #
       # @return [Hash] nested hash (see +inject_schema+)
-      def wrap_schema_into_namespace(schema, carrier, klass)
+      def wrap_schema_into_namespace(schema, config, klass)
         nested_hash = Surrealist::StringUtils.break_namespaces(
-          klass, carrier.camelize, carrier.namespaces_nesting_level
+          klass, config.camelize?, config.namespace_nesting_level
         )
 
         inject_schema(nested_hash, Surrealist::Copier.deep_copy(schema))

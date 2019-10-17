@@ -2,10 +2,7 @@
 
 require 'oj'
 require 'set'
-require_relative 'surrealist/any'
-require_relative 'surrealist/bool'
 require_relative 'surrealist/builder'
-require_relative 'surrealist/carrier'
 require_relative 'surrealist/class_methods'
 require_relative 'surrealist/copier'
 require_relative 'surrealist/exception_raiser'
@@ -15,15 +12,20 @@ require_relative 'surrealist/instance_methods'
 require_relative 'surrealist/schema_definer'
 require_relative 'surrealist/serializer'
 require_relative 'surrealist/string_utils'
-require_relative 'surrealist/type_helper'
+require_relative 'surrealist/result'
+require_relative 'surrealist/type_systems'
 require_relative 'surrealist/value_assigner'
 require_relative 'surrealist/vars_helper'
 require_relative 'surrealist/wrapper'
+require_relative 'surrealist/configuration'
 
 # Main module that provides the +json_schema+ class method and +surrealize+ instance method.
 module Surrealist
   # Default namespaces nesting level
-  DEFAULT_NESTING_LEVEL = 666
+  DEFAULT_NESTING_LEVEL = Configuration::DEFAULT_NESTING_LEVEL
+  # Expose Surrealist's builtin type system's types
+  Any = TypeSystems::Builtin::Types::Any
+  Bool = TypeSystems::Builtin::Types::Bool
 
   class << self
     # @param [Class] base class to include/extend +Surrealist+.
@@ -128,14 +130,17 @@ module Surrealist
       schema = Surrealist::VarsHelper.find_schema(instance.class)
       Surrealist::ExceptionRaiser.raise_unknown_schema!(instance) if schema.nil?
 
-      parameters = config ? config.merge(args) : args
+      unless instance.class.type_system_override.nil?
+        args.merge!(type_system: instance.class.type_system_override)
+      end
+
+      overridden_config = config.with_overrides(args)
 
       # TODO: Refactor (something pipeline-like would do here, perhaps a builder of some sort)
-      carrier = Surrealist::Carrier.call(parameters)
       copied_schema = Surrealist::Copier.deep_copy(schema)
-      built_schema = Builder.new(carrier, copied_schema, instance).call
-      wrapped_schema = Surrealist::Wrapper.wrap(built_schema, carrier, instance.class.name)
-      carrier.camelize ? Surrealist::HashUtils.camelize_hash(wrapped_schema) : wrapped_schema
+      built_schema = Builder.new(overridden_config, copied_schema, instance).call
+      wrapped_schema = Surrealist::Wrapper.wrap(built_schema, overridden_config, instance.class.name)
+      overridden_config.camelize? ? Surrealist::HashUtils.camelize_hash(wrapped_schema) : wrapped_schema
     end
     # rubocop:enable Metrics/AbcSize
 
@@ -143,12 +148,12 @@ module Surrealist
     #
     # @return [Hash] default arguments (@see Surrealist::Carrier)
     def config
-      @default_args || Surrealist::HashUtils::EMPTY_HASH
+      @config || Configuration::DEFAULT
     end
 
     # Sets default serialization arguments with a block
     #
-    # @param [Hash] hash arguments to be set (@see Surrealist::Carrier)
+    # @param [Hash] hash of arguments to be set (@see Surrealist::Carrier)
     # @param [Proc] _block a block which will be yielded to Surrealist::Carrier instance
     #
     # @example set config
@@ -156,15 +161,31 @@ module Surrealist
     #     config.camelize = true
     #     config.include_root = true
     #   end
-    def configure(hash = nil, &_block)
+    #
+    # rubocop:disable Metrics/MethodLength
+    def configure(config = nil, &_block)
       if block_given?
-        carrier = Surrealist::Carrier.new
-        yield(carrier)
-        @default_args = carrier.parameters
+        Configuration.new.tap do |config_instance|
+          yield config_instance
+          @config = config_instance
+        end
       else
-        @default_args = hash.nil? ? Surrealist::HashUtils::EMPTY_HASH : hash
+        @config =
+          if config.nil?
+            Configuration::DEFAULT
+          elsif config.is_a?(Hash)
+            Configuration.new(config)
+          elsif config.is_a?(Configuration)
+            config
+          else
+            raise ArgumentError, <<~MSG.squish
+              Expected `config` to be a hash, nil, or an instance of Surrealist::Configuration,
+              but got: #{config}
+            MSG
+          end
       end
     end
+    # rubocop:enable Metrics/MethodLength
 
     private
 

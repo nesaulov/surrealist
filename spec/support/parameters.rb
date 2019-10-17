@@ -19,6 +19,8 @@ VALID_PARAMS = [
     root: :root, namespaces_nesting_level: 435 },
   { camelize: true,  include_namespaces: false, include_root: true,
     root: nil, namespaces_nesting_level: 666 },
+  { camelize: true,  include_namespaces: false, include_root: true,
+    root: nil, namespaces_nesting_level: 666 },
 ].freeze
 
 INVALID_PARAMS = [

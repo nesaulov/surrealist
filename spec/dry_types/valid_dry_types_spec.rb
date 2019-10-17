@@ -7,6 +7,8 @@ class ExampleClass; end
 class ValidWithBaseTypes
   include Surrealist
 
+  type_system Surrealist::TypeSystems::DryTypes
+
   json_schema do
     {
       an_any: Types::Any,
@@ -51,6 +53,8 @@ end
 class ValidWithStrictTypes
   include Surrealist
 
+  type_system Surrealist::TypeSystems::DryTypes
+
   json_schema do
     {
       a_nil: Types::Strict::Nil,
@@ -93,6 +97,8 @@ end
 class WithValidCoercibleTypes
   include Surrealist
 
+  type_system Surrealist::TypeSystems::DryTypes
+
   json_schema do
     {
       a_string: Types::Coercible::String,
@@ -114,6 +120,8 @@ end
 
 class WithValidFormTypes
   include Surrealist
+
+  type_system Surrealist::TypeSystems::DryTypes
 
   json_schema do
     {
@@ -149,6 +157,8 @@ end
 class WithValidJsonTypes
   include Surrealist
 
+  type_system Surrealist::TypeSystems::DryTypes
+
   json_schema do
     {
       a_nil: Types::Json::Nil,
@@ -172,6 +182,8 @@ end
 
 class WithValidOptionalAndConstrained
   include Surrealist
+
+  type_system Surrealist::TypeSystems::DryTypes
 
   json_schema do
     {

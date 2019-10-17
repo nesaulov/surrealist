@@ -9,6 +9,8 @@ RSpec.describe 'Dry-types with invalid scenarios' do
     it { expect { instance.build_schema }.to raise_error(Surrealist::InvalidTypeError) }
   end
 
+  before { Surrealist.configure { |c| c.type_system = :dry_types } }
+
   context 'with strict types' do
     context 'nil' do
       let(:instance) do
