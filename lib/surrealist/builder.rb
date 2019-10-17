@@ -7,11 +7,11 @@ module Surrealist
     Schema = Struct.new(:key, :value)
     Schema.freeze
 
-    # @param [Carrier] carrier instance of Surrealist::Carrier
+    # @param [Configuration] instance of Surrealist::Configuration
     # @param [Hash] schema the schema defined in the object's class.
     # @param [Object] instance the instance of the object which methods from the schema are called on.
-    def initialize(carrier, schema, instance)
-      @carrier = carrier
+    def initialize(config, schema, instance)
+      @config = config
       @schema = schema
       @instance = instance
     end
@@ -30,8 +30,11 @@ module Surrealist
         if schema_value.is_a?(Hash)
           check_for_ar(schema, instance, schema_key, schema_value)
         else
-          ValueAssigner.assign(Schema.new(schema_key, schema_value),
-                               instance) { |coerced_value| schema[schema_key] = coerced_value }
+          ValueAssigner.assign(
+            Schema.new(schema_key, schema_value),
+            instance,
+            config,
+          ) { |coerced_value| schema[schema_key] = coerced_value }
         end
       end
     rescue NoMethodError => e
@@ -40,7 +43,7 @@ module Surrealist
 
     private
 
-    attr_reader :carrier, :instance, :schema
+    attr_reader :config, :instance, :schema
 
     # Checks if result is an instance of ActiveRecord::Relation
     #

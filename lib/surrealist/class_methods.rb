@@ -129,6 +129,15 @@ module Surrealist
       end
     end
 
+    # A DSL method for overriding a type system for a specific serializer.
+    #
+    # @param [Class] system the type system to use. Must conform to Surrealist's type system
+    #   interface.
+    def type_system(system)
+      @type_system_override = system
+    end
+    attr_reader :type_system_override
+
     private
 
     def read_schema

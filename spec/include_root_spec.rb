@@ -15,6 +15,8 @@ end
 class SeriousCat
   include Surrealist
 
+  type_system TypeSystems::DryTypes
+
   json_schema do
     {
       weight: Types::String,
@@ -52,6 +54,8 @@ module Instrument
   class Guitar
     include Surrealist
 
+    type_system TypeSystems::DryTypes
+
     json_schema do
       { brand_name: Types::Strict::String }
     end
@@ -66,6 +70,8 @@ class Code
   class Language
     class Ruby
       include Surrealist
+
+      type_system TypeSystems::DryTypes
 
       json_schema do
         { age: Types::String }

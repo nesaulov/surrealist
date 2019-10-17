@@ -41,7 +41,7 @@ module EvilEvents
       end
 
       def core
-        true
+        false
       end
 
       def author
@@ -50,7 +50,7 @@ module EvilEvents
     end
   end
   # expecting: evil_events: { core: {
-  #   metadata: { core: true, author: '0exp' }
+  #   metadata: { core: false, author: '0exp' }
   # } }
 end
 
@@ -323,7 +323,7 @@ RSpec.describe Surrealist do
         {
           evil_events: {
             core: {
-              metadata: { core: true, author: '0exp' },
+              metadata: { core: false, author: '0exp' },
             },
           },
         }
@@ -333,7 +333,7 @@ RSpec.describe Surrealist do
         {
           evilEvents: {
             core: {
-              metadata: { core: true, author: '0exp' },
+              metadata: { core: false, author: '0exp' },
             },
           },
         }
@@ -343,7 +343,7 @@ RSpec.describe Surrealist do
         {
           'evil_events' => {
             'core' => {
-              'metadata' => { 'core' => true, 'author' => '0exp' },
+              'metadata' => { 'core' => false, 'author' => '0exp' },
             },
           },
         }
@@ -353,7 +353,7 @@ RSpec.describe Surrealist do
         {
           'evilEvents' => {
             'core' => {
-              'metadata' => { 'core' => true, 'author' => '0exp' },
+              'metadata' => { 'core' => false, 'author' => '0exp' },
             },
           },
         }

@@ -25,10 +25,10 @@ class Table
 end
 
 RSpec.describe Surrealist::Builder do
-  subject(:result) { described_class.new(carrier, schema, instance).call }
+  subject(:result) { described_class.new(config, schema, instance).call }
 
   let(:instance) { Table.new }
-  let(:carrier) { nil }
+  let(:config) { Surrealist::Configuration::DEFAULT }
 
   context 'valid schema is passed' do
     let(:schema) { Hash[foo: String, bar: Array] }
