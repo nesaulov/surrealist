@@ -131,7 +131,7 @@ module Surrealist
       parameters = config ? config.merge(args) : args
 
       # TODO: Refactor (something pipeline-like would do here, perhaps a builder of some sort)
-      carrier = Surrealist::Carrier.call(parameters)
+      carrier = Surrealist::Carrier.call(**parameters)
       copied_schema = Surrealist::Copier.deep_copy(schema)
       built_schema = Builder.new(carrier, copied_schema, instance).call
       wrapped_schema = Surrealist::Wrapper.wrap(built_schema, carrier, instance.class.name)
