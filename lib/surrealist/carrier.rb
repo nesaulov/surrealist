@@ -22,7 +22,7 @@ module Surrealist
     #
     # @return [Carrier] self if type checks were passed.
     def self.call(**args)
-      new(args).sanitize!
+      new(**args).sanitize!
     end
 
     def initialize(**args)

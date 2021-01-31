@@ -497,10 +497,10 @@ class Car
 
   json_schema do
     {
-      age:            Types::Coercible::Int,
+      age:            Types::Coercible::Integer,
       brand:          Types::Coercible::String,
-      doors:          Types::Int.optional,
-      horsepower:     Types::Strict::Int.constrained(gteq: 20),
+      doors:          Types::Integer.optional,
+      horsepower:     Types::Strict::Integer.constrained(gteq: 20),
       fuel_system:    Types::Any,
       previous_owner: Types::String,
     }

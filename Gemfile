@@ -11,10 +11,10 @@ group :development, :test do
   gem 'coveralls', require: false
   gem 'dry-struct'
   gem 'dry-types'
-  gem 'rom', '~> 4.0'
+  gem 'rom', '~> 5.0'
   gem 'rom-repository'
   gem 'rom-sql'
   gem 'sequel'
-  gem 'sqlite3', '~> 1.4.1'
+  gem 'sqlite3', '~> 1.4'
   gem 'yard', require: false unless ENV['TRAVIS']
 end

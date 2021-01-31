@@ -81,7 +81,7 @@ module Surrealist
     # Checks whether object is a collection or an instance and serializes it
     def surrealize(**args)
       if Helper.collection?(object)
-        Surrealist.surrealize_collection(object, args.merge(context: context))
+        Surrealist.surrealize_collection(object, **args.merge(context: context))
       else
         Surrealist.surrealize(instance: self, **args)
       end
@@ -90,7 +90,7 @@ module Surrealist
     # Passes build_schema to Surrealist
     def build_schema(**args)
       if Helper.collection?(object)
-        build_collection_schema(args)
+        build_collection_schema(**args)
       else
         Surrealist.build_schema(instance: self, **args)
       end
@@ -102,7 +102,7 @@ module Surrealist
 
     # Maps collection and builds schema for each instance.
     def build_collection_schema(**args)
-      object.map { |object| self.class.new(object, context).build_schema(args) }
+      object.map { |object| self.class.new(object, **context).build_schema(**args) }
     end
 
     # Methods not found inside serializer will be invoked on the object

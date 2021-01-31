@@ -49,10 +49,10 @@ module Surrealist
     #   # => "{\"name\":\"Nikita\",\"age\":23}"
     #   # For more examples see README
     def surrealize(**args)
-      return args[:serializer].new(self).surrealize(args) if args[:serializer]
+      return args[:serializer].new(self).surrealize(**args) if args[:serializer]
 
       if (serializer = find_serializer(args[:for]))
-        return serializer.new(self).surrealize(args)
+        return serializer.new(self).surrealize(**args)
       end
 
       Oj.dump(Surrealist.build_schema(instance: self, **args), mode: :compat)
@@ -60,10 +60,10 @@ module Surrealist
 
     # Invokes +Surrealist+'s class method +build_schema+
     def build_schema(**args)
-      return args[:serializer].new(self).build_schema(args) if args[:serializer]
+      return args[:serializer].new(self).build_schema(**args) if args[:serializer]
 
       if (serializer = find_serializer(args[:for]))
-        return serializer.new(self).build_schema(args)
+        return serializer.new(self).build_schema(**args)
       end
 
       Surrealist.build_schema(instance: self, **args)

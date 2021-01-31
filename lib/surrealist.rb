@@ -59,7 +59,7 @@ module Surrealist
       Surrealist::ExceptionRaiser.raise_invalid_collection! unless Helper.collection?(collection)
 
       result = collection.map do |object|
-        Helper.surrealist?(object.class) ? __build_schema(object, args) : object
+        Helper.surrealist?(object.class) ? __build_schema(object, **args) : object
       end
 
       args[:raw] ? result : Oj.dump(result, mode: :compat)
@@ -128,13 +128,13 @@ module Surrealist
       schema = Surrealist::VarsHelper.find_schema(instance.class)
       Surrealist::ExceptionRaiser.raise_unknown_schema!(instance) if schema.nil?
 
-      parameters = config ? config.merge(args) : args
+      parameters = config ? config.merge(**args) : args
 
       # TODO: Refactor (something pipeline-like would do here, perhaps a builder of some sort)
-      carrier = Surrealist::Carrier.call(parameters)
+      carrier = Surrealist::Carrier.call(**parameters)
       copied_schema = Surrealist::Copier.deep_copy(schema)
       built_schema = Builder.new(carrier, copied_schema, instance).call
-      wrapped_schema = Surrealist::Wrapper.wrap(built_schema, carrier, instance.class.name)
+      wrapped_schema = Surrealist::Wrapper.wrap(built_schema, carrier, klass: instance.class.name)
       carrier.camelize ? Surrealist::HashUtils.camelize_hash(wrapped_schema) : wrapped_schema
     end
     # rubocop:enable Metrics/AbcSize
@@ -178,10 +178,10 @@ module Surrealist
     #   provided in the object's class. Values will be taken from the return values
     #   of appropriate methods from the object.
     def __build_schema(object, **args)
-      return args[:serializer].new(object, args[:context].to_h).build_schema(args) if args[:serializer]
+      return args[:serializer].new(object, **args[:context].to_h).build_schema(**args) if args[:serializer]
 
       if (serializer = Surrealist::VarsHelper.find_serializer(object.class, tag: args[:for]))
-        serializer.new(object, args[:context].to_h).build_schema(args)
+        serializer.new(object, **args[:context].to_h).build_schema(**args)
       else
         build_schema(instance: object, **args)
       end
