@@ -33,7 +33,7 @@ module Surrealist
       # @param [Boolean] first_upper should the first letter be capitalized.
       #
       # @return [String] camelized string.
-      def camelize(snake_string, first_upper = true)
+      def camelize(snake_string, first_upper: true)
         if first_upper
           snake_string.to_s.gsub(UNDERSCORE_REGEXP) { Regexp.last_match[1].capitalize }
         else
@@ -73,7 +73,7 @@ module Surrealist
         Surrealist::ExceptionRaiser.raise_invalid_nesting!(nesting_level) unless nesting_level.positive?
 
         klass.split(NAMESPACES_SEPARATOR).last(nesting_level).reverse!.inject({}) do |a, n|
-          key = (camelize ? camelize(uncapitalize(n), false) : underscore(n)).to_sym
+          key = (camelize ? camelize(uncapitalize(n), first_upper: false) : underscore(n)).to_sym
 
           { key => a }
         end

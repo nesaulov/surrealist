@@ -251,9 +251,9 @@ RSpec.describe Surrealist do
           { namespaces_nesting_level: 9 },
           { namespaces_nesting_level: 10 },
           { namespaces_nesting_level: 999 },
-        ].each_with_index do |hash, index|
-          it "works with #{hash} arguments" do
-            expect(instance.build_schema(hash))
+        ].each_with_index do |hsh, index|
+          it "works with #{hsh} arguments" do
+            expect(instance.build_schema(**hsh))
               .to eq(expectations[index])
           end
         end
@@ -305,9 +305,9 @@ RSpec.describe Surrealist do
               namespaces_nesting_level: 'none' },
             { include_root: true, camelize: true, include_namespaces: true,
               namespaces_nesting_level: String },
-          ].each do |hash|
-            it "raises ArgumentError for nesting_level: #{hash[:namespaces_nesting_level]}" do
-              expect { instance.build_schema(hash) }
+          ].each do |hsh|
+            it "raises ArgumentError for nesting_level: #{hsh[:namespaces_nesting_level]}" do
+              expect { instance.build_schema(**hsh) }
                 .to raise_error(ArgumentError,
                                 /Expected `namespaces_nesting_level` to be a positive integer, got/)
             end

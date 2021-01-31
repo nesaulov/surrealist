@@ -24,10 +24,9 @@ RSpec.describe Surrealist::TypeHelper do
       context 'optional dry-types' do
         [
           [nil, Types::Any],
-          [nil, Types::Form::Nil],
-          [nil, Types::Json::Nil],
+          [nil, Types::JSON::Nil],
           [nil, Types::String.optional],
-          [nil, Types::Int.optional],
+          [nil, Types::Integer.optional],
           [nil, Types::Array.optional],
           [nil, Types::Bool.optional],
           [nil, Types::Any.optional],
@@ -42,24 +41,13 @@ RSpec.describe Surrealist::TypeHelper do
           [nil, Types::Date.optional],
           [nil, Types::DateTime.optional],
           [nil, Types::Time.optional],
-          [nil, Types::Form::Nil.optional],
-          [nil, Types::Form::Date.optional],
-          [nil, Types::Form::DateTime.optional],
-          [nil, Types::Form::True.optional],
-          [nil, Types::Form::False.optional],
-          [nil, Types::Form::Bool.optional],
-          [nil, Types::Form::Int.optional],
-          [nil, Types::Form::Float.optional],
-          [nil, Types::Form::Decimal.optional],
-          [nil, Types::Form::Array.optional],
-          [nil, Types::Form::Hash.optional],
-          [nil, Types::Json::Nil.optional],
-          [nil, Types::Json::Date.optional],
-          [nil, Types::Json::DateTime.optional],
-          [nil, Types::Json::Time.optional],
-          [nil, Types::Json::Decimal.optional],
-          [nil, Types::Json::Array.optional],
-          [nil, Types::Json::Hash.optional],
+          [nil, Types::JSON::Nil.optional],
+          [nil, Types::JSON::Date.optional],
+          [nil, Types::JSON::DateTime.optional],
+          [nil, Types::JSON::Time.optional],
+          [nil, Types::JSON::Decimal.optional],
+          [nil, Types::JSON::Array.optional],
+          [nil, Types::JSON::Hash.optional],
         ].each do |params|
           it "returns true for #{params} because value is nil and type is not strict" do
             expect(described_class.valid_type?(*params)).to eq true
@@ -70,7 +58,7 @@ RSpec.describe Surrealist::TypeHelper do
       context 'non-optional dry-types' do
         [
           [nil, Types::String],
-          [nil, Types::Int],
+          [nil, Types::Integer],
           [nil, Types::Array],
           [nil, Types::Bool],
           [nil, Types::Symbol],
@@ -83,21 +71,11 @@ RSpec.describe Surrealist::TypeHelper do
           [nil, Types::Date],
           [nil, Types::DateTime],
           [nil, Types::Time],
-          [nil, Types::Form::Date],
-          [nil, Types::Form::DateTime],
-          [nil, Types::Form::True],
-          [nil, Types::Form::False],
-          [nil, Types::Form::Bool],
-          [nil, Types::Form::Int],
-          [nil, Types::Form::Float],
-          [nil, Types::Form::Decimal],
-          [nil, Types::Form::Array],
-          [nil, Types::Form::Hash],
-          [nil, Types::Json::Date],
-          [nil, Types::Json::DateTime],
-          [nil, Types::Json::Time],
-          [nil, Types::Json::Array],
-          [nil, Types::Json::Hash],
+          [nil, Types::JSON::Date],
+          [nil, Types::JSON::DateTime],
+          [nil, Types::JSON::Time],
+          [nil, Types::JSON::Array],
+          [nil, Types::JSON::Hash],
         ].each do |params|
           it "returns false for #{params} because value is nil" do
             expect(described_class.valid_type?(*params)).to eq false
@@ -111,7 +89,7 @@ RSpec.describe Surrealist::TypeHelper do
           [nil, Types::Strict::True],
           [nil, Types::Strict::False],
           [nil, Types::Strict::Bool],
-          [nil, Types::Strict::Int],
+          [nil, Types::Strict::Integer],
           [nil, Types::Strict::Float],
           [nil, Types::Strict::Decimal],
           [nil, Types::Strict::String],
@@ -142,7 +120,7 @@ RSpec.describe Surrealist::TypeHelper do
 
         context 'types that can\'t be coerced' do
           [
-            [nil, Types::Coercible::Int],
+            [nil, Types::Coercible::Integer],
             [nil, Types::Coercible::Float],
             [nil, Types::Coercible::Decimal],
           ].each do |params|
@@ -171,12 +149,10 @@ RSpec.describe Surrealist::TypeHelper do
     context 'integer values' do
       [
         [666, Integer],
-        [666, Types::Int],
-        [666, Types::Int.optional],
-        [666, Types::Strict::Int],
-        [666, Types::Coercible::Int],
-        [666, Types::Form::Int],
-        [666, Types::Form::Int.optional],
+        [666, Types::Integer],
+        [666, Types::Integer.optional],
+        [666, Types::Strict::Integer],
+        [666, Types::Coercible::Integer],
       ].each do |params|
         it "returns true for #{params}" do
           expect(described_class.valid_type?(*params)).to eq true
@@ -190,10 +166,8 @@ RSpec.describe Surrealist::TypeHelper do
         [%w[an array], Types::Array],
         [%w[an array], Types::Array.optional],
         [%w[an array], Types::Strict::Array],
-        [%w[an array], Types::Json::Array],
-        [%w[an array], Types::Json::Array.optional],
-        [%w[an array], Types::Form::Array],
-        [%w[an array], Types::Form::Array.optional],
+        [%w[an array], Types::JSON::Array],
+        [%w[an array], Types::JSON::Array.optional],
         [%w[an array], Types::Coercible::Array],
         [%w[an array], Types::Coercible::Array.optional],
       ].each do |params|
@@ -209,10 +183,8 @@ RSpec.describe Surrealist::TypeHelper do
         [{ a: :b }, Types::Hash],
         [{ a: :b }, Types::Hash.optional],
         [{ a: :b }, Types::Strict::Hash],
-        [{ a: :b }, Types::Form::Hash],
-        [{ a: :b }, Types::Form::Hash.optional],
-        [{ a: :b }, Types::Json::Hash],
-        [{ a: :b }, Types::Json::Hash.optional],
+        [{ a: :b }, Types::JSON::Hash],
+        [{ a: :b }, Types::JSON::Hash.optional],
         [{ a: :b }, Types::Coercible::Hash],
         [{ a: :b }, Types::Coercible::Hash.optional],
       ].each do |params|
@@ -297,7 +269,7 @@ RSpec.describe Surrealist::TypeHelper do
 
     [
       ['smth', Types::String],
-      [23, Types::Int],
+      [23, Types::Integer],
       [[2], Types::Array],
       [true, Types::Bool],
       [:sym, Types::Symbol],
@@ -310,21 +282,11 @@ RSpec.describe Surrealist::TypeHelper do
       [Date.new, Types::Date],
       [DateTime.new, Types::DateTime],
       [Time.new, Types::Time],
-      [Date.new, Types::Form::Date],
-      [DateTime.new, Types::Form::DateTime],
-      [true, Types::Form::True],
-      [false, Types::Form::False],
-      [true, Types::Form::Bool],
-      [3, Types::Form::Int],
-      [3.5, Types::Form::Float],
-      [56.2, Types::Form::Decimal],
-      [%w[ar ray], Types::Form::Array],
-      [{ k: :v }, Types::Form::Hash],
-      [Date.new, Types::Json::Date],
-      [DateTime.new, Types::Json::DateTime],
-      [Time.new, Types::Json::Time],
-      [%w[ar ray], Types::Json::Array],
-      [{ k: :v }, Types::Json::Hash],
+      [Date.new, Types::JSON::Date],
+      [DateTime.new, Types::JSON::DateTime],
+      [Time.new, Types::JSON::Time],
+      [%w[ar ray], Types::JSON::Array],
+      [{ k: :v }, Types::JSON::Hash],
     ].each do |params|
       it "returns value if it doesn't have to be coerced for #{params}" do
         expect(described_class.coerce(*params)).to eq(params.first)
