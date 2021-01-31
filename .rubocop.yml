@@ -5,7 +5,7 @@ AllCops:
     - './gemfiles/*gemfile'
     - './tmp/*'
 
-Documentation:
+Style/Documentation:
   Exclude:
     - benchmarks/*rb
     - spec/**/*rb
