@@ -102,8 +102,8 @@ unless ruby25
   class RomUser < Dry::Struct
     include Surrealist
 
-    attribute :name, String
-    attribute :email, String
+    attribute :name, 'string'
+    attribute :email, 'string'
 
     json_schema { { email: String } }
   end
