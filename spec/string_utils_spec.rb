@@ -15,7 +15,7 @@ RSpec.describe Surrealist::StringUtils do
       snake_case snake_case::Namespace With1::Numbers with-dashes::and-Namespaces
     ].each_with_index do |string, index|
       it "underscores #{string}" do
-        expect(described_class.underscore(string)). to eq(expectations[index])
+        expect(described_class.underscore(string)).to eq(expectations[index])
       end
     end
   end
@@ -46,7 +46,7 @@ RSpec.describe Surrealist::StringUtils do
       CamelCase
     ].each_with_index do |string, index|
       it "converts #{string} to camelBack" do
-        expect(described_class.camelize(string, false)).to eq(camelback_expectations[index])
+        expect(described_class.camelize(string, first_upper: false)).to eq(camelback_expectations[index])
       end
 
       it "converts #{string} to CamelCase" do

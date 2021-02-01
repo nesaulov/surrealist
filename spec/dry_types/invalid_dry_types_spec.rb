@@ -92,7 +92,7 @@ RSpec.describe 'Dry-types with invalid scenarios' do
       let(:instance) do
         Class.new(Object) do
           include Surrealist
-          json_schema { { an_int: Types::Strict::Int } }
+          json_schema { { an_int: Types::Strict::Integer } }
 
           def an_int; '23'; end
         end.new
@@ -172,7 +172,7 @@ RSpec.describe 'Dry-types with invalid scenarios' do
       let(:instance) do
         Class.new(Object) do
           include Surrealist
-          json_schema { { an_int: Types::Strict::Int.constrained(gteq: 29) } }
+          json_schema { { an_int: Types::Strict::Integer.constrained(gteq: 29) } }
 
           def an_int; 23; end
         end.new

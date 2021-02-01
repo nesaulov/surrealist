@@ -11,8 +11,8 @@ module Surrealist
       # @param [String] klass instance's class name.
       #
       # @return [Hash] a wrapped hash.
-      def wrap(hash, carrier, klass = false)
-        namespaces_condition = carrier.include_namespaces || carrier.namespaces_nesting_level != DEFAULT_NESTING_LEVEL # rubocop:disable Metrics/LineLength
+      def wrap(hash, carrier, klass: false)
+        namespaces_condition = carrier.include_namespaces || carrier.namespaces_nesting_level != DEFAULT_NESTING_LEVEL # rubocop:disable Layout/LineLength
 
         if !klass && (carrier.include_root || namespaces_condition)
           Surrealist::ExceptionRaiser.raise_unknown_root!
@@ -56,7 +56,7 @@ module Surrealist
       # @return [Hash] a hash with schema wrapped inside a root key.
       def wrap_schema_into_root(schema, carrier, root)
         root_key = if carrier.camelize
-                     Surrealist::StringUtils.camelize(root, false).to_sym
+                     Surrealist::StringUtils.camelize(root, first_upper: false).to_sym
                    else
                      Surrealist::StringUtils.underscore(root).to_sym
                    end

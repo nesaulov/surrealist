@@ -15,7 +15,7 @@ module Surrealist
         return hash unless hash.is_a?(Hash)
 
         hash.each_with_object({}) do |(k, v), obj|
-          obj[camelize_key(k, false)] = camelize_hash(v)
+          obj[camelize_key(k, first_upper: false)] = camelize_hash(v)
         end
       end
 
@@ -27,11 +27,12 @@ module Surrealist
       # @param [Boolean] first_upper should the first letter be capitalized.
       #
       # @return [String | Symbol] camelized key of a hash.
-      def camelize_key(key, first_upper = true)
-        if key.is_a? Symbol
-          Surrealist::StringUtils.camelize(key.to_s, first_upper).to_sym
-        elsif key.is_a? String
-          Surrealist::StringUtils.camelize(key, first_upper)
+      def camelize_key(key, first_upper: true)
+        case key
+        when Symbol
+          Surrealist::StringUtils.camelize(key.to_s, first_upper: first_upper).to_sym
+        when String
+          Surrealist::StringUtils.camelize(key, first_upper: first_upper)
         else
           key
         end

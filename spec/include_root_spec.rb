@@ -19,7 +19,7 @@ class SeriousCat
     {
       weight: Types::String,
       cat_food: {
-        amount: Types::Strict::Int,
+        amount: Types::Strict::Integer,
         brand: Types::Strict::String,
       },
     }

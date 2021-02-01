@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/AbcSize,Metrics/MethodLength
+# rubocop:disable Metrics/MethodLength
 require_relative '../lib/surrealist'
 require 'benchmark/ips'
 require 'active_record'
@@ -36,7 +36,7 @@ end
 ActiveModelSerializers.config.adapter = :json
 
 def random_name
-  ('a'..'z').to_a.shuffle.join('').first(10).capitalize
+  ('a'..'z').to_a.shuffle.join.first(10).capitalize
 end
 
 class User < ActiveRecord::Base
@@ -304,4 +304,4 @@ benchmark_associations_collection
 #   Surrealist (associations): collection through Surrealist.surrealize_collection():        2.4 i/s
 #   Surrealist (associations): collection through Surrealist::Serializer:        2.4 i/s - 1.03x  slower
 #   AMS (associations): collection:        1.5 i/s - 1.60x  slower
-# rubocop:enable Metrics/AbcSize,Metrics/MethodLength
+# rubocop:enable Metrics/MethodLength

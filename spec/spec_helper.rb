@@ -30,12 +30,12 @@ RSpec.configure do |config|
   config.order = 'random'
 end
 
-def ruby_24
-  ::RUBY_VERSION =~ /2.4/
+def ruby25
+  ::RUBY_VERSION =~ /2.5/
 end
 
 module Types
-  include Dry::Types.module
+  include Dry.Types
 end
 
 srand RSpec.configuration.seed

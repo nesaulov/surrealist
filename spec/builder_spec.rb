@@ -73,7 +73,7 @@ RSpec.describe Surrealist::Builder do
   context 'invalid schema is passed' do
     context 'with undefined method' do
       let(:schema) { Hash[not_a_method: String] }
-      let(:message) { /undefined method `not_a_method'.* You have probably defined a key in the schema that doesn't have a corresponding method/ } # rubocop:disable Metrics/LineLength
+      let(:message) { /undefined method `not_a_method'.* You have probably defined a key in the schema that doesn't have a corresponding method/ } # rubocop:disable Layout/LineLength
 
       it 'raises UndefinedMethodError' do
         expect { result }.to raise_error(Surrealist::UndefinedMethodError, message)

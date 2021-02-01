@@ -1,27 +1,29 @@
 AllCops:
-  TargetRubyVersion: 2.4
+  TargetRubyVersion: 2.5
+  NewCops: enable
+  SuggestExtensions: false
   Exclude:
     - './gemfiles/*gemfile'
     - './tmp/*'
 
-Documentation:
+Style/Documentation:
   Exclude:
     - benchmarks/*rb
     - spec/**/*rb
 
 #  Layout
 
-Layout/AlignParameters:
+Layout/ParameterAlignment:
   Enabled: true
 
 Layout/EmptyLineBetweenDefs:
   Exclude:
     - spec/**/*rb
 
-Layout/IndentFirstArrayElement:
+Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent
 
-Layout/IndentFirstHashElement:
+Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
 
 Layout/MultilineMethodCallIndentation:
@@ -35,6 +37,10 @@ Layout/SpaceInLambdaLiteral:
 
 Layout/ClosingParenthesisIndentation:
   Enabled: true
+
+Layout/LineLength:
+  Exclude: [ benchmarks/*rb ]
+  Max: 110
 
 # Lint
 Lint/AmbiguousBlockAssociation:
@@ -52,6 +58,19 @@ Lint/NonLocalExitFromIterator:
 Lint/RescueType:
   Enabled: true
 
+Lint/MissingSuper:
+  Enabled: false
+
+Lint/ConstantDefinitionInBlock:
+  Exclude:
+    - spec/**/*rb
+
+Lint/EmptyClass:
+  Enabled: false
+
+Lint/SymbolConversion:
+  Enabled: false
+
 # Metrics
 
 Metrics/BlockLength:
@@ -65,10 +84,6 @@ Metrics/CyclomaticComplexity:
 Metrics/MethodLength:
   Max: 15
 
-Metrics/LineLength:
-  Exclude: [benchmarks/*rb]
-  Max: 110
-
 Metrics/PerceivedComplexity:
   Enabled: false
 
@@ -81,7 +96,7 @@ Naming/AccessorMethodName:
   Enabled: false
 
 Naming/PredicateName:
-  NamePrefixBlacklist:
+  ForbiddenPrefixes:
     - is_
 
 # Style
@@ -152,9 +167,10 @@ Style/TrailingCommaInHashLiteral:
 Style/MissingRespondToMissing:
   Enabled: false
 
-Style/MethodMissingSuper:
-  Enabled: false
-
 Style/EvalWithLocation:
   Exclude:
     - spec/**/*.rb
+
+Style/ClassVars:
+  Enabled: false
+

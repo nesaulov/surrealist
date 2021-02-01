@@ -3,7 +3,7 @@
 class NullCarrier
   attr_reader :camelize, :include_root, :include_namespaces, :namespaces_nesting_level, :root
 
-  def initialize(camelize = false)
+  def initialize(camelize: false)
     @camelize                 = camelize
     @include_root             = false
     @include_namespaces       = false
@@ -83,26 +83,26 @@ RSpec.describe Surrealist::Wrapper do
     ]
 
     context 'with `camelize: true`' do
-      args_with_root_and_camelize.each do |hash|
-        carrier = Surrealist::Carrier.call(hash)
+      args_with_root_and_camelize.each do |hsh|
+        carrier = Surrealist::Carrier.call(**hsh)
         it_behaves_like 'schema is camelized and wrapped in the klass root key' do
-          let(:wrapped_hash) { described_class.wrap(object, carrier, klass) }
+          let(:wrapped_hash) { described_class.wrap(object, carrier, klass: klass) }
         end
       end
     end
 
     context 'with `camelize: false`' do
-      args_with_root_and_without_camelize.each do |hash|
-        carrier = Surrealist::Carrier.call(hash)
+      args_with_root_and_without_camelize.each do |hsh|
+        carrier = Surrealist::Carrier.call(**hsh)
         it_behaves_like 'schema is wrapped in the klass root key' do
-          let(:wrapped_hash) { described_class.wrap(object, carrier, klass) }
+          let(:wrapped_hash) { described_class.wrap(object, carrier, klass: klass) }
         end
       end
     end
 
     context 'without klass' do
-      args_with_root_and_camelize.zip(args_with_root_and_without_camelize).flatten.compact.each do |hash|
-        carrier = Surrealist::Carrier.call(hash)
+      args_with_root_and_camelize.zip(args_with_root_and_without_camelize).flatten.compact.each do |hsh|
+        carrier = Surrealist::Carrier.call(**hsh)
         it_behaves_like 'UnknownRootError is raised' do
           let(:wrapped_hash) { described_class.wrap(object, carrier) }
         end
@@ -110,10 +110,10 @@ RSpec.describe Surrealist::Wrapper do
     end
 
     context 'without wrapping' do
-      args_without_root.each do |hash|
-        carrier = Surrealist::Carrier.call(hash)
+      args_without_root.each do |hsh|
+        carrier = Surrealist::Carrier.call(**hsh)
         it_behaves_like 'hash is cloned deeply and it`s structure is not changed' do
-          let(:copy) { described_class.wrap(object, carrier, klass) }
+          let(:copy) { described_class.wrap(object, carrier, klass: klass) }
         end
       end
     end
@@ -126,20 +126,20 @@ RSpec.describe Surrealist::Wrapper do
       end
 
       context 'with camelize' do
-        let(:copy) { described_class.wrap(object, NullCarrier.new(true)) }
+        let(:copy) { described_class.wrap(object, NullCarrier.new(camelize: true)) }
 
         it_behaves_like 'hash is cloned deeply and it`s structure is not changed'
       end
 
       context 'with klass' do
-        let(:copy) { described_class.wrap(object, NullCarrier.new, klass) }
+        let(:copy) { described_class.wrap(object, NullCarrier.new, klass: klass) }
 
         it_behaves_like 'hash is cloned deeply and it`s structure is not changed'
       end
 
       context 'with klass and camelize' do
         let(:copy) do
-          described_class.wrap(object, NullCarrier.new(true), klass)
+          described_class.wrap(object, NullCarrier.new(camelize: true), klass: klass)
         end
 
         it_behaves_like 'hash is cloned deeply and it`s structure is not changed'

@@ -5,12 +5,12 @@ script: bundle exec rake
 matrix:
   fast_finish: true
   include:
-    - rvm: ruby-head
+    - rvm: 3.0
+      gemfile: Gemfile
+    - rvm: 2.7
       gemfile: Gemfile
     - rvm: 2.6
       gemfile: Gemfile
     - rvm: 2.5
-      gemfile: Gemfile
-    - rvm: 2.4
       gemfile: gemfiles/activerecord42.gemfile
 

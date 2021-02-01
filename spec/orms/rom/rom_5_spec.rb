@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-if ruby_24
+unless ruby25
   class UserModel
     include Surrealist
 
@@ -9,7 +9,9 @@ if ruby_24
     attr_reader :id, :name, :email
 
     def initialize(attributes)
-      @id, @name, @email = attributes.values_at(:id, :name, :email)
+      @id = attributes[:id]
+      @name = attributes[:name]
+      @email = attributes[:email]
     end
   end
 
@@ -25,12 +27,28 @@ if ruby_24
     attr_reader :id, :name, :email
 
     def initialize(attributes)
-      @id, @name, @email = attributes.values_at(:id, :name, :email)
+      @id = attributes.id
+      @name = attributes.name
+      @email = attributes.email
     end
   end
 
-  class DelegatedUser < UserModel
-    delegate_surrealization_to UserModel
+  class SomeUser
+    include Surrealist
+
+    json_schema { { id: Integer, email: String } }
+
+    attr_reader :id, :name, :email
+
+    def initialize(attributes)
+      @id = attributes.id
+      @name = attributes.name
+      @email = attributes.email
+    end
+  end
+
+  class DelegatedUser < SomeUser
+    delegate_surrealization_to SomeUser
 
     def initialize(attributes)
       super
@@ -59,20 +77,22 @@ if ruby_24
     model GrandChildUser
   end
 
-  container = ROM.container(:sql, ['sqlite::memory']) do |conf|
-    conf.default.create_table(:users) do
+  container = ROM.container(:sql, 'sqlite::memory') do |config|
+    config.default.connection.create_table(:users) do
       primary_key :id
       column :name, String, null: false
       column :email, String, null: false
     end
 
-    conf.register_mapper(UsersMapper)
-    conf.register_mapper(MapperWithoutSchema)
-    conf.register_mapper(MapperDelegatedSchema)
-    conf.register_mapper(MapperInheritedDelegatedSchema)
-    conf.commands(:users) do
-      define(:create)
+    config.relation(:users) do
+      schema(infer: true)
+      auto_map false
     end
+
+    config.register_mapper(UsersMapper)
+    config.register_mapper(MapperWithoutSchema)
+    config.register_mapper(MapperDelegatedSchema)
+    config.register_mapper(MapperInheritedDelegatedSchema)
   end
 
   class UserRepo < ROM::Repository[:users]
@@ -82,8 +102,8 @@ if ruby_24
   class RomUser < Dry::Struct
     include Surrealist
 
-    attribute :name, String
-    attribute :email, String
+    attribute :name, 'string'
+    attribute :email, 'string'
 
     json_schema { { email: String } }
   end
@@ -151,7 +171,7 @@ if ruby_24
 
     context 'using ROM::Struct::Model#as(Representative)' do
       context 'instance' do
-        let(:instance) { users.as(RomUser).to_a[1] }
+        let(:instance) { users.map_to(RomUser).to_a[1] }
         let(:result) { '{"email":"dane@as.rom"}' }
 
         it { expect(instance.surrealize).to eq(result) }
@@ -159,7 +179,7 @@ if ruby_24
         it_behaves_like 'error is raised for invalid params: instance'
 
         context '#where().first' do
-          let(:instance) { users.as(RomUser).where(id: 2).first }
+          let(:instance) { users.map_to(RomUser).where(id: 2).first }
 
           it { expect(instance.surrealize).to eq(result) }
           it_behaves_like 'error is not raised for valid params: instance'
@@ -168,7 +188,7 @@ if ruby_24
       end
 
       context 'collection' do
-        let(:collection) { users.as(RomUser).to_a }
+        let(:collection) { users.map_to(RomUser).to_a }
         let(:result) do
           [{ 'email' => 'jane@struct.rom' },
            { 'email' => 'dane@as.rom' },
@@ -180,7 +200,7 @@ if ruby_24
         it_behaves_like 'error is raised for invalid params: collection'
 
         context '#where().to_a' do
-          let(:collection) { users.as(RomUser).where { id < 4 }.to_a }
+          let(:collection) { users.map_to(RomUser).where { id < 4 }.to_a }
 
           it { expect(parsed_collection).to eq(result) }
           it_behaves_like 'error is not raised for valid params: collection'
@@ -191,16 +211,16 @@ if ruby_24
 
     context 'using mapper' do
       context 'instance' do
-        let(:instance) { users.as(:user_obj).to_a[2] }
+        let(:instance) { users.map_with(:user_obj).to_a[2] }
         let(:result) { '{"id":3,"email":"jack@mapper.rom"}' }
 
         it { expect(instance.surrealize).to eq(result) }
-        it { expect(users.as(:user_obj).to_a.size).to eq(3) }
+        it { expect(users.map_with(:user_obj).to_a.size).to eq(3) }
         it_behaves_like 'error is not raised for valid params: instance'
         it_behaves_like 'error is raised for invalid params: instance'
 
         context '#where().first' do
-          let(:instance) { users.as(:user_obj).where(id: 3).first }
+          let(:instance) { users.map_with(:user_obj).where(id: 3).first }
 
           it { expect(instance.surrealize).to eq(result) }
           it_behaves_like 'error is not raised for valid params: instance'
@@ -209,7 +229,7 @@ if ruby_24
       end
 
       context 'collection' do
-        let(:collection) { users.as(:user_obj).to_a }
+        let(:collection) { users.map_with(:user_obj).to_a }
         let(:result) do
           [{ 'id' => 1, 'email' => 'jane@struct.rom' },
            { 'id' => 2, 'email' => 'dane@as.rom' },
@@ -221,7 +241,7 @@ if ruby_24
         it_behaves_like 'error is raised for invalid params: collection'
 
         context '#where().to_a' do
-          let(:collection) { users.as(:user_obj).where { id < 4 }.to_a }
+          let(:collection) { users.map_with(:user_obj).where { id < 4 }.to_a }
 
           it { expect(parsed_collection).to eq(result) }
           it_behaves_like 'error is not raised for valid params: collection'
@@ -231,8 +251,8 @@ if ruby_24
     end
 
     context 'with no schema provided' do
-      let(:instance) { users.as(:user_wo_schema).first }
-      let(:collection) { users.as(:user_wo_schema).to_a }
+      let(:instance) { users.map_with(:user_wo_schema).first }
+      let(:collection) { users.map_with(:user_wo_schema).to_a }
 
       describe 'UnknownSchemaError is raised' do
         specify 'for instance' do
@@ -251,16 +271,16 @@ if ruby_24
 
     context 'with delegated schema' do
       context 'for instance' do
-        let(:instance) { users.as(:user_de_schema).to_a[2] }
+        let(:instance) { users.map_with(:user_de_schema).to_a[2] }
         let(:result) { '{"id":3,"email":"delegated@example.com"}' }
 
         it { expect(instance.surrealize).to eq(result) }
-        it { expect(users.as(:user_de_schema).to_a.size).to eq(3) }
+        it { expect(users.map_with(:user_de_schema).to_a.size).to eq(3) }
         it_behaves_like 'error is not raised for valid params: instance'
         it_behaves_like 'error is raised for invalid params: instance'
 
         context '#where().first' do
-          let(:instance) { users.as(:user_de_schema).where(id: 3).first }
+          let(:instance) { users.map_with(:user_de_schema).where(id: 3).first }
 
           it { expect(instance.surrealize).to eq(result) }
           it_behaves_like 'error is not raised for valid params: instance'
@@ -269,7 +289,7 @@ if ruby_24
       end
 
       context 'for collection' do
-        let(:collection) { users.as(:user_de_schema).to_a }
+        let(:collection) { users.map_with(:user_de_schema).to_a }
         let(:result) do
           [{ 'id' => 1, 'email' => 'delegated@example.com' },
            { 'id' => 2, 'email' => 'delegated@example.com' },
@@ -281,7 +301,7 @@ if ruby_24
         it_behaves_like 'error is raised for invalid params: collection'
 
         context '#where().to_a' do
-          let(:collection) { users.as(:user_de_schema).where { id < 4 }.to_a }
+          let(:collection) { users.map_with(:user_de_schema).where { id < 4 }.to_a }
 
           it { expect(parsed_collection).to eq(result) }
           it_behaves_like 'error is not raised for valid params: collection'
@@ -291,8 +311,8 @@ if ruby_24
     end
 
     context 'with inheritance of class that has delegated but we don\'t delegate' do
-      let(:instance) { users.as(:user_child_de_schema).first }
-      let(:collection) { users.as(:user_child_de_schema).to_a }
+      let(:instance) { users.map_with(:user_child_de_schema).first }
+      let(:collection) { users.map_with(:user_child_de_schema).to_a }
 
       describe 'UnknownSchemaError is raised' do
         specify 'for instance' do

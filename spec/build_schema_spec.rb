@@ -189,21 +189,21 @@ RSpec.describe Surrealist do
   describe '#build_schema' do
     context 'with hash arg' do
       specify do
-        expect(ComplexNumber.new(real: 1, imaginary: 2).build_schema)
+        expect(ComplexNumber.new({ real: 1, imaginary: 2 }).build_schema)
           .to eq(real: 1, imaginary: 2)
       end
     end
 
     context 'deep hash arg' do
       specify do
-        expect(DeepHash.new(list: [1, 2], nested: { right: 4, left: 'three' }).build_schema)
+        expect(DeepHash.new({ list: [1, 2], nested: { right: 4, left: 'three' } }).build_schema)
           .to eq(list: [1, 2], nested: { right: 4, left: 'three' })
       end
     end
 
     context 'root hash with object inside' do
       specify do
-        expect(HashRoot.new(nested: OpenStruct.new(real: 1, imaginary: -1)).build_schema)
+        expect(HashRoot.new({ nested: OpenStruct.new(real: 1, imaginary: -1) }).build_schema)
           .to eq(nested: { real: 1, imaginary: -1 })
       end
     end
