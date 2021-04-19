@@ -42,13 +42,13 @@ RSpec.describe 'Multiple serializers' do
 
   describe 'single item' do
     context 'default' do
-      let(:expectation) { Hash[id: 1, title: 'Ruby is dead', author: { name: 'John' }] }
+      let(:expectation) { { id: 1, title: 'Ruby is dead', author: { name: 'John' } } }
 
       it { expect(post.surrealize).to eq(expectation.to_json) }
     end
 
     context 'specific' do
-      let(:expectation) { Hash[id: 1, title: 'Ruby is dead'] }
+      let(:expectation) { { id: 1, title: 'Ruby is dead' } }
 
       it { expect(post.surrealize(for: :short)).to eq(expectation.to_json) }
       it { expect(post.surrealize(serializer: ShortPostSerializer)).to eq(expectation.to_json) }
