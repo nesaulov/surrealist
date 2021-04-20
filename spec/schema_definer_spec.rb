@@ -6,7 +6,7 @@ RSpec.describe Surrealist::SchemaDefiner do
   let(:instance) { Person }
 
   context 'when hash is passed' do
-    let(:schema) { Hash[a: 1, b: {}] }
+    let(:schema) { { a: 1, b: {} } }
 
     before { described_class.call(instance, schema) }
 

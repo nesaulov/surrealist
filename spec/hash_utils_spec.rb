@@ -5,13 +5,13 @@ RSpec.describe Surrealist::HashUtils do
     subject(:camelized_hash) { described_class.camelize_hash(hash) }
 
     context 'not nested hash' do
-      let(:hash) { Hash[snake_key: 'some value'] }
+      let(:hash) { { snake_key: 'some value' } }
 
       it { expect(camelized_hash.keys.first).to eq(:snakeKey) }
     end
 
     context 'nested hash' do
-      let(:hash) { Hash[snake_key: { nested_key: { one_more_level: true } }] }
+      let(:hash) { { snake_key: { nested_key: { one_more_level: true } } } }
 
       it 'camelizes hash recursively' do
         expect(camelized_hash).to eq(snakeKey: { nestedKey: { oneMoreLevel: true } })
@@ -19,7 +19,7 @@ RSpec.describe Surrealist::HashUtils do
     end
 
     context 'mixed symbols and string' do
-      let(:hash) { Hash[snake_key: { 'nested_key' => { 'one_more_level': true } }] }
+      let(:hash) { { snake_key: { 'nested_key' => { 'one_more_level': true } } } }
 
       it 'camelizes hash recursively' do
         expect(camelized_hash).to eq(snakeKey: { 'nestedKey' => { 'oneMoreLevel': true } })
@@ -27,7 +27,7 @@ RSpec.describe Surrealist::HashUtils do
     end
 
     context 'array as hash key' do
-      let(:hash) { Hash[['some_key'] => 'value'] }
+      let(:hash) { { ['some_key'] => 'value' } }
 
       it { expect(camelized_hash.keys.first).to eq(['some_key']) }
     end

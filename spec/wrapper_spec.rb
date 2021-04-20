@@ -37,7 +37,7 @@ RSpec.describe Surrealist::Wrapper do
       end
     end
 
-    let(:object) { Hash[a: 3, nested_thing: { key: :value }] }
+    let(:object) { { a: 3, nested_thing: { key: :value } } }
     let(:klass) { 'SomeClass' }
     let(:error) { "Can't wrap schema in root key - class name was not passed" }
 
